@@ -1,0 +1,28 @@
+FOCO+ — cómo publicarla en GitHub Pages
+========================================
+
+1. Descomprime el .zip en tu computador. Verás esta carpeta con:
+   index.html, manifest.json, sw.js, perfil.js, LEEME.txt
+   y las carpetas english, sql, lectura, lib, iconos.
+
+2. En github.com crea un repositorio público llamado "foco"
+   (botón "+" arriba a la derecha → New repository).
+
+3. Dentro del repositorio: "uploading an existing file" (o Add file → Upload files).
+   Arrastra TODO el contenido de la carpeta (los archivos y las carpetas,
+   no la carpeta "foco-plus" entera). Usa el computador, no el celular:
+   así se suben también las subcarpetas. Luego "Commit changes".
+
+4. Settings → Pages → Branch: main → / (root) → Save.
+
+5. En 1–2 minutos tu app queda en:  https://TU-USUARIO.github.io/foco/
+   Ábrela en Chrome en tu Android → aparece "Instalar".
+
+AGREGAR UN MÓDULO NUEVO MÁS ADELANTE
+- Una carpeta nueva con su index.html (con ../perfil.js al inicio).
+- Una entrada nueva en la lista MODULOS de index.html.
+- La ruta nueva en la lista ARCHIVOS de sw.js.
+
+CADA VEZ QUE SUBAS CAMBIOS
+- En sw.js cambia VERSION (foco-plus-v1 → foco-plus-v2, etc.) y súbelo junto
+  con lo que cambiaste. Así los teléfonos detectan la actualización.

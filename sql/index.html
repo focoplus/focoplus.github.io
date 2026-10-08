@@ -1,0 +1,834 @@
+<!doctype html><html lang="es"><head><script src="../perfil.js" data-modulo="sql"></script><meta name="theme-color" content="#16213A"><link rel="manifest" href="../manifest.json"><link rel="icon" type="image/png" href="../iconos/favicon.png"><link rel="apple-touch-icon" href="../iconos/apple-touch-icon.png"><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Foco SQL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: una sola columna enfocada (máx 680px) — mapa de lecciones como sendero, una tarea a la vez, barra de acción fija abajo */
+:root {
+  --bg: #eef2f6;
+  --surface: #ffffff;
+  --ink: #17212e;
+  --muted: #5b6878;
+  --line: #d4dce6;
+  --accent: #f2a516;     /* marigold: la "luz de foco" */
+  --accent-ink: #3a2700;
+  --brand: #1f4e79;      /* azul pizarra */
+  --ok: #15805a;
+  --ok-soft: #dff3ea;
+  --bad: #b33a3a;
+  --bad-soft: #f9e3e3;
+  --code-bg: #f4f7fb;
+  --kw: #1f4e79;
+  --str: #9b5a00;
+  --warn-soft: #fdf1d8;
+  --warn-ink: #8a5a00;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111821; --surface: #19232f; --ink: #e8eef5; --muted: #9aa8b8; --line: #2c3a4a;
+  --accent: #f5b53a; --accent-ink: #2a1c00; --brand: #8cc0ef; --ok: #4ccf98; --ok-soft: #12352a;
+  --bad: #f08a8a; --bad-soft: #3b1d1f; --code-bg: #121b25; --kw: #8cc0ef; --str: #f5c46a; --warn-soft: #2e2512; --warn-ink: #f5c46a; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #111821; --surface: #19232f; --ink: #e8eef5; --muted: #9aa8b8; --line: #2c3a4a;
+  --accent: #f5b53a; --accent-ink: #2a1c00; --brand: #8cc0ef; --ok: #4ccf98; --ok-soft: #12352a;
+  --bad: #f08a8a; --bad-soft: #3b1d1f; --code-bg: #121b25; --kw: #8cc0ef; --str: #f5c46a; --warn-soft: #2e2512; --warn-ink: #f5c46a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.55; }
+.wrap { max-width: 680px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 120px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+code, .mono { font-family: var(--f-mono); font-size: .9em; }
+p { margin: 0; }
+
+/* Top bar */
+.top { display: flex; align-items: center; gap: 12px; justify-content: space-between; padding-block: 4px 16px; }
+.brand { display: flex; align-items: baseline; gap: 8px; }
+.brand h1 { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+.brand h1 span { background: var(--accent); color: var(--accent-ink); padding: 0 6px; border-radius: 6px; margin-left: 2px; }
+.stats { display: flex; gap: 8px; font-variant-numeric: tabular-nums; }
+.pill { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-weight: 700; font-size: 15px; white-space: nowrap; }
+.pill small { font-weight: 400; color: var(--muted); }
+.iconbtn { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 10px; padding: 4px 10px; font-size: 14px; }
+
+/* Map */
+.hello { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: grid; gap: 12px; }
+.hello h2 { font-size: 24px; }
+.hello p { color: var(--muted); max-width: 60ch; }
+.next-btn { justify-self: start; }
+.path { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 0; position: relative; }
+.path li { position: relative; padding-left: 56px; padding-block: 6px; }
+.path li::before { content: ""; position: absolute; left: 21px; top: 0; bottom: 0; width: 3px; background: var(--line); }
+.path li:first-child::before { top: 50%; }
+.path li:last-child::before { bottom: 50%; }
+.node { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-mono); font-weight: 600; font-size: 14px; background: var(--surface); border: 3px solid var(--line); color: var(--muted); z-index: 1; font-variant-numeric: tabular-nums; }
+.path li.done .node { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.path li.current .node { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent); }
+.lesson-btn { width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; color: var(--ink); display: grid; gap: 2px; }
+.lesson-btn:hover { border-color: var(--brand); }
+.path li.current .lesson-btn { border: 2px solid var(--accent); }
+.lesson-btn b { font-family: var(--f-display); font-size: 18px; font-weight: 600; }
+.lesson-btn span { color: var(--muted); font-size: 15px; }
+.lesson-btn .kwtag { font-family: var(--f-mono); font-size: 13px; color: var(--brand); }
+.boss .node { border-radius: 8px; }
+.path li.weak .node { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-family: var(--f-display); font-weight: 800; }
+.path li.weak .lesson-btn { border-color: var(--accent); border-style: dashed; }
+.weak-tag { color: var(--warn-ink) !important; font-weight: 700; font-size: 14px !important; }
+.reinforce { margin-top: 16px; background: var(--warn-soft); border: 2px solid var(--accent); border-radius: 18px; padding: 16px 18px; display: grid; gap: 12px; }
+.reinforce p { font-size: 15px; max-width: 60ch; }
+.reinforce-list { display: grid; gap: 8px; }
+.rf-btn { text-align: left; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; display: grid; gap: 2px; }
+.rf-btn:hover { border-color: var(--accent); }
+.rf-btn b { font-family: var(--f-display); font-weight: 600; font-size: 17px; }
+.rf-btn span { color: var(--muted); font-size: 14px; }
+.missed { text-align: left; background: var(--warn-soft); border-radius: 12px; padding: 12px 16px; width: 100%; max-width: 520px; }
+.missed ul { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 15px; }
+.done-card.is-weak .stamp { background: var(--surface); color: var(--accent); border: 6px solid var(--accent); }
+
+
+/* Lesson screen */
+.lesson-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.back { background: none; border: none; color: var(--muted); font-size: 15px; padding: 6px 0; }
+.steps { flex: 1; display: flex; gap: 6px; overflow-x: auto; padding-block: 4px; scrollbar-width: none; }
+.stp { flex: 0 0 auto; min-width: 34px; height: 34px; padding: 0 8px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface); color: var(--muted); font-family: var(--f-mono); font-weight: 600; font-size: 14px; font-variant-numeric: tabular-nums; }
+.stp.learn { font-family: var(--f-body); font-size: 13px; }
+.stp.ok { border-color: var(--ok); color: var(--ok); background: var(--ok-soft); }
+.stp.cur { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.stp:disabled { opacity: .4; cursor: default; }
+.stp:not(:disabled):not(.cur):hover { border-color: var(--brand); }
+.prog-tag { color: var(--brand) !important; font-weight: 700; font-size: 14px !important; }
+.bar { flex: 1; height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .35s ease; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: grid; gap: 14px; }
+.eyebrow { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+.card h2 { font-size: 26px; }
+.card .q { font-size: 19px; font-weight: 700; }
+.explain { display: grid; gap: 10px; max-width: 62ch; }
+.explain b { color: var(--brand); }
+.sql { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-family: var(--f-mono); font-size: 15px; white-space: pre-wrap; word-break: break-word; }
+.sql .k { color: var(--kw); font-weight: 600; }
+.sql .s { color: var(--str); }
+.tip { border-left: 4px solid var(--accent); padding: 4px 0 4px 12px; color: var(--muted); font-size: 15px; }
+
+/* Editor */
+.editor { width: 100%; min-height: 96px; resize: vertical; background: var(--code-bg); color: var(--ink); border: 2px solid var(--line); border-radius: 12px; padding: 12px; font-family: var(--f-mono); font-size: 16px; line-height: 1.5; }
+.editor:focus { border-color: var(--brand); outline: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: 14px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 8px; padding: 5px 10px; }
+.chip.kw { color: var(--kw); font-weight: 600; }
+.chip.tool { color: var(--muted); font-family: var(--f-body); }
+.chip:active { transform: translateY(2px); border-bottom-width: 1px; }
+.chips-label { font-size: 13px; color: var(--muted); }
+
+/* Choose */
+.opts { display: grid; gap: 8px; }
+.opt { text-align: left; background: var(--surface); color: var(--ink); border: 2px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 17px; }
+.opt:hover:not(:disabled) { border-color: var(--brand); }
+.opt.right { border-color: var(--ok); background: var(--ok-soft); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.opt code { font-size: 15px; }
+
+/* Results */
+.result { display: grid; gap: 6px; }
+.result-meta { font-size: 13px; color: var(--muted); }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; max-height: 320px; overflow-y: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 7px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); background: var(--code-bg); position: sticky; top: 0; font-weight: 600; }
+td.num { text-align: right; font-family: var(--f-mono); font-size: 13.5px; }
+tr:last-child td { border-bottom: none; }
+.tlabel { display: inline-flex; align-items: center; gap: 8px; justify-self: start; background: var(--code-bg); border: 1px solid var(--line); border-bottom: none; border-radius: 10px 10px 0 0; padding: 5px 12px; font-size: 13px; color: var(--muted); margin-bottom: -6px; }
+.tlabel b { font-family: var(--f-mono); color: var(--brand); font-size: 14px; }
+.tlabel i { font-style: normal; color: var(--muted); }
+.tablewrap.labeled { border-top-left-radius: 0; }
+.uses { font-size: 15px; color: var(--muted); margin-top: -6px; }
+.uses b { font-family: var(--f-mono); color: var(--brand); font-weight: 600; }
+.err { background: var(--bad-soft); color: var(--bad); border-radius: 12px; padding: 10px 14px; font-size: 15px; }
+
+/* Feedback */
+.feedback { border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; }
+.feedback.ok { background: var(--ok-soft); color: var(--ink); border: 2px solid var(--ok); }
+.feedback.ok strong { color: var(--ok); }
+.feedback.no { background: var(--bad-soft); border: 2px solid var(--bad); }
+.feedback.no strong { color: var(--bad); }
+.linkbtn { background: none; border: none; color: var(--brand); text-decoration: underline; padding: 0; font-size: 15px; justify-self: start; }
+
+/* Action bar */
+.actionbar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 5; }
+.actionbar .in { max-width: 680px; margin: 0 auto; display: flex; gap: 10px; }
+.btn { border-radius: 14px; padding: 13px 20px; font-weight: 700; font-size: 17px; border: 2px solid transparent; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); flex: 1; box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 60%, #000); }
+.btn.primary:active { transform: translateY(2px); box-shadow: none; }
+.btn.ghost { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.btn:disabled { opacity: .5; cursor: default; }
+
+/* Drawer: tablas */
+.drawer { position: fixed; inset: 0; background: color-mix(in srgb, var(--ink) 45%, transparent); z-index: 10; display: grid; align-items: end; }
+.sheet { background: var(--bg); border-radius: 20px 20px 0 0; max-height: 85%; overflow-y: auto; padding: 18px 16px calc(24px + env(safe-area-inset-bottom, 0px)); max-width: 760px; width: 100%; margin: 0 auto; display: grid; gap: 16px; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; }
+.sheet h3 { font-size: 20px; }
+.tname { font-family: var(--f-mono); font-weight: 600; color: var(--brand); }
+.tdesc { color: var(--muted); font-size: 14px; }
+
+/* Done */
+.done-card { text-align: center; justify-items: center; padding-block: 32px; }
+.stamp { width: 110px; height: 110px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 34px; animation: pop .5s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes pop { from { transform: scale(.3) rotate(-20deg); } to { transform: scale(1) rotate(0); } }
+.loading { text-align: center; color: var(--muted); padding: 40px 0; }
+@media (prefers-reduced-motion: reduce) { .stamp { animation: none; } .bar i { transition: none; } }
+@media (max-width: 420px) { .brand h1 { font-size: 22px; } .pill { padding: 3px 9px; font-size: 14px; } .card { padding: 16px; } }
+</style>
+
+<div class="wrap" id="app"><p class="loading">Cargando la base de datos…</p></div>
+<div class="actionbar" id="actionbar" hidden><div class="in" id="actions"></div></div>
+<div class="drawer" id="drawer" hidden></div>
+
+<script src="../lib/sql-asm.js"></script>
+<script>
+/* ================= DATOS: El Almacén ================= */
+const SEED = `
+CREATE TABLE productos (id INTEGER, nombre TEXT, categoria TEXT, precio INTEGER, stock INTEGER);
+INSERT INTO productos VALUES
+(1,'Pan amasado','Panadería',1500,40),
+(2,'Marraqueta (kg)','Panadería',2200,25),
+(3,'Leche entera 1L','Lácteos',1190,30),
+(4,'Yogurt frutilla','Lácteos',450,60),
+(5,'Queso gauda 250g','Lácteos',3290,12),
+(6,'Palta hass (kg)','Verdulería',4990,8),
+(7,'Tomate (kg)','Verdulería',1890,20),
+(8,'Manzana (kg)','Verdulería',1490,35),
+(9,'Bebida cola 1,5L','Bebidas',1790,24),
+(10,'Jugo naranja 1L','Bebidas',1350,0),
+(11,'Té 100 bolsitas','Almacén',2590,15),
+(12,'Arroz grado 1 (kg)','Almacén',1390,50),
+(13,'Fideos espirales','Almacén',990,45),
+(14,'Chocolate en barra','Dulces',1290,18),
+(15,'Galletas de agua','Dulces',890,0);
+CREATE TABLE clientes (id INTEGER, nombre TEXT, comuna TEXT, edad INTEGER);
+INSERT INTO clientes VALUES
+(1,'Camila','Providencia',29),(2,'Benjamín','Maipú',41),(3,'Sofía','Ñuñoa',35),(4,'Matías','Maipú',23),
+(5,'Valentina','Puente Alto',52),(6,'Tomás','Providencia',67),(7,'Isidora','La Florida',19),(8,'Diego','Ñuñoa',38);
+CREATE TABLE ventas (id INTEGER, cliente_id INTEGER, producto_id INTEGER, cantidad INTEGER, fecha TEXT);
+INSERT INTO ventas VALUES
+(1,1,3,2,'2026-09-01'),(2,2,1,10,'2026-09-01'),(3,3,6,1,'2026-09-02'),(4,1,14,3,'2026-09-02'),
+(5,4,9,2,'2026-09-03'),(6,5,12,4,'2026-09-03'),(7,2,7,2,'2026-09-04'),(8,6,11,1,'2026-09-05'),
+(9,3,4,6,'2026-09-05'),(10,7,14,2,'2026-09-06'),(11,8,9,3,'2026-09-06'),(12,4,13,5,'2026-09-07'),
+(13,1,8,2,'2026-09-08'),(14,5,3,3,'2026-09-08'),(15,2,5,1,'2026-09-09'),(16,8,1,6,'2026-09-10');
+`;
+const TABLE_INFO = {
+  productos: 'Lo que vende el almacén: nombre, categoría, precio en pesos y unidades en bodega (stock).',
+  clientes: 'Las personas que compran: nombre, comuna y edad.',
+  ventas: 'Cada compra: quién compró (cliente_id), qué compró (producto_id), cuántas unidades y cuándo.'
+};
+
+/* ================= LECCIONES ================= */
+// type 'choose': {q, options[], answer(index), why}
+// type 'write':  {q, solution, ordered, hint, chips[]}
+// alt: variantes que rotan cada vez que repites la lección (sobrescriben campos del ejercicio base)
+const T = ['productos','clientes','ventas'];
+const LESSONS = [
+{ id:'tablas', title:'¿Qué es una tabla?', kw:'tablas, filas, columnas', blurb:'Lo primero: cómo se guardan los datos.',
+  learn:`<p>Una <b>base de datos</b> es un conjunto de <b>tablas</b>. Cada tabla se parece a una hoja de Excel.</p>
+<p>Cada línea horizontal es una <b>fila</b> (un registro: un producto, un cliente). Cada línea vertical es una <b>columna</b> (un dato de ese registro: nombre, precio).</p>
+<p><b>SQL</b> es el idioma para hacerle preguntas a esas tablas. En este juego trabajas en un almacén de barrio con 3 tablas.</p>`,
+  example:'SELECT * FROM productos;', exampleNote:'Toca "Probar ejemplo" para ver la tabla productos. Todavía no necesitas entender el código.',
+  challenges:[
+    {type:'choose', q:'En la tabla productos, ¿qué es "Pan amasado, Panadería, 1500, 40"?', options:['Una columna','Una fila','Una tabla'], answer:1, why:'Es una línea horizontal con todos los datos de un producto: una fila.',
+      alt:[{q:'En la tabla clientes, ¿qué es "Camila, Providencia, 29"?', why:'Es una línea horizontal con todos los datos de una clienta: una fila.'},
+           {q:'En la tabla ventas, ¿qué es "2, 2, 1, 10, 2026-09-01"?', why:'Son todos los datos de una venta en una línea horizontal: una fila.'}]},
+    {type:'choose', q:'¿Qué es "precio"?', options:['Una fila','Una base de datos','Una columna'], answer:2, why:'"precio" es un dato que tienen todos los productos: una columna.',
+      alt:[{q:'En la tabla clientes, ¿qué es "comuna"?', why:'"comuna" es un dato que tienen todos los clientes: una columna.'},
+           {q:'¿Qué es "clientes"?', options:['Una fila','Una tabla','Una columna'], answer:1, why:'"clientes" agrupa las filas y columnas de todas las personas que compran: es una tabla.'}]},
+    {type:'choose', q:'¿Cuántas columnas tiene la tabla productos?', options:['3','5','15'], answer:1, why:'id, nombre, categoria, precio y stock: 5 columnas. (15 es el número de filas.)',
+      alt:[{q:'¿Cuántas columnas tiene la tabla clientes?', options:['4','8','2'], answer:0, why:'id, nombre, comuna y edad: 4 columnas. (8 es el número de filas.)'},
+           {q:'¿Cuántas filas tiene la tabla clientes?', options:['4','8','16'], answer:1, why:'Hay 8 clientes, una fila por cada uno. (4 es el número de columnas.)'}]},
+  ]},
+{ id:'select', title:'Ver una tabla completa', kw:'SELECT * FROM', blurb:'Tu primera consulta.',
+  learn:`<p>Para ver todo lo que hay en una tabla se escribe:</p>
+<p><b>SELECT</b> significa "muéstrame". El <b>*</b> (asterisco) significa "todas las columnas". <b>FROM</b> significa "de la tabla".</p>`,
+  example:'SELECT * FROM clientes;', exampleNote:'Se lee: "muéstrame todas las columnas de la tabla clientes".',
+  challenges:[
+    {type:'choose', q:'En SQL, ¿qué significa el * en SELECT * ?', options:['Multiplicar','Todas las columnas','Solo la primera fila'], answer:1, why:'Después de SELECT, el * es un comodín que significa "todas las columnas".',
+      alt:[{q:'¿Qué palabra indica de qué tabla se sacan los datos?', options:['SELECT','FROM','*'], answer:1, why:'FROM significa "de la tabla": después de FROM va el nombre de la tabla.'},
+           {q:'¿Qué significa SELECT?', options:['Borrar','Muéstrame','Guardar'], answer:1, why:'SELECT pide mostrar datos. No cambia nada de la tabla.'}]},
+    {type:'write', q:'Muestra la tabla productos completa (todas sus columnas).', solution:'SELECT * FROM productos', hint:'Igual que el ejemplo, pero con la tabla productos.', chips:['SELECT','*','FROM',...T],
+      alt:[{q:'Muestra la tabla clientes completa (todas sus columnas).', solution:'SELECT * FROM clientes', hint:'SELECT * FROM y el nombre de la tabla.'},
+           {q:'Muestra la tabla ventas completa (todas sus columnas).', solution:'SELECT * FROM ventas', hint:'SELECT * FROM y el nombre de la tabla.'}]},
+    {type:'write', q:'Muestra la tabla ventas completa (todas sus columnas).', solution:'SELECT * FROM ventas', hint:'SELECT * FROM y el nombre de la tabla.', chips:['SELECT','*','FROM',...T],
+      alt:[{q:'Muestra la tabla productos completa (todas sus columnas).', solution:'SELECT * FROM productos', hint:'SELECT * FROM productos'},
+           {q:'Muestra la tabla clientes completa (todas sus columnas).', solution:'SELECT * FROM clientes', hint:'SELECT * FROM clientes'}]},
+  ]},
+{ id:'columnas', title:'Elegir columnas', kw:'SELECT col1, col2', blurb:'Muestra solo lo que te importa.',
+  learn:`<p>En vez de <b>*</b> puedes escribir los nombres de las columnas que quieres ver, separados por <b>coma</b>.</p>
+<p>El orden en que las escribes es el orden en que aparecen.</p>`,
+  example:'SELECT nombre, precio FROM productos;', exampleNote:'Solo nombre y precio, sin id, categoría ni stock.',
+  challenges:[
+    {type:'write', q:'Muestra solo el nombre de todos los clientes.', solution:'SELECT nombre FROM clientes', hint:'Cambia el * por la columna nombre.', chips:['SELECT','FROM',',','nombre','comuna','edad','clientes'],
+      alt:[{q:'Muestra solo la comuna de todos los clientes.', solution:'SELECT comuna FROM clientes', hint:'Cambia el * por la columna comuna.'},
+           {q:'Muestra solo la edad de todos los clientes.', solution:'SELECT edad FROM clientes', hint:'Cambia el * por la columna edad.'}]},
+    {type:'write', q:'Muestra el nombre y la comuna de los clientes.', solution:'SELECT nombre, comuna FROM clientes', hint:'Dos columnas separadas por coma: nombre, comuna', chips:['SELECT','FROM',',','nombre','comuna','edad','clientes'],
+      alt:[{q:'Muestra el nombre y la edad de los clientes.', solution:'SELECT nombre, edad FROM clientes', hint:'Dos columnas separadas por coma: nombre, edad'},
+           {q:'Muestra la comuna y el nombre de los clientes, en ese orden.', solution:'SELECT comuna, nombre FROM clientes', hint:'El orden importa: primero comuna, después nombre.'}]},
+    {type:'choose', q:'¿Cuál de estas consultas está bien escrita?', options:['SELECT nombre precio FROM productos','SELECT nombre, precio FROM productos','SELECT nombre, precio, FROM productos'], answer:1, why:'Las columnas van separadas por coma, y no se pone coma antes de FROM.',
+      alt:[{options:['SELECT nombre, edad FROM clientes','SELECT nombre edad FROM clientes','SELECT, nombre, edad FROM clientes'], answer:0, why:'Coma entre columnas, sin coma después de SELECT ni antes de FROM.'},
+           {options:['SELECT categoria, stock, FROM productos','SELECT categoria stock FROM productos','SELECT categoria, stock FROM productos'], answer:2, why:'Coma entre columnas, sin coma antes de FROM.'}]},
+    {type:'write', q:'Muestra el nombre y el stock de los productos.', solution:'SELECT nombre, stock FROM productos', hint:'SELECT nombre, stock FROM …', chips:['SELECT','FROM',',','nombre','categoria','precio','stock','productos'],
+      alt:[{q:'Muestra el nombre y la categoría de los productos.', solution:'SELECT nombre, categoria FROM productos', hint:'SELECT nombre, categoria FROM … (categoria va sin tilde)'},
+           {q:'Muestra el nombre, el precio y el stock de los productos.', solution:'SELECT nombre, precio, stock FROM productos', hint:'Tres columnas, con coma entre cada una.'}]},
+  ]},
+{ id:'where-texto', title:'Filtrar por texto', kw:'WHERE col = \'texto\'', blurb:'Muestra solo las filas que cumplen algo.',
+  learn:`<p><b>WHERE</b> significa "donde". Sirve para quedarte solo con las filas que cumplen una condición.</p>
+<p>Cuando comparas con un texto, el texto va entre <b>comillas simples</b>: <code>'Maipú'</code>. Tiene que estar escrito igual, con tildes y mayúsculas.</p>`,
+  example:"SELECT * FROM clientes WHERE comuna = 'Maipú';", exampleNote:'Solo los clientes cuya comuna es Maipú.',
+  challenges:[
+    {type:'choose', q:'¿Cuál está bien escrita?', options:["WHERE categoria = Lácteos","WHERE categoria = 'Lácteos'","WHERE 'categoria' = Lácteos"], answer:1, why:'El nombre de la columna va sin comillas; el texto que buscas va entre comillas simples.',
+      alt:[{options:["WHERE comuna = 'Maipú'","WHERE comuna = Maipú","WHERE 'comuna' = 'Maipú'"], answer:0, why:'La columna (comuna) va sin comillas; el texto (Maipú) va entre comillas simples.'},
+           {q:'Buscas la categoría Bebidas. ¿Cuál funciona?', options:["WHERE categoria = 'bebidas'","WHERE categoria = 'Bebidas'","WHERE categoria = Bebidas"], answer:1, why:'El texto tiene que estar entre comillas y escrito igual que en la tabla, con la B mayúscula.'}]},
+    {type:'write', q:"Muestra todos los productos de la categoría 'Lácteos'.", solution:"SELECT * FROM productos WHERE categoria = 'Lácteos'", hint:"SELECT * FROM productos WHERE categoria = 'Lácteos'", chips:['SELECT','*','FROM','WHERE','=','productos','categoria',"'Lácteos'","'Bebidas'","'Panadería'"],
+      alt:[{q:"Muestra todos los productos de la categoría 'Bebidas'.", solution:"SELECT * FROM productos WHERE categoria = 'Bebidas'", hint:"WHERE categoria = 'Bebidas'"},
+           {q:"Muestra todos los productos de la categoría 'Panadería'.", solution:"SELECT * FROM productos WHERE categoria = 'Panadería'", hint:"WHERE categoria = 'Panadería' (con tilde)"}]},
+    {type:'write', q:"Muestra el nombre de los clientes que viven en 'Providencia'.", solution:"SELECT nombre FROM clientes WHERE comuna = 'Providencia'", hint:'Elige la columna nombre y filtra por comuna.', chips:['SELECT','FROM','WHERE','=','clientes','nombre','comuna',"'Providencia'","'Maipú'","'La Florida'"],
+      alt:[{q:"Muestra el nombre de los clientes que viven en 'Maipú'.", solution:"SELECT nombre FROM clientes WHERE comuna = 'Maipú'", hint:"SELECT nombre FROM clientes WHERE comuna = 'Maipú'"},
+           {q:"Muestra el nombre y la edad de los clientes de 'La Florida'.", solution:"SELECT nombre, edad FROM clientes WHERE comuna = 'La Florida'", hint:"Dos columnas, y WHERE comuna = 'La Florida'", chips:['SELECT','FROM','WHERE','=',',','clientes','nombre','edad','comuna',"'Providencia'","'La Florida'"]}]},
+  ]},
+{ id:'where-num', title:'Filtrar por números', kw:'>  <  >=  <=  <>', blurb:'Más caro que, menor que, distinto de.',
+  learn:`<p>Con números puedes usar comparaciones. Los números van <b>sin comillas</b>.</p>
+<p><code>&gt;</code> mayor que · <code>&lt;</code> menor que · <code>&gt;=</code> mayor o igual · <code>&lt;=</code> menor o igual · <code>=</code> igual · <code>&lt;&gt;</code> distinto</p>`,
+  example:'SELECT nombre, precio FROM productos WHERE precio > 2000;', exampleNote:'Productos que cuestan más de $2.000.',
+  challenges:[
+    {type:'write', q:'Muestra el nombre y el precio de los productos que cuestan menos de 1000.', solution:'SELECT nombre, precio FROM productos WHERE precio < 1000', hint:'Usa < 1000 (sin punto de miles).', chips:['SELECT','FROM','WHERE',',','>','<','>=','=','productos','nombre','precio','stock','1000','3000','20'],
+      alt:[{q:'Muestra el nombre y el precio de los productos que cuestan más de 3000.', solution:'SELECT nombre, precio FROM productos WHERE precio > 3000', hint:'Usa > 3000 (sin punto de miles).'},
+           {q:'Muestra el nombre y el stock de los productos con menos de 20 unidades.', solution:'SELECT nombre, stock FROM productos WHERE stock < 20', hint:'WHERE stock < 20'}]},
+    {type:'write', q:'¿Qué productos están sin stock? Muestra solo su nombre.', solution:'SELECT nombre FROM productos WHERE stock = 0', hint:'Sin stock significa stock igual a 0.', chips:['SELECT','FROM','WHERE','=','>','<','productos','nombre','precio','stock','0','40','1500'],
+      alt:[{q:'¿Qué productos tienen más de 40 unidades en stock? Muestra solo su nombre.', solution:'SELECT nombre FROM productos WHERE stock > 40', hint:'WHERE stock > 40'},
+           {q:'¿Qué producto cuesta exactamente 1500? Muestra solo su nombre.', solution:'SELECT nombre FROM productos WHERE precio = 1500', hint:'Exactamente = igual: WHERE precio = 1500'}]},
+    {type:'write', q:'Muestra el nombre y la edad de los clientes de 40 años o más.', solution:'SELECT nombre, edad FROM clientes WHERE edad >= 40', hint:'"40 o más" se escribe >= 40', chips:['SELECT','FROM','WHERE',',','>','<','>=','<=','clientes','nombre','edad','40','30'],
+      alt:[{q:'Muestra el nombre y la edad de los clientes menores de 30 años.', solution:'SELECT nombre, edad FROM clientes WHERE edad < 30', hint:'"Menores de 30" se escribe < 30'},
+           {q:'Muestra el nombre y el precio de los productos que cuestan 1000 o menos.', solution:'SELECT nombre, precio FROM productos WHERE precio <= 1000', hint:'"1000 o menos" se escribe <= 1000', chips:['SELECT','FROM','WHERE',',','>','<','>=','<=','productos','nombre','precio','1000']}]},
+  ]},
+{ id:'and-or', title:'Juntar condiciones', kw:'AND · OR', blurb:'Dos condiciones a la vez.',
+  learn:`<p><b>AND</b> (y): la fila tiene que cumplir <b>las dos</b> condiciones.</p>
+<p><b>OR</b> (o): basta con que cumpla <b>una</b> de ellas.</p>`,
+  example:"SELECT nombre, precio FROM productos WHERE categoria = 'Verdulería' AND precio < 2000;", exampleNote:'Verdulería y además barato.',
+  challenges:[
+    {type:'choose', q:"Quieres clientes de Maipú y también clientes de Ñuñoa en el mismo resultado. ¿Qué usas?", options:["comuna = 'Maipú' AND comuna = 'Ñuñoa'","comuna = 'Maipú' OR comuna = 'Ñuñoa'"], answer:1, why:'Nadie vive en dos comunas a la vez, así que AND no devolvería nada. Con OR basta que cumpla una.',
+      alt:[{q:'Quieres productos de Bebidas que además cuesten menos de 1500. ¿Qué usas?', options:["categoria = 'Bebidas' AND precio < 1500","categoria = 'Bebidas' OR precio < 1500"], answer:0, why:'Tiene que cumplir las dos cosas a la vez: AND. Con OR saldrían también productos baratos de otras categorías.'},
+           {q:'Quieres productos de Dulces y también productos de Panadería. ¿Qué usas?', options:["categoria = 'Dulces' AND categoria = 'Panadería'","categoria = 'Dulces' OR categoria = 'Panadería'"], answer:1, why:'Un producto tiene una sola categoría, así que con AND no saldría nada. OR junta los dos grupos.'}]},
+    {type:'write', q:"Muestra los productos de 'Lácteos' que cuestan menos de 1500.", solution:"SELECT * FROM productos WHERE categoria = 'Lácteos' AND precio < 1500", hint:"WHERE categoria = 'Lácteos' AND precio < 1500", chips:['SELECT','*','FROM','WHERE','AND','OR','=','<','>','productos','categoria','precio','stock',"'Lácteos'","'Verdulería'",'1500','10'],
+      alt:[{q:"Muestra los productos de 'Verdulería' con stock mayor a 10.", solution:"SELECT * FROM productos WHERE categoria = 'Verdulería' AND stock > 10", hint:"WHERE categoria = 'Verdulería' AND stock > 10"},
+           {q:"Muestra los clientes de 'Maipú' menores de 30 años.", solution:"SELECT * FROM clientes WHERE comuna = 'Maipú' AND edad < 30", hint:"WHERE comuna = 'Maipú' AND edad < 30", chips:['SELECT','*','FROM','WHERE','AND','OR','=','<','>','clientes','comuna','edad',"'Maipú'",'30']}]},
+    {type:'write', q:"Muestra el nombre de los clientes que viven en 'Maipú' o en 'Providencia'.", solution:"SELECT nombre FROM clientes WHERE comuna = 'Maipú' OR comuna = 'Providencia'", hint:'Repite comuna = en cada lado del OR.', chips:['SELECT','FROM','WHERE','AND','OR','=','clientes','nombre','comuna',"'Maipú'","'Providencia'","'La Florida'","'Ñuñoa'"],
+      alt:[{q:"Muestra el nombre de los clientes que viven en 'Ñuñoa' o en 'La Florida'.", solution:"SELECT nombre FROM clientes WHERE comuna = 'Ñuñoa' OR comuna = 'La Florida'", hint:'Repite comuna = en cada lado del OR.'},
+           {q:"Muestra el nombre de los productos de 'Dulces' o de 'Bebidas'.", solution:"SELECT nombre FROM productos WHERE categoria = 'Dulces' OR categoria = 'Bebidas'", hint:'Repite categoria = en cada lado del OR.', chips:['SELECT','FROM','WHERE','AND','OR','=','productos','nombre','categoria',"'Dulces'","'Bebidas'"]}]},
+  ]},
+{ id:'order', title:'Ordenar resultados', kw:'ORDER BY · DESC', blurb:'De menor a mayor, o al revés.',
+  learn:`<p><b>ORDER BY</b> ordena el resultado por una columna. Va al final de la consulta.</p>
+<p>Por defecto ordena de menor a mayor (o de la A a la Z). Si agregas <b>DESC</b> ordena al revés: de mayor a menor.</p>`,
+  example:'SELECT nombre, precio FROM productos ORDER BY precio DESC;', exampleNote:'Del más caro al más barato.',
+  challenges:[
+    {type:'write', q:'Muestra nombre y precio de los productos, del más barato al más caro.', solution:'SELECT nombre, precio FROM productos ORDER BY precio', ordered:true, hint:'ORDER BY precio, sin DESC.', chips:['SELECT','FROM','ORDER BY','DESC',',','productos','clientes','nombre','precio'],
+      alt:[{q:'Muestra el nombre de los productos ordenados de la A a la Z.', solution:'SELECT nombre FROM productos ORDER BY nombre', hint:'De la A a la Z es el orden normal: ORDER BY nombre'},
+           {q:'Muestra el nombre de los clientes ordenados de la A a la Z.', solution:'SELECT nombre FROM clientes ORDER BY nombre', hint:'ORDER BY nombre, sin DESC.'}]},
+    {type:'write', q:'Muestra nombre y edad de los clientes, del mayor al más joven.', solution:'SELECT nombre, edad FROM clientes ORDER BY edad DESC', ordered:true, hint:'Mayor primero = DESC.', chips:['SELECT','FROM','ORDER BY','DESC',',','clientes','nombre','edad'],
+      alt:[{q:'Muestra nombre y edad de los clientes, del más joven al mayor.', solution:'SELECT nombre, edad FROM clientes ORDER BY edad', hint:'Más joven primero = de menor a mayor, sin DESC.'},
+           {q:'Muestra nombre y precio de los productos, del más caro al más barato.', solution:'SELECT nombre, precio FROM productos ORDER BY precio DESC', hint:'Más caro primero = DESC.', chips:['SELECT','FROM','ORDER BY','DESC',',','productos','nombre','precio']}]},
+    {type:'choose', q:'¿Dónde va el ORDER BY?', options:['Justo después de SELECT','Antes de FROM','Al final, después del WHERE'], answer:2, why:'El orden es: SELECT … FROM … WHERE … ORDER BY …',
+      alt:[{q:'¿Qué hace DESC?', options:['Ordena de mayor a menor','Borra filas','Ordena de menor a mayor'], answer:0, why:'DESC viene de "descendente": de mayor a menor, o de la Z a la A.'},
+           {q:'Si escribes ORDER BY precio sin nada más, ¿cómo queda?', options:['Del más caro al más barato','Del más barato al más caro','Sin ordenar'], answer:1, why:'Por defecto ORDER BY va de menor a mayor. Para lo contrario se agrega DESC.'}]},
+  ]},
+{ id:'limit', title:'Los primeros N', kw:'LIMIT', blurb:'El top 3, el más joven, el más caro.',
+  learn:`<p><b>LIMIT</b> corta el resultado a cierta cantidad de filas. Va al final de todo.</p>
+<p>Junto con ORDER BY sirve para sacar rankings: "los 3 más caros".</p>`,
+  example:'SELECT nombre, precio FROM productos ORDER BY precio DESC LIMIT 3;', exampleNote:'Los 3 productos más caros.',
+  challenges:[
+    {type:'write', q:'Muestra nombre y edad del cliente más joven (solo 1).', solution:'SELECT nombre, edad FROM clientes ORDER BY edad LIMIT 1', ordered:true, hint:'Ordena por edad de menor a mayor y deja solo 1.', chips:['SELECT','FROM','ORDER BY','DESC','LIMIT',',','clientes','productos','nombre','edad','precio','1','3'],
+      alt:[{q:'Muestra nombre y edad del cliente de mayor edad (solo 1).', solution:'SELECT nombre, edad FROM clientes ORDER BY edad DESC LIMIT 1', hint:'Ordena por edad con DESC y deja solo 1.'},
+           {q:'Muestra nombre y precio del producto más caro (solo 1).', solution:'SELECT nombre, precio FROM productos ORDER BY precio DESC LIMIT 1', hint:'ORDER BY precio DESC LIMIT 1'}]},
+    {type:'write', q:'Muestra nombre y stock de los 3 productos con más stock.', solution:'SELECT nombre, stock FROM productos ORDER BY stock DESC LIMIT 3', ordered:true, hint:'ORDER BY stock DESC LIMIT 3', chips:['SELECT','FROM','ORDER BY','DESC','LIMIT',',','productos','clientes','nombre','stock','precio','edad','2','3'],
+      alt:[{q:'Muestra nombre y precio de los 3 productos más baratos.', solution:'SELECT nombre, precio FROM productos ORDER BY precio LIMIT 3', hint:'Más baratos primero (sin DESC) y LIMIT 3.'},
+           {q:'Muestra nombre y edad de los 2 clientes más jóvenes.', solution:'SELECT nombre, edad FROM clientes ORDER BY edad LIMIT 2', hint:'ORDER BY edad LIMIT 2'}]},
+  ]},
+{ id:'like', title:'Buscar parecidos', kw:"LIKE '%texto%'", blurb:'Cuando no sabes el nombre exacto.',
+  learn:`<p><b>LIKE</b> busca textos que se parecen. El símbolo <b>%</b> significa "cualquier cosa, o nada".</p>
+<p><code>'P%'</code> empieza con P · <code>'%kg%'</code> contiene "kg" · <code>'%a'</code> termina en a</p>`,
+  example:"SELECT nombre FROM productos WHERE nombre LIKE '%kg%';", exampleNote:'Productos que se venden por kilo.',
+  challenges:[
+    {type:'write', q:"Muestra el nombre de los productos que empiezan con 'P'.", solution:"SELECT nombre FROM productos WHERE nombre LIKE 'P%'", hint:"WHERE nombre LIKE 'P%'", chips:['SELECT','FROM','WHERE','LIKE','productos','nombre',"'P%'","'%P'","'M%'","'%M'","'%a'"],
+      alt:[{q:"Muestra el nombre de los productos que empiezan con 'M'.", solution:"SELECT nombre FROM productos WHERE nombre LIKE 'M%'", hint:"WHERE nombre LIKE 'M%'"},
+           {q:"Muestra el nombre de los clientes cuyo nombre termina en 'a'.", solution:"SELECT nombre FROM clientes WHERE nombre LIKE '%a'", hint:"Termina en a: el % va antes, '%a'", chips:['SELECT','FROM','WHERE','LIKE','clientes','nombre',"'a%'","'%a'","'%a%'"]}]},
+    {type:'choose', q:"¿Qué encuentra LIKE '%1L'?", options:['Textos que empiezan con 1L','Textos que terminan con 1L','Solo el texto exacto 1L'], answer:1, why:'El % está antes, así que puede venir cualquier cosa antes y el texto tiene que terminar en 1L.',
+      alt:[{q:"¿Qué encuentra LIKE 'Pan%'?", options:['Textos que terminan en Pan','Textos que empiezan con Pan','Textos que no tienen Pan'], answer:1, why:'El % está después: empieza con Pan y luego puede venir cualquier cosa.'},
+           {q:"¿Qué encuentra LIKE '%queso%'?", options:['Textos que contienen "queso" en cualquier parte','Solo el texto exacto queso','Textos sin queso'], answer:0, why:'Con % a los dos lados, "queso" puede estar al inicio, al medio o al final.'}]},
+    {type:'write', q:"Muestra el nombre de los clientes cuyo nombre contiene la letra 'v'.", solution:"SELECT nombre FROM clientes WHERE nombre LIKE '%v%'", hint:"Contiene = % a ambos lados. En este juego LIKE no distingue mayúsculas.", chips:['SELECT','FROM','WHERE','LIKE','clientes','nombre',"'v%'","'%v%'"],
+      alt:[{q:"Muestra el nombre de los productos que contienen '1L'.", solution:"SELECT nombre FROM productos WHERE nombre LIKE '%1L%'", hint:"Contiene = % a ambos lados: '%1L%'", chips:['SELECT','FROM','WHERE','LIKE','productos','nombre',"'1L%'","'%1L%'"]},
+           {q:"Muestra el nombre de los productos que contienen 'kg'.", solution:"SELECT nombre FROM productos WHERE nombre LIKE '%kg%'", hint:"Contiene = % a ambos lados: '%kg%'", chips:['SELECT','FROM','WHERE','LIKE','productos','nombre',"'kg%'","'%kg%'"]}]},
+  ]},
+{ id:'agregados', title:'Contar y sumar', kw:'COUNT · SUM · AVG · MAX', blurb:'Una sola respuesta para toda la tabla.',
+  learn:`<p>Estas funciones resumen muchas filas en un solo número:</p>
+<p><b>COUNT(*)</b> cuenta filas · <b>SUM(col)</b> suma · <b>AVG(col)</b> promedio · <b>MAX(col)</b> el mayor · <b>MIN(col)</b> el menor</p>`,
+  example:'SELECT COUNT(*) FROM productos;', exampleNote:'¿Cuántos productos hay?',
+  challenges:[
+    {type:'write', q:'¿Cuántos clientes hay?', solution:'SELECT COUNT(*) FROM clientes', hint:'SELECT COUNT(*) FROM …', chips:['SELECT','FROM','COUNT(*)','SUM(','AVG(','MAX(',')','clientes','productos','ventas'],
+      alt:[{q:'¿Cuántas ventas hay registradas?', solution:'SELECT COUNT(*) FROM ventas', hint:'SELECT COUNT(*) FROM ventas'},
+           {q:'¿Cuántas filas tiene la tabla clientes?', solution:'SELECT COUNT(*) FROM clientes', hint:'Contar filas = COUNT(*)'}]},
+    {type:'write', q:'¿Cuántas unidades hay en total en bodega? Suma el stock de todos los productos.', solution:'SELECT SUM(stock) FROM productos', hint:'SUM(stock)', chips:['SELECT','FROM','COUNT(*)','SUM(','AVG(','MAX(',')','productos','ventas','clientes','stock','cantidad','edad'],
+      alt:[{q:'¿Cuántas unidades se vendieron en total? Suma la cantidad de todas las ventas.', solution:'SELECT SUM(cantidad) FROM ventas', hint:'SUM(cantidad) FROM ventas'},
+           {q:'¿Cuál es la edad promedio de los clientes?', solution:'SELECT AVG(edad) FROM clientes', hint:'Promedio = AVG(edad)'}]},
+    {type:'write', q:'¿Cuál es el precio más alto?', solution:'SELECT MAX(precio) FROM productos', hint:'MAX(precio)', chips:['SELECT','FROM','SUM(','AVG(','MAX(','MIN(',')','productos','clientes','precio','edad'],
+      alt:[{q:'¿Cuál es el precio más bajo?', solution:'SELECT MIN(precio) FROM productos', hint:'MIN(precio)'},
+           {q:'¿Qué edad tiene el cliente mayor?', solution:'SELECT MAX(edad) FROM clientes', hint:'MAX(edad) FROM clientes'}]},
+    {type:'write', q:"¿Cuántos productos son de 'Verdulería'?", solution:"SELECT COUNT(*) FROM productos WHERE categoria = 'Verdulería'", hint:'COUNT(*) también funciona con WHERE.', chips:['SELECT','FROM','WHERE','=','COUNT(*)','productos','clientes','categoria','comuna','stock',"'Verdulería'","'Maipú'",'0'],
+      alt:[{q:"¿Cuántos clientes viven en 'Maipú'?", solution:"SELECT COUNT(*) FROM clientes WHERE comuna = 'Maipú'", hint:"COUNT(*) con WHERE comuna = 'Maipú'"},
+           {q:'¿Cuántos productos están sin stock?', solution:'SELECT COUNT(*) FROM productos WHERE stock = 0', hint:'COUNT(*) con WHERE stock = 0'}]},
+  ]},
+{ id:'group', title:'Agrupar', kw:'GROUP BY', blurb:'Un resumen por cada categoría.',
+  learn:`<p><b>GROUP BY</b> junta las filas que tienen el mismo valor y calcula un resumen para cada grupo.</p>
+<p>En el SELECT pones la columna con la que agrupas y la función (COUNT, SUM…).</p>`,
+  example:'SELECT categoria, COUNT(*) FROM productos GROUP BY categoria;', exampleNote:'Cuántos productos hay en cada categoría.',
+  challenges:[
+    {type:'write', q:'¿Cuántos clientes hay en cada comuna? Muestra comuna y cantidad.', solution:'SELECT comuna, COUNT(*) FROM clientes GROUP BY comuna', hint:'Igual que el ejemplo, pero con clientes y comuna.', chips:['SELECT','FROM','GROUP BY','COUNT(*)','SUM(','AVG(',')',',','clientes','ventas','comuna','edad','cliente_id'],
+      alt:[{q:'¿Cuántas ventas tiene cada cliente_id? Muestra cliente_id y la cantidad de ventas.', solution:'SELECT cliente_id, COUNT(*) FROM ventas GROUP BY cliente_id', hint:'GROUP BY cliente_id y COUNT(*)'},
+           {q:'¿Cuál es la edad promedio en cada comuna? Muestra comuna y el promedio.', solution:'SELECT comuna, AVG(edad) FROM clientes GROUP BY comuna', hint:'AVG(edad) y GROUP BY comuna'}]},
+    {type:'write', q:'¿Cuánto stock hay en cada categoría? Muestra categoria y la suma del stock.', solution:'SELECT categoria, SUM(stock) FROM productos GROUP BY categoria', hint:'SELECT categoria, SUM(stock) … GROUP BY categoria', chips:['SELECT','FROM','GROUP BY','COUNT(*)','SUM(','MAX(',')',',','productos','ventas','categoria','stock','precio','producto_id','cantidad'],
+      alt:[{q:'¿Cuál es el precio más alto de cada categoría? Muestra categoria y el máximo.', solution:'SELECT categoria, MAX(precio) FROM productos GROUP BY categoria', hint:'MAX(precio) y GROUP BY categoria'},
+           {q:'¿Cuántas unidades se vendieron de cada producto_id? Muestra producto_id y la suma de cantidad.', solution:'SELECT producto_id, SUM(cantidad) FROM ventas GROUP BY producto_id', hint:'SUM(cantidad) FROM ventas GROUP BY producto_id'}]},
+    {type:'write', q:'En la tabla ventas, ¿cuántas unidades compró cada cliente_id? Muestra cliente_id y la suma de cantidad.', solution:'SELECT cliente_id, SUM(cantidad) FROM ventas GROUP BY cliente_id', hint:'Agrupa por cliente_id y suma cantidad.', chips:['SELECT','FROM','GROUP BY','COUNT(*)','SUM(',')',',','ventas','cliente_id','fecha','cantidad'],
+      alt:[{q:'¿Cuántas ventas hubo cada fecha? Muestra fecha y la cantidad de ventas.', solution:'SELECT fecha, COUNT(*) FROM ventas GROUP BY fecha', hint:'GROUP BY fecha y COUNT(*)'},
+           {q:'¿Cuántas unidades se vendieron cada fecha? Muestra fecha y la suma de cantidad.', solution:'SELECT fecha, SUM(cantidad) FROM ventas GROUP BY fecha', hint:'SUM(cantidad) y GROUP BY fecha'}]},
+  ]},
+{ id:'join', title:'Unir tablas', kw:'JOIN … ON', blurb:'Cambiar números por nombres.',
+  learn:`<p>La tabla ventas no dice el nombre del cliente: dice <b>cliente_id</b>, que es el <b>id</b> de la tabla clientes.</p>
+<p><b>JOIN</b> une dos tablas, y <b>ON</b> dice qué columnas tienen que coincidir. Como hay dos tablas, escribes <code>tabla.columna</code> para no confundirte.</p>`,
+  example:'SELECT clientes.nombre, ventas.cantidad, ventas.fecha\nFROM ventas\nJOIN clientes ON ventas.cliente_id = clientes.id;', exampleNote:'Cada venta, ahora con el nombre de quien compró.',
+  challenges:[
+    {type:'choose', q:'¿Para qué sirve el ON en un JOIN?', options:['Para ordenar','Para decir qué columnas conectan las dos tablas','Para encender la base de datos'], answer:1, why:'ON dice cómo emparejar las filas: ventas.cliente_id con clientes.id.',
+      alt:[{q:'En la tabla ventas, la columna producto_id coincide con…', options:['clientes.id','productos.id','ventas.id'], answer:1, why:'producto_id guarda el id del producto vendido, o sea productos.id.'},
+           {q:'¿Qué significa escribir clientes.nombre?', options:['La columna nombre de la tabla clientes','Un nombre con punto final','Una tabla nueva'], answer:0, why:'tabla.columna: primero la tabla y después la columna. Sirve cuando dos tablas tienen columnas con el mismo nombre.'}]},
+    {type:'write', q:'Muestra el nombre del producto y la cantidad de cada venta.', solution:'SELECT productos.nombre, ventas.cantidad FROM ventas JOIN productos ON ventas.producto_id = productos.id', hint:'Igual que el ejemplo, pero con productos y producto_id.', chips:['SELECT','FROM','JOIN','ON','=',',','ventas','productos','clientes','productos.nombre','clientes.nombre','ventas.cantidad','ventas.fecha','ventas.producto_id','ventas.cliente_id','productos.id','clientes.id'],
+      alt:[{q:'Muestra el nombre del cliente y la fecha de cada venta.', solution:'SELECT clientes.nombre, ventas.fecha FROM ventas JOIN clientes ON ventas.cliente_id = clientes.id', hint:'JOIN clientes ON ventas.cliente_id = clientes.id'},
+           {q:'Muestra el nombre del producto y la fecha de cada venta.', solution:'SELECT productos.nombre, ventas.fecha FROM ventas JOIN productos ON ventas.producto_id = productos.id', hint:'JOIN productos ON ventas.producto_id = productos.id'}]},
+    {type:'write', q:"Muestra la fecha de las ventas hechas a clientes de 'Maipú'.", solution:"SELECT ventas.fecha FROM ventas JOIN clientes ON ventas.cliente_id = clientes.id WHERE clientes.comuna = 'Maipú'", hint:'Haz el JOIN con clientes y después agrega WHERE clientes.comuna = …', chips:['SELECT','FROM','JOIN','ON','WHERE','=','ventas','clientes','ventas.fecha','ventas.cliente_id','clientes.id','clientes.comuna',"'Maipú'","'Ñuñoa'"],
+      alt:[{q:"Muestra la fecha de las ventas hechas a clientes de 'Ñuñoa'.", solution:"SELECT ventas.fecha FROM ventas JOIN clientes ON ventas.cliente_id = clientes.id WHERE clientes.comuna = 'Ñuñoa'", hint:"JOIN con clientes y WHERE clientes.comuna = 'Ñuñoa'"},
+           {q:"Muestra la cantidad de cada venta de productos 'Lácteos'.", solution:"SELECT ventas.cantidad FROM ventas JOIN productos ON ventas.producto_id = productos.id WHERE productos.categoria = 'Lácteos'", hint:"JOIN con productos y WHERE productos.categoria = 'Lácteos'", chips:['SELECT','FROM','JOIN','ON','WHERE','=','ventas','productos','ventas.cantidad','ventas.producto_id','productos.id','productos.categoria',"'Lácteos'"]}]},
+  ]},
+{ id:'jefe', boss:true, title:'Desafío final', kw:'todo junto', blurb:'Preguntas reales de un almacén.',
+  learn:`<p>Ahora mezclas todo lo que aprendiste. No hay ejemplo nuevo: usa las pistas si te trabas.</p>
+<p>Recuerda el orden: <b>SELECT … FROM … JOIN … ON … WHERE … GROUP BY … ORDER BY … LIMIT</b></p>`,
+  example:'', exampleNote:'',
+  challenges:[
+    {type:'write', q:'¿Cuáles son los 2 clientes que más unidades compraron? Muestra su nombre y el total, del mayor al menor.', solution:'SELECT clientes.nombre, SUM(ventas.cantidad) AS total FROM ventas JOIN clientes ON ventas.cliente_id = clientes.id GROUP BY clientes.nombre ORDER BY total DESC LIMIT 2', ordered:true, hint:'JOIN con clientes, GROUP BY clientes.nombre, ORDER BY SUM(ventas.cantidad) DESC, LIMIT 2.', chips:['SELECT','FROM','JOIN','ON','GROUP BY','ORDER BY','DESC','LIMIT','SUM(',')','AS','=',',','ventas','clientes','productos','clientes.nombre','clientes.comuna','productos.nombre','ventas.cantidad','ventas.cliente_id','ventas.producto_id','clientes.id','productos.id','total','1','2'],
+      alt:[{q:'¿Cuáles son los 2 productos más vendidos en unidades? Muestra su nombre y el total, del mayor al menor.', solution:'SELECT productos.nombre, SUM(ventas.cantidad) AS total FROM ventas JOIN productos ON ventas.producto_id = productos.id GROUP BY productos.nombre ORDER BY total DESC LIMIT 2', hint:'JOIN con productos, GROUP BY productos.nombre, ORDER BY SUM(ventas.cantidad) DESC, LIMIT 2.'},
+           {q:'¿Qué comuna compró más unidades? Muestra solo esa comuna y su total.', solution:'SELECT clientes.comuna, SUM(ventas.cantidad) AS total FROM ventas JOIN clientes ON ventas.cliente_id = clientes.id GROUP BY clientes.comuna ORDER BY total DESC LIMIT 1', hint:'JOIN con clientes, GROUP BY clientes.comuna, ORDER BY total DESC, LIMIT 1.'}]},
+    {type:'write', q:"¿Cuántas unidades se vendieron de productos 'Lácteos'? Responde con un solo número.", solution:"SELECT SUM(ventas.cantidad) FROM ventas JOIN productos ON ventas.producto_id = productos.id WHERE productos.categoria = 'Lácteos'", hint:'JOIN con productos, WHERE por categoría y SUM de la cantidad.', chips:['SELECT','FROM','JOIN','ON','WHERE','SUM(',')','=','ventas','productos','clientes','ventas.cantidad','ventas.producto_id','ventas.cliente_id','productos.id','clientes.id','productos.categoria','clientes.comuna',"'Lácteos'","'Verdulería'","'Providencia'"],
+      alt:[{q:"¿Cuántas unidades se vendieron de productos 'Verdulería'? Responde con un solo número.", solution:"SELECT SUM(ventas.cantidad) FROM ventas JOIN productos ON ventas.producto_id = productos.id WHERE productos.categoria = 'Verdulería'", hint:"JOIN con productos, WHERE productos.categoria = 'Verdulería' y SUM."},
+           {q:"¿Cuántas unidades compraron los clientes de 'Providencia'? Responde con un solo número.", solution:"SELECT SUM(ventas.cantidad) FROM ventas JOIN clientes ON ventas.cliente_id = clientes.id WHERE clientes.comuna = 'Providencia'", hint:"JOIN con clientes, WHERE clientes.comuna = 'Providencia' y SUM."}]},
+    {type:'write', q:'¿Cuántas ventas se hicieron en cada comuna? Muestra comuna y cantidad de ventas.', solution:'SELECT clientes.comuna, COUNT(*) FROM ventas JOIN clientes ON ventas.cliente_id = clientes.id GROUP BY clientes.comuna', hint:'JOIN con clientes y GROUP BY clientes.comuna, contando con COUNT(*).', chips:['SELECT','FROM','JOIN','ON','GROUP BY','COUNT(*)','SUM(',')','=',',','ventas','clientes','productos','clientes.comuna','clientes.nombre','productos.categoria','ventas.cantidad','ventas.cliente_id','ventas.producto_id','clientes.id','productos.id'],
+      alt:[{q:'¿Cuántas ventas tuvo cada categoría? Muestra categoria y cantidad de ventas.', solution:'SELECT productos.categoria, COUNT(*) FROM ventas JOIN productos ON ventas.producto_id = productos.id GROUP BY productos.categoria', hint:'JOIN con productos y GROUP BY productos.categoria, contando con COUNT(*).'},
+           {q:'¿Cuántas unidades compró cada cliente? Muestra su nombre y la suma de cantidad.', solution:'SELECT clientes.nombre, SUM(ventas.cantidad) FROM ventas JOIN clientes ON ventas.cliente_id = clientes.id GROUP BY clientes.nombre', hint:'JOIN con clientes, GROUP BY clientes.nombre y SUM(ventas.cantidad).'}]},
+  ]},
+];
+const XP_PER = 10;
+
+/* ================= LÓGICA DE CORRECCIÓN ================= */
+function norm(v){
+  if (v === null || v === undefined) return '∅';
+  if (typeof v === 'number') return (Math.round(v*100)/100).toString();
+  return String(v).trim();
+}
+function runSQL(db, sql){
+  lastSql = sql;
+  const res = db.exec(sql);
+  if (!res.length) return {columns:[], values:[]};
+  return res[res.length-1];
+}
+function check(db, ch, userSql){
+  let got, exp;
+  try { got = runSQL(db, userSql); } catch(e){ return {ok:false, error: friendlyError(e.message)}; }
+  exp = runSQL(db, ch.solution);
+  if (!got.columns.length){
+    return {ok:false, got, msg:'Tu consulta no devolvió ninguna fila. Revisa el filtro: los textos tienen que estar escritos igual que en la tabla, con tildes y mayúsculas.'};
+  }
+  if (got.columns.length !== exp.columns.length){
+    return {ok:false, got, msg:`Tu resultado tiene ${got.columns.length} columna${got.columns.length===1?'':'s'} y se esperaban ${exp.columns.length}. Revisa qué pusiste después de SELECT.`};
+  }
+  if (got.values.length !== exp.values.length){
+    return {ok:false, got, msg:`Tu resultado tiene ${got.values.length} fila${got.values.length===1?'':'s'} y se esperaban ${exp.values.length}. Revisa el filtro (WHERE) o el LIMIT.`};
+  }
+  const g = got.values.map(r => r.map(norm).join('␟'));
+  const e = exp.values.map(r => r.map(norm).join('␟'));
+  if (ch.ordered){
+    const same = g.every((r,i)=>r===e[i]);
+    if (!same){
+      const ms = [...g].sort().join('|') === [...e].sort().join('|');
+      return {ok:false, got, msg: ms ? 'Tienes los datos correctos, pero en otro orden. Revisa el ORDER BY (¿falta o sobra DESC?).' : 'Las filas no son las esperadas. Revisa columnas y filtro.'};
+    }
+  } else {
+    if ([...g].sort().join('|') !== [...e].sort().join('|')) return {ok:false, got, msg:'El resultado no coincide. Revisa las columnas, el filtro y que los textos estén escritos igual (tildes y mayúsculas).'};
+  }
+  return {ok:true, got};
+}
+let lastSql = '';
+function friendlyError(m){
+  if (/no such table/i.test(m)) return 'Esa tabla no existe. Las tablas son: productos, clientes y ventas. ('+m+')';
+  const col = (m.match(/no such column: (\w+)/i) || [])[1];
+  if (col && T.includes(col.toLowerCase())) return `${col} es el nombre de una tabla, no de una columna. Las tablas van después de FROM: SELECT * FROM ${col}`;
+  if (/no such column/i.test(m)) return 'Esa columna no existe. Toca "Ver tablas" para ver los nombres. ('+m+')';
+  const near = (m.match(/near "([^"]+)"/) || [])[1];
+  if (near && T.includes(near.toLowerCase()) && !/\bFROM\s+$/i.test(lastSql.slice(0, lastSql.toLowerCase().indexOf(near.toLowerCase())))) return `Antes del nombre de la tabla (${near}) va la palabra FROM. Ejemplo: SELECT * FROM ${near}`;
+  if (/syntax error/i.test(m)) return 'Hay algo mal escrito cerca de donde indica el mensaje. Revisa comas, comillas y el orden de las palabras. ('+m+')';
+  if (/incomplete input/i.test(m)) return 'La consulta quedó incompleta. ¿Falta cerrar una comilla o un paréntesis?';
+  return m;
+}
+
+/* ================= ESTADO ================= */
+const store = {
+  get(){ try { return JSON.parse(localStorage.getItem('foco-sql') || 'null'); } catch(e){ return null; } },
+  set(v){ try { localStorage.setItem('foco-sql', JSON.stringify(v)); } catch(e){} }
+};
+const today = () => new Date().toISOString().slice(0,10);
+const fresh = () => ({done:{}, stats:{}, runs:{}, inprog:{}, xp:0, streak:0, lastDay:null});
+let P = Object.assign(fresh(), store.get() || {});
+P.stats = P.stats || {}; P.runs = P.runs || {}; P.inprog = P.inprog || {};
+function save(){ store.set(P); }
+function bumpStreak(){
+  const t = today();
+  if (P.lastDay === t) return;
+  const y = new Date(Date.now()-864e5).toISOString().slice(0,10);
+  P.streak = (P.lastDay === y) ? P.streak + 1 : 1;
+  P.lastDay = t;
+}
+
+let DB = null;
+let S = {screen:'map', li:0, run:0, step:0, maxStep:0, solvedSteps:[], finished:false, tries:0, solved:false, draft:'', lessonXp:0, errors:0, missed:[], order:null, sawSol:false};
+
+/* ================= RENDER ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KW = /\b(SELECT|FROM|WHERE|AND|OR|ORDER BY|GROUP BY|DESC|ASC|LIMIT|LIKE|JOIN|ON|AS|COUNT|SUM|AVG|MAX|MIN)\b/g;
+function hl(sql){
+  return esc(sql).split(/('[^']*')/).map(p => p.startsWith("'") ? `<span class="s">${p}</span>` : p.replace(KW,'<span class="k">$1</span>')).join('');
+}
+function tablesIn(sql){
+  const found = [];
+  (sql || '').replace(/\b(?:FROM|JOIN)\s+([a-z_]+)/gi, (m, t) => { t = t.toLowerCase(); if (T.includes(t) && !found.includes(t)) found.push(t); });
+  return found;
+}
+function tableLabel(sql){
+  const ts = tablesIn(sql);
+  if (!ts.length) return '';
+  return `<div class="tlabel"><span>${ts.length > 1 ? 'Tablas' : 'Tabla'}</span>${ts.map(t => `<b>${t}</b>`).join('<i>+</i>')}</div>`;
+}
+function usesLine(sql){
+  const ts = tablesIn(sql);
+  if (!ts.length) return '';
+  return `<p class="uses">${ts.length > 1 ? 'Trabajas con las tablas' : 'Trabajas con la tabla'} ${ts.map(t => `<b>${t}</b>`).join(' y ')}</p>`;
+}
+function tableHTML(r, sql){
+  if (!r.columns.length) return tableLabel(sql) + '<p class="result-meta">La consulta no devolvió filas.</p>';
+  const head = r.columns.map(c=>`<th>${esc(c)}</th>`).join('');
+  const body = r.values.length ? r.values.map(row => '<tr>'+row.map(v => `<td class="${typeof v==='number'?'num':''}">${v===null?'—':esc(typeof v==='number'?norm(v):v)}</td>`).join('')+'</tr>').join('')
+    : `<tr><td colspan="${r.columns.length}">Sin filas</td></tr>`;
+  return tableLabel(sql) + `<div class="tablewrap${sql?' labeled':''}"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>
+  <p class="result-meta">${r.values.length} fila${r.values.length===1?'':'s'}</p>`;
+}
+function nextIndex(){ const i = LESSONS.findIndex(l => !P.done[l.id]); return i === -1 ? LESSONS.length-1 : i; }
+function statusOf(l){ return !P.done[l.id] ? '' : (P.stats[l.id] && P.stats[l.id].weak ? 'weak' : 'done'); }
+function topbar(){
+  return `<div class="top"><div class="brand"><h1>Foco <span>SQL</span></h1></div>
+  <div class="stats"><span class="pill" title="Puntos">${P.xp} <small>XP</small></span><span class="pill" title="Días seguidos">${P.streak||0} <small>${P.streak===1?'día':'días'}</small></span></div></div>`;
+}
+function setActions(html){
+  const bar = $('#actionbar');
+  if (!html){ bar.hidden = true; return; }
+  $('#actions').innerHTML = html; bar.hidden = false;
+}
+
+function renderMap(){
+  S.screen = 'map';
+  const ni = nextIndex();
+  const total = LESSONS.length, doneN = LESSONS.filter(l=>P.done[l.id]).length;
+  const weak = LESSONS.map((l,i)=>({l,i})).filter(x => statusOf(x.l) === 'weak');
+  const allDone = doneN === total;
+  $('#app').innerHTML = topbar() + `
+  <section class="hello">
+    <h2>${doneN===0 ? 'Aprende SQL desde cero, de a poquito' : allDone ? (weak.length ? 'Terminaste el camino, te queda reforzar' : '¡Terminaste todo el camino!') : 'Sigue donde quedaste'}</h2>
+    <p>${doneN===0 ? 'Cada lección dura unos 3 minutos: una idea corta y unas pocas misiones. Trabajas con datos reales de un almacén de barrio.' : allDone ? 'Puedes repetir cualquier lección para practicar. Cada vez que la repites, los ejercicios cambian.' : `Llevas ${doneN} de ${total} lecciones. La siguiente: <b>${esc(LESSONS[ni].title)}</b>.`}</p>
+    ${allDone ? '' : `<button class="btn primary next-btn" id="go">${doneN===0?'Empezar':'Continuar'}</button>`}
+  </section>
+  ${weak.length ? `<section class="reinforce">
+    <div><span class="eyebrow">Para reforzar</span>
+    <p>En ${weak.length===1?'esta lección':'estas lecciones'} te equivocaste varias veces. Repítela${weak.length===1?'':'s'} con ejercicios nuevos hasta pasarla${weak.length===1?'':'s'} con 1 error o menos.</p></div>
+    <div class="reinforce-list">${weak.map(x => `<button class="rf-btn" data-i="${x.i}"><b>${esc(x.l.title)}</b><span>${P.stats[x.l.id].errors} errores la última vez · ${esc(x.l.kw)}</span></button>`).join('')}</div>
+  </section>` : ''}
+  <ol class="path">${LESSONS.map((l,i)=>{ const st = statusOf(l); return `
+    <li class="${st} ${i===ni && !allDone?'current':''} ${l.boss?'boss':''}">
+      <span class="node">${st==='done'?'✓':st==='weak'?'!':(l.boss?'★':i+1)}</span>
+      <button class="lesson-btn" data-i="${i}"><b>${esc(l.title)}</b><span class="kwtag">${esc(l.kw)}</span><span>${esc(l.blurb)}</span>${st==='weak'?`<span class="weak-tag">Por reforzar · ${P.stats[l.id].errors} errores</span>`:''}${P.inprog[l.id] && P.inprog[l.id].step > 0 ? `<span class="prog-tag">En curso · misión ${Math.min(P.inprog[l.id].step, l.challenges.length)} de ${l.challenges.length}</span>`:''}</button>
+    </li>`; }).join('')}
+  </ol>
+  <p style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="iconbtn" id="tables">Ver tablas del almacén</button>
+    <button class="iconbtn" id="reset">Borrar mi progreso</button>
+  </p>`;
+  setActions('');
+  const go = $('#go'); if (go) go.onclick = () => openLesson(ni);
+  document.querySelectorAll('.lesson-btn, .rf-btn').forEach(b => b.onclick = () => openLesson(+b.dataset.i));
+  $('#tables').onclick = openTables;
+  $('#reset').onclick = confirmReset;
+  window.scrollTo(0,0);
+}
+function confirmReset(){
+  const b = $('#reset');
+  if (b.dataset.armed){ P = fresh(); save(); renderMap(); return; }
+  b.dataset.armed = '1'; b.textContent = 'Toca otra vez para confirmar';
+  setTimeout(()=>{ if (b.isConnected){ delete b.dataset.armed; b.textContent = 'Borrar mi progreso'; } }, 4000);
+}
+
+function openLesson(i, restart){
+  const id = LESSONS[i].id;
+  const saved = !restart && P.inprog[id];
+  if (saved){
+    S = Object.assign({tries:0, solved:false, draft:'', order:null, sawSol:false, finished:false}, saved, {screen:'lesson', li:i});
+  } else {
+    const run = P.runs[id] || 0;
+    P.runs[id] = run + 1;
+    S = {screen:'lesson', li:i, run, step:0, maxStep:0, solvedSteps:[], tries:0, solved:false, draft:'', lessonXp:0, errors:0, missed:[], order:null, sawSol:false, finished:false};
+    persist();
+  }
+  renderLesson();
+}
+// Guarda la lección a medio camino para retomarla desde el mapa
+function persist(){
+  if (S.screen !== 'lesson' || S.finished) return;
+  const id = LESSONS[S.li].id;
+  P.inprog[id] = {run:S.run, step:S.step, maxStep:S.maxStep, solvedSteps:S.solvedSteps, errors:S.errors, missed:S.missed, lessonXp:S.lessonXp};
+  save();
+}
+const isPractice = () => S.finished || S.solvedSteps.includes(S.step);
+function goTo(step){
+  const l = LESSONS[S.li];
+  if (step < 0 || step > S.maxStep || step > l.challenges.length + 1) return;
+  S.step = step; resetStep(); persist(); renderLesson(); window.scrollTo(0,0);
+}
+// Elige la variante del ejercicio según cuántas veces has abierto la lección
+function getCh(l, idx){
+  const base = l.challenges[idx];
+  const alts = base.alt || [];
+  const k = (S.run + idx) % (alts.length + 1);
+  return k === 0 ? base : Object.assign({}, base, alts[k-1]);
+}
+function markError(ch){
+  if (isPractice()) return;
+  S.errors++;
+  if (!S.missed.includes(ch.q)) S.missed.push(ch.q);
+}
+function stepsCount(l){ return l.challenges.length + 1; }
+function header(l){
+  const n = l.challenges.length;
+  const chips = [];
+  for (let s = 0; s <= n; s++){
+    const solved = s > 0 && S.solvedSteps.includes(s);
+    const cls = [s === S.step ? 'cur' : '', solved ? 'ok' : '', s === 0 ? 'learn' : ''].join(' ');
+    const label = s === 0 ? 'Aprende' : String(s);
+    const aria = s === 0 ? 'Ir a la explicación' : `Ir a la misión ${s}${solved ? ' (lograda)' : ''}`;
+    chips.push(`<button class="stp ${cls}" data-s="${s}" ${s > S.maxStep ? 'disabled' : ''} aria-label="${aria}" ${s===S.step?'aria-current="step"':''}>${solved && s !== S.step ? '✓' : label}</button>`);
+  }
+  return `<div class="lesson-head"><button class="back" id="back">← Mapa</button><nav class="steps" aria-label="Partes de la lección">${chips.join('')}</nav><button class="iconbtn" id="tables">Tablas</button></div>`;
+}
+function renderLesson(){
+  const l = LESSONS[S.li];
+  if (S.step === 0) return renderLearn(l);
+  if (S.step > l.challenges.length) return renderDone(l);
+  const ch = getCh(l, S.step-1);
+  ch.type === 'choose' ? renderChoose(l, ch) : renderWrite(l, ch);
+}
+function wireCommon(){
+  $('#back').onclick = () => { persist(); renderMap(); };
+  document.querySelectorAll('.stp').forEach(b => b.onclick = () => goTo(+b.dataset.s));
+  $('#tables').onclick = openTables;
+}
+function renderLearn(l){
+  $('#app').innerHTML = header(l) + `
+  <section class="card">
+    <span class="eyebrow">Lección ${S.li+1} · Aprende</span>
+    <h2>${esc(l.title)}</h2>
+    <div class="explain">${l.learn}</div>
+    ${l.example ? `<div class="sql">${hl(l.example)}</div><p class="tip">${esc(l.exampleNote)}</p><div id="exout"></div>` : ''}
+  </section>`;
+  wireCommon();
+  setActions((l.example ? `<button class="btn ghost" id="try">Probar ejemplo</button>` : '') + `<button class="btn primary" id="next">Vamos</button>`);
+  if (l.example) $('#try').onclick = () => { $('#exout').innerHTML = '<div class="result">'+tableHTML(runSQL(DB, l.example), l.example)+'</div>'; };
+  $('#next').onclick = () => { S.maxStep = Math.max(S.maxStep, 1); goTo(1); };
+  window.scrollTo(0,0);
+}
+function resetStep(){ S.tries = 0; S.solved = false; S.draft = ''; S.order = null; S.sawSol = false; }
+function award(){
+  if (isPractice()) return 0;
+  const gain = S.tries === 0 ? XP_PER : Math.max(4, XP_PER - 3*S.tries);
+  P.xp += gain; S.lessonXp += gain; bumpStreak();
+  if (!S.solvedSteps.includes(S.step)) S.solvedSteps.push(S.step);
+  persist(); save();
+  return gain;
+}
+function goNext(){ S.maxStep = Math.max(S.maxStep, S.step + 1); goTo(S.step + 1); }
+function shuffled(n){ const a = [...Array(n).keys()]; for (let i=n-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+function renderChoose(l, ch){
+  if (!S.order || S.order.length !== ch.options.length) S.order = shuffled(ch.options.length);
+  $('#app').innerHTML = header(l) + `
+  <section class="card">
+    <span class="eyebrow">Misión ${S.step} de ${l.challenges.length} · Elige${isPractice()?' · Práctica, no suma errores':''}</span>
+    <p class="q">${esc(ch.q)}</p>
+    <div class="opts">${S.order.map(i => { const o = ch.options[i]; return `<button class="opt" data-i="${i}">${/[=<>*']|SELECT|WHERE/.test(o)?`<code>${esc(o)}</code>`:esc(o)}</button>`; }).join('')}</div>
+    <div id="fb"></div>
+  </section>`;
+  wireCommon();
+  setActions(`<button class="btn primary" id="next" disabled>Elige una opción</button>`);
+  document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    if (S.solved) return;
+    const i = +b.dataset.i;
+    if (i === ch.answer){
+      b.classList.add('right'); S.solved = true;
+      document.querySelectorAll('.opt').forEach(x => x.disabled = true);
+      const pr = isPractice(); const g = award();
+      $('#fb').innerHTML = `<div class="feedback ok"><strong>¡Correcto!${pr ? ' (práctica)' : ` +${g} XP`}</strong><p>${esc(ch.why)}</p></div>`;
+      setActions(`<button class="btn primary" id="next">Siguiente</button>`);
+      $('#next').onclick = goNext; $('#next').focus();
+    } else {
+      b.classList.add('wrong'); b.disabled = true; S.tries++; markError(ch); persist();
+      $('#fb').innerHTML = `<div class="feedback no"><strong>Esa no es.</strong><p>Prueba con otra opción.</p></div>`;
+    }
+  });
+}
+function renderWrite(l, ch){
+  $('#app').innerHTML = header(l) + `
+  <section class="card">
+    <span class="eyebrow">Misión ${S.step} de ${l.challenges.length} · Escribe${isPractice()?' · Práctica, no suma errores':''}</span>
+    <p class="q">${esc(ch.q)}</p>
+    ${usesLine(ch.solution)}
+    <label for="ed" class="chips-label">Tu consulta (puedes escribir o tocar los bloques)</label>
+    <textarea id="ed" class="editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="SELECT …">${esc(S.draft)}</textarea>
+    <div class="chips">${ch.chips.map(c=>`<button class="chip ${/^[A-Z]/.test(c)?'kw':''}" data-t="${esc(c)}">${esc(c)}</button>`).join('')}
+      <button class="chip tool" data-act="undo" aria-label="Borrar última palabra">⌫ palabra</button><button class="chip tool" data-act="clear">Limpiar</button></div>
+    <div id="out"></div>
+    <div id="fb"></div>
+  </section>`;
+  wireCommon();
+  const ed = $('#ed');
+  ed.oninput = () => { S.draft = ed.value; };
+  ed.onkeydown = e => { if ((e.ctrlKey||e.metaKey) && e.key === 'Enter'){ e.preventDefault(); submit(); } };
+  document.querySelectorAll('.chip').forEach(b => b.onclick = () => {
+    if (ed.readOnly) return;
+    if (b.dataset.act === 'clear'){ ed.value = ''; }
+    else if (b.dataset.act === 'undo'){ ed.value = ed.value.replace(/\s*\S+\s*$/, ''); ed.value += ed.value ? ' ' : ''; }
+    else {
+      const t = b.dataset.t, v = ed.value;
+      const noSpaceBefore = /^[,)]$/.test(t) || /\($/.test(v);
+      ed.value = (noSpaceBefore ? v.replace(/\s+$/,'') : (v && !/\s$/.test(v) ? v+' ' : v)) + t + (/\($/.test(t) ? '' : ' ');
+    }
+    S.draft = ed.value;
+  });
+  setActions(`<button class="btn ghost" id="run">Ejecutar</button><button class="btn primary" id="chk">Comprobar</button>`);
+  $('#run').onclick = () => {
+    const sql = ed.value.trim(); if (!sql) return;
+    try { $('#out').innerHTML = '<div class="result"><span class="result-meta">Tu resultado</span>'+tableHTML(runSQL(DB, sql), sql)+'</div>'; }
+    catch(e){ $('#out').innerHTML = `<div class="err">${esc(friendlyError(e.message))}</div>`; }
+  };
+  $('#chk').onclick = submit;
+  function submit(){
+    if (S.solved) return goNext();
+    const sql = ed.value.trim();
+    if (!sql){ $('#fb').innerHTML = `<div class="feedback no"><strong>Falta la consulta.</strong><p>Escribe algo o toca los bloques de abajo.</p></div>`; return; }
+    const r = check(DB, ch, sql);
+    $('#out').innerHTML = r.got ? '<div class="result"><span class="result-meta">Tu resultado</span>'+tableHTML(r.got, sql)+'</div>' : '';
+    if (r.ok){
+      S.solved = true; const pr = isPractice(); const g = award();
+      $('#fb').innerHTML = `<div class="feedback ok"><strong>¡Lo lograste!${pr ? ' (práctica)' : ` +${g} XP`}</strong></div>`;
+      ed.readOnly = true;
+      setActions(`<button class="btn primary" id="next">Siguiente</button>`);
+      $('#next').onclick = goNext; $('#next').focus();
+    } else {
+      S.tries++; markError(ch); persist();
+      const msg = r.error ? r.error : r.msg;
+      $('#fb').innerHTML = `<div class="feedback no"><strong>Casi. Intenta de nuevo.</strong><p>${esc(msg)}</p>
+        <button class="linkbtn" id="hint">Ver pista</button>
+        ${S.tries >= 2 ? `<button class="linkbtn" id="sol">Ver una solución (cuenta como error)</button>` : ''}
+        <div id="extra"></div></div>`;
+      $('#hint').onclick = () => { $('#extra').innerHTML = `<p class="tip">${esc(ch.hint)}</p>`; };
+      const so = $('#sol'); if (so) so.onclick = () => {
+        if (!S.sawSol){ S.sawSol = true; S.errors++; }
+        $('#extra').innerHTML = `<div class="sql">${hl(ch.solution)}</div><p class="tip">Cópiala a mano para practicar y toca Comprobar.</p>`;
+      };
+    }
+  }
+  if (!('ontouchstart' in window)) ed.focus();
+}
+const WEAK_AT = 2; // con 2 o más errores la lección queda "por reforzar"
+function renderDone(l){
+  if (!S.finished){
+    S.finished = true;
+    const weak = S.errors >= WEAK_AT;
+    P.done[l.id] = true;
+    P.stats[l.id] = {errors: S.errors, weak, missed: S.missed.slice(0, 4), at: today()};
+    delete P.inprog[l.id];
+    save();
+  }
+  const st = P.stats[l.id], weak = st.weak;
+  const last = S.li === LESSONS.length - 1;
+  const nextWeak = LESSONS.findIndex((x,i) => i !== S.li && statusOf(x) === 'weak');
+  S.maxStep = l.challenges.length + 1;
+  $('#app').innerHTML = header(l) + `
+  <section class="card done-card ${weak?'is-weak':''}">
+    <div class="stamp">${weak ? '!' : '+'+S.lessonXp}</div>
+    <h2>${weak ? 'Lección completada, queda por reforzar' : last ? '¡Terminaste Foco SQL!' : '¡Lección lista!'}</h2>
+    ${weak ? `<p style="max-width:48ch">Tuviste <b>${st.errors} errores</b> en <b>${esc(l.kw)}</b>. Quedará marcada en el mapa hasta que la pases con 1 error o menos. La próxima vez los ejercicios serán distintos.</p>
+      <p class="tip" style="text-align:left">Toca un número arriba para volver a practicar esa misión.</p>
+      ${st.missed.length ? `<div class="missed"><span class="eyebrow">Te costó</span><ul>${st.missed.map(q=>`<li>${esc(q)}</li>`).join('')}</ul></div>` : ''}`
+    : `<p style="color:var(--muted);max-width:44ch">${last ? 'Ya sabes consultar, filtrar, ordenar, resumir y unir tablas. Eso es la base del SQL que se usa en el trabajo.' : `Dominaste <b>${esc(l.kw)}</b>${st.errors===0?' sin errores':' con solo 1 error'}. ${P.streak>1?`Llevas ${P.streak} días seguidos.`:'Vuelve mañana para empezar una racha.'}`}</p>`}
+  </section>`;
+  let acts = `<button class="btn ghost" id="map">Mapa</button>`;
+  if (weak) acts += `<button class="btn ghost" id="again">Repetir ahora</button>`;
+  if (!last) acts += `<button class="btn primary" id="nx">Siguiente lección</button>`;
+  else if (nextWeak !== -1) acts += `<button class="btn primary" id="rf">Reforzar otra</button>`;
+  setActions(acts);
+  wireCommon();
+  $('#map').onclick = renderMap;
+  const nx = $('#nx'); if (nx) nx.onclick = () => openLesson(S.li+1);
+  const ag = $('#again'); if (ag) ag.onclick = () => openLesson(S.li);
+  const rf = $('#rf'); if (rf) rf.onclick = () => openLesson(nextWeak);
+  window.scrollTo(0,0);
+}
+function openTables(){
+  const d = $('#drawer');
+  d.innerHTML = `<div class="sheet" role="dialog" aria-label="Tablas del almacén">
+    <div class="sheet-head"><h3>Tablas del almacén</h3><button class="iconbtn" id="close">Cerrar</button></div>
+    ${T.map(t => `<div class="result"><span class="tname">${t}</span><span class="tdesc">${TABLE_INFO[t]}</span>${tableHTML(runSQL(DB,'SELECT * FROM '+t))}</div>`).join('')}
+  </div>`;
+  d.hidden = false;
+  $('#close').onclick = () => d.hidden = true;
+  d.onclick = e => { if (e.target === d) d.hidden = true; };
+  $('#close').focus();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#drawer').hidden = true; });
+
+/* ================= ARRANQUE ================= */
+function start(data){
+  if (data && data.S) S = Object.assign({}, S, data.S);
+  if (typeof initSqlJs !== 'function'){
+    $('#app').innerHTML = topbar() + '<div class="err">No se pudo cargar el motor de SQL. Cierra y vuelve a abrir la app.</div>';
+    return;
+  }
+  initSqlJs().then(SQL => {
+    DB = new SQL.Database(); DB.run(SEED);
+    S.screen === 'lesson' ? renderLesson() : renderMap();
+  }).catch(() => { $('#app').innerHTML = topbar() + '<div class="err">No se pudo iniciar la base de datos. Recarga la página.</div>'; });
+}
+window.claude?.hot?.snapshot?.(() => ({S}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>

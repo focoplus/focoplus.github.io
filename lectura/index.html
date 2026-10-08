@@ -1,0 +1,1126 @@
+<!doctype html><html lang="es"><head><script src="../perfil.js" data-modulo="lectura"></script><meta name="theme-color" content="#16213A"><link rel="manifest" href="../manifest.json"><link rel="icon" type="image/png" href="../iconos/favicon.png"><link rel="apple-touch-icon" href="../iconos/apple-touch-icon.png"><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Foco Lectura</title>
+<meta name="theme-color" content="#EEF1F6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap">
+<style>
+/* Layout: columna de celular (máx 520px), navegación inferior al alcance del pulgar, botón flotante "Leer" y un modo lectura a pantalla completa. Tinta azul + cinta de marcapáginas. */
+:root {
+  --bg: #EEF1F6;
+  --surface: #FFFFFF;
+  --surface-2: #F5F6FA;
+  --ink: #19203A;
+  --muted: #626A82;
+  --faint: #8F96AC;
+  --line: #E0E4ED;
+  --tinta: #2F3F86;
+  --tinta-soft: #E4E8F7;
+  --cinta: #C9475E;
+  --cinta-ink: #FFFFFF;
+  --heat-1: #D9DFF3; --heat-2: #A8B4E4; --heat-3: #6576C9; --heat-4: #2F3F86;
+  --ok: #1E7F55; --ok-soft: #E0F1E8;
+  --bad: #B13A3A; --bad-soft: #F8E4E4;
+  --shadow: 0 1px 2px rgba(25,32,58,.06), 0 6px 20px rgba(25,32,58,.06);
+  /* modo lectura: siempre nocturno, a propósito */
+  --night: #0E1120; --night-2: #181C30; --night-ink: #ECEEF6; --night-muted: #9097B4; --night-line: #272C45; --lamp: #F2B85B;
+  --f-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --f-ui: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1220; --surface: #181C2E; --surface-2: #1F2438; --ink: #E8EAF3; --muted: #A0A7BF; --faint: #737A96; --line: #2A3049;
+  --tinta: #9EADF2; --tinta-soft: #242B4C; --cinta: #F07890; --cinta-ink: #24090F;
+  --heat-1: #252C4D; --heat-2: #37448A; --heat-3: #5D71D2; --heat-4: #A9B7F5;
+  --ok: #5CCB97; --ok-soft: #133226; --bad: #F08A8A; --bad-soft: #3B1D22; --shadow: 0 1px 2px rgba(0,0,0,.3); color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0F1220; --surface: #181C2E; --surface-2: #1F2438; --ink: #E8EAF3; --muted: #A0A7BF; --faint: #737A96; --line: #2A3049;
+  --tinta: #9EADF2; --tinta-soft: #242B4C; --cinta: #F07890; --cinta-ink: #24090F;
+  --heat-1: #252C4D; --heat-2: #37448A; --heat-3: #5D71D2; --heat-4: #A9B7F5;
+  --ok: #5CCB97; --ok-soft: #133226; --bad: #F08A8A; --bad-soft: #3B1D22; --shadow: 0 1px 2px rgba(0,0,0,.3); color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html, body { background: var(--bg); }
+body { color: var(--ink); font-family: var(--f-ui); font-size: 16px; line-height: 1.45; }
+.wrap { max-width: 520px; margin: 0 auto; padding-inline: 16px; padding-block: 12px 150px; display: grid; gap: 14px; }
+h1, h2, h3 { margin: 0; font-family: var(--f-display); font-weight: 600; line-height: 1.12; text-wrap: balance; letter-spacing: -.01em; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--tinta); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.sec-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-inline: 2px; }
+.sec-title h2 { font-size: 21px; }
+.link { background: none; border: none; color: var(--tinta); font-weight: 700; font-size: 14px; padding: 6px 0; }
+
+.card { background: var(--surface); border-radius: 22px; padding: 18px; display: grid; gap: 14px; box-shadow: var(--shadow); min-width: 0; }
+.card.flat { box-shadow: none; border: 1px solid var(--line); }
+
+/* Encabezado */
+.hd { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 8px 2px 2px; }
+.hd h1 { font-size: 32px; }
+.iconbtn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; color: var(--muted); flex: 0 0 auto; }
+.iconbtn svg { width: 20px; height: 20px; }
+.notice { background: var(--tinta-soft); color: var(--ink); border-radius: 14px; padding: 10px 14px; font-size: 14px; }
+
+/* Hoy */
+.ringrow { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+.ring { width: 112px; height: 112px; position: relative; flex: 0 0 auto; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+.ring .track { fill: none; stroke: var(--tinta-soft); stroke-width: 10; }
+.ring .fill { fill: none; stroke: var(--tinta); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
+.ring.done .fill { stroke: var(--ok); }
+.ring .lbl { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.ring .lbl b { font-family: var(--f-display); font-size: 34px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+.ring .lbl small { color: var(--muted); font-size: 12px; }
+.ringrow h2 { font-size: 22px; }
+.stepper { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.stepper button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface-2); font-weight: 700; color: var(--ink); }
+.stepper b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.weekrow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.wd { display: grid; grid-template-rows: 34px auto; justify-items: center; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.wd i { width: 30px; height: 30px; border-radius: 50%; border: 2px dashed var(--line); display: grid; place-items: center; font-style: normal; }
+.wd.read i { border: none; background: var(--heat-2); }
+.wd.met i { border: none; background: var(--tinta); }
+.wd.met i::after { content: ""; width: 9px; height: 5px; border-left: 2px solid var(--surface); border-bottom: 2px solid var(--surface); transform: rotate(-45deg) translate(1px, -1px); }
+.wd.today i { outline: 2px solid var(--cinta); outline-offset: 2px; }
+.wd.future { opacity: .45; }
+.streaks { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip-stat { display: inline-flex; align-items: baseline; gap: 5px; background: var(--surface-2); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--muted); }
+.chip-stat b { color: var(--ink); font-size: 15px; font-variant-numeric: tabular-nums; }
+
+/* Portadas generadas */
+.cover { position: relative; aspect-ratio: 2 / 3; border-radius: 4px 10px 10px 4px; overflow: hidden; color: #fff; background: var(--c, #2F3F86); display: grid; align-content: space-between; padding: 10% 10% 9% 16%; box-shadow: inset 6px 0 0 rgba(0,0,0,.18), inset 7px 0 0 rgba(255,255,255,.08), 0 6px 14px rgba(15,18,32,.18); max-width: 100%; }
+.cover::before { content: ""; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(255,255,255,.16), transparent 45%, rgba(0,0,0,.18)); pointer-events: none; }
+.cover .ct { font-family: var(--f-display); font-weight: 600; line-height: 1.08; font-size: var(--fs, 15px); overflow-wrap: anywhere; position: relative; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.cover .ca { font-size: calc(var(--fs, 15px) * .62); opacity: .8; position: relative; letter-spacing: .04em; text-transform: uppercase; }
+.cover .rule { width: 34%; height: 2px; background: rgba(255,255,255,.55); position: relative; }
+
+.reel { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 8px; margin-inline: -2px; scrollbar-width: none; }
+.reel::-webkit-scrollbar { display: none; }
+.now { flex: 0 0 auto; width: min(86%, 330px); scroll-snap-align: start; background: var(--surface); border-radius: 22px; padding: 14px; display: grid; grid-template-columns: 92px 1fr; gap: 14px; box-shadow: var(--shadow); text-align: left; border: none; color: inherit; }
+.now.solo { width: 100%; }
+.now .info { display: grid; align-content: space-between; gap: 8px; min-width: 0; }
+.now h3 { font-size: 19px; overflow-wrap: anywhere; }
+.now .sub { font-size: 13px; color: var(--muted); }
+.bar { height: 6px; border-radius: 99px; background: var(--tinta-soft); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 99px; background: var(--tinta); }
+.bar.cinta i { background: var(--cinta); }
+.btn-play { white-space: nowrap; justify-self: start; display: inline-flex; align-items: center; gap: 8px; border: none; background: var(--cinta); color: var(--cinta-ink); border-radius: 999px; padding: 9px 16px 9px 12px; font-weight: 700; font-size: 14px; }
+.btn-play svg { width: 16px; height: 16px; }
+.add-now { flex: 0 0 auto; width: 140px; scroll-snap-align: start; border: 2px dashed var(--line); border-radius: 22px; background: none; color: var(--muted); font-weight: 600; font-size: 14px; display: grid; place-content: center; gap: 6px; text-align: center; padding: 14px; }
+.add-now b { font-size: 28px; font-weight: 400; color: var(--tinta); }
+
+.plan { background: var(--tinta); color: #fff; }
+.plan .eyebrow { color: rgba(255,255,255,.7); }
+.plan p.big { font-family: var(--f-display); font-size: 20px; line-height: 1.3; }
+.plan p.big em { font-style: italic; color: #fff; border-bottom: 1px solid rgba(255,255,255,.4); }
+.plan .link { color: #fff; opacity: .85; justify-self: start; padding: 0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .plan { background: var(--tinta-soft); } }
+:root[data-theme="dark"] .plan { background: var(--tinta-soft); }
+
+.insight { display: grid; grid-template-columns: 4px 1fr; gap: 12px; padding: 4px 2px; }
+.insight::before { content: ""; background: var(--cinta); border-radius: 4px; }
+.insight p { font-size: 14.5px; color: var(--muted); }
+.insight p b { color: var(--ink); }
+.insight cite { font-style: normal; font-size: 12.5px; color: var(--faint); display: block; margin-top: 4px; }
+
+.list { display: grid; }
+.row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.row:last-child { border-bottom: none; }
+.row .t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.row .t small { display: block; font-size: 13px; color: var(--muted); }
+.row .v { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--tinta); }
+.x { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 10px; padding: 6px 10px; font-size: 13px; white-space: nowrap; }
+.x.danger { border-color: var(--bad); color: var(--bad); background: var(--bad-soft); }
+.empty { color: var(--muted); font-size: 14.5px; text-align: center; padding: 10px 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+
+/* Botón flotante y navegación */
+.fab { position: fixed; right: max(16px, calc(50% - 260px + 16px)); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 15; display: inline-flex; align-items: center; gap: 8px; border: none; background: var(--cinta); color: var(--cinta-ink); border-radius: 999px; padding: 14px 20px 14px 16px; font-weight: 700; font-size: 16px; box-shadow: 0 8px 22px color-mix(in srgb, var(--cinta) 40%, transparent); font-variant-numeric: tabular-nums; }
+.fab svg { width: 20px; height: 20px; }
+.fab.live { background: var(--night); color: var(--lamp); box-shadow: 0 8px 22px rgba(14,17,32,.35); }
+.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 14; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); }
+.nav .in { max-width: 520px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; }
+.nav button { border: none; background: none; display: grid; justify-items: center; gap: 3px; padding: 6px 2px; font-size: 11.5px; font-weight: 600; color: var(--faint); border-radius: 12px; min-height: 52px; }
+.nav button svg { width: 24px; height: 24px; }
+.nav button[aria-current="page"] { color: var(--tinta); }
+.nav button[aria-current="page"] svg { stroke-width: 2.2; }
+.nav .play { justify-self: center; width: 62px; height: 62px; min-height: 0; margin-top: -26px; border-radius: 50%; background: var(--cinta); color: var(--cinta-ink); display: grid; place-content: center; justify-items: center; gap: 0; padding: 0; box-shadow: 0 0 0 5px var(--bg), 0 8px 20px color-mix(in srgb, var(--cinta) 45%, transparent); font-size: 11px; font-weight: 700; }
+.nav .play svg { width: 22px; height: 22px; margin-left: 2px; }
+.nav .play.live { background: var(--night); color: var(--lamp); box-shadow: 0 0 0 5px var(--bg), 0 8px 20px rgba(14,17,32,.35); font-variant-numeric: tabular-nums; }
+.nav .play.live svg { width: 14px; height: 14px; }
+
+/* Segmentos y chips */
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; background: var(--surface-2); border-radius: 14px; padding: 4px; }
+.seg button { border: none; background: none; border-radius: 10px; padding: 9px 6px; font-weight: 600; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.seg button[aria-checked="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(25,32,58,.12); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: var(--surface); }
+
+/* Formularios */
+label.f { display: grid; gap: 6px; font-size: 13px; color: var(--muted); font-weight: 600; min-width: 0; }
+input[type=text], input[type=number], input[type=date], select, textarea { width: 100%; background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; font-size: 16px; color: var(--ink); }
+textarea { resize: vertical; min-height: 84px; line-height: 1.4; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--tinta); }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { border: none; border-radius: 16px; padding: 15px 18px; font-weight: 700; font-size: 16px; }
+.btn.primary { background: var(--cinta); color: var(--cinta-ink); }
+.btn.tinta { background: var(--tinta); color: var(--surface); }
+.btn.ghost { background: var(--surface-2); color: var(--ink); }
+.btns { display: flex; gap: 10px; }
+.btns > * { flex: 1; }
+
+/* Mes */
+.monthnav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.monthnav h2 { font-size: 24px; text-transform: capitalize; }
+.navbtn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); font-size: 20px; line-height: 1; color: var(--ink); }
+.navbtn:disabled { opacity: .3; cursor: default; }
+.hero { display: grid; gap: 4px; }
+.hero b { font-family: var(--f-display); font-size: 56px; font-weight: 600; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.hero span { color: var(--muted); font-size: 14.5px; }
+.delta { display: inline-block; font-size: 13px; font-weight: 700; border-radius: 999px; padding: 3px 10px; background: var(--ok-soft); color: var(--ok); justify-self: start; }
+.delta.down { background: var(--surface-2); color: var(--muted); }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.dow { text-align: center; font-size: 11px; font-weight: 700; color: var(--faint); }
+.day { aspect-ratio: 1; max-width: 100%; border-radius: 12px; border: none; background: var(--surface-2); display: grid; place-items: center; font-size: 14px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; padding: 0; }
+.day.h1 { background: var(--heat-1); color: var(--ink); }
+.day.h2 { background: var(--heat-2); color: var(--ink); }
+.day.h3 { background: var(--heat-3); color: #fff; }
+.day.h4 { background: var(--heat-4); color: var(--surface); }
+.day.today { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--cinta); }
+.day.future { opacity: .35; cursor: default; }
+.day.blank { visibility: hidden; }
+.legend { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; background: var(--surface-2); }
+.legend .h1 { background: var(--heat-1); } .legend .h2 { background: var(--heat-2); } .legend .h3 { background: var(--heat-3); } .legend .h4 { background: var(--heat-4); }
+.kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kpi { background: var(--surface-2); border-radius: 16px; padding: 12px 14px; display: grid; gap: 2px; min-width: 0; }
+.kpi b { font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.kpi span { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .goal { stroke: var(--cinta); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.chart .ax { fill: var(--faint); font-family: var(--f-ui); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart .gl { fill: var(--cinta); font-family: var(--f-ui); font-size: 11px; font-weight: 700; }
+.chart .vl { fill: var(--ink); font-family: var(--f-ui); font-size: 11px; font-weight: 700; }
+.chart .b { fill: var(--heat-2); }
+.chart .b.met { fill: var(--tinta); }
+.chart .hit { fill: transparent; }
+.hbars { display: grid; gap: 12px; }
+.hb { display: grid; gap: 5px; min-width: 0; }
+.hb .top { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; }
+.hb .top span:first-child { min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
+.hb .top span:last-child { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 13.5px; }
+.cols { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; height: 120px; }
+.cols.four { grid-template-columns: repeat(4, 1fr); }
+.col { display: grid; grid-template-rows: auto 1fr auto; height: 100%; gap: 4px; text-align: center; min-width: 0; }
+.col .v { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.col .b { align-self: end; background: var(--heat-2); border-radius: 6px 6px 2px 2px; min-height: 3px; }
+.col .b.top { background: var(--tinta); }
+.col .n { font-size: 11.5px; font-weight: 700; color: var(--muted); }
+.quote { border-left: 3px solid var(--cinta); padding: 2px 0 2px 12px; display: grid; gap: 4px; }
+.quote p { font-family: var(--f-display); font-style: italic; font-size: 17px; line-height: 1.35; overflow-wrap: anywhere; }
+.quote small { color: var(--muted); font-size: 12.5px; }
+
+/* Estantería */
+.shelf { display: flex; align-items: flex-end; gap: 4px; min-height: 190px; padding: 0 10px; overflow-x: auto; scrollbar-width: none; border-bottom: 10px solid var(--surface-2); border-radius: 0 0 6px 6px; box-shadow: 0 6px 0 -2px var(--line); }
+.shelf::-webkit-scrollbar { display: none; }
+.spine { flex: 0 0 auto; border: none; border-radius: 3px 3px 1px 1px; background: var(--c); color: #fff; writing-mode: vertical-rl; transform: rotate(180deg); padding: 10px 0; font-family: var(--f-display); font-weight: 600; font-size: 13px; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; box-shadow: inset -3px 0 0 rgba(0,0,0,.15), inset 3px 0 0 rgba(255,255,255,.1); display: flex; align-items: center; }
+.spine span { overflow: hidden; text-overflow: ellipsis; }
+.spine.lean { transform: rotate(180deg) translateX(0) skewX(0); }
+.shelf-empty { flex: 1; align-self: center; text-align: center; color: var(--muted); font-size: 14px; padding: 20px 10px; }
+
+/* Libros */
+.bookrow { display: grid; grid-template-columns: 54px 1fr auto; gap: 14px; align-items: center; padding: 10px 0; border: none; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; color: inherit; }
+.bookrow:last-child { border-bottom: none; }
+.bookrow .cover { --fs: 8px; padding: 8% 8% 8% 14%; }
+.bookrow .cover .ca, .bookrow .cover .rule { display: none; }
+.bookrow h3 { font-size: 17px; overflow-wrap: anywhere; }
+.bookrow .meta { font-size: 13px; color: var(--muted); display: grid; gap: 6px; margin-top: 4px; }
+.pill { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+.pill.leyendo { background: var(--tinta-soft); color: var(--tinta); }
+.pill.pendiente { background: var(--surface-2); color: var(--muted); }
+.pill.terminado { background: var(--ok-soft); color: var(--ok); }
+
+/* Hojas inferiores */
+.drawer { position: fixed; inset: 0; background: rgba(10,12,24,.45); z-index: 40; display: grid; align-items: end; }
+.sheet { background: var(--surface); border-radius: 26px 26px 0 0; max-height: 90%; overflow-y: auto; padding: 10px 18px calc(22px + env(safe-area-inset-bottom, 0px)); max-width: 520px; width: 100%; margin: 0 auto; display: grid; gap: 14px; animation: up .28s cubic-bezier(.2,.9,.3,1) both; }
+.sheet::before { content: ""; width: 40px; height: 5px; border-radius: 9px; background: var(--line); justify-self: center; }
+@keyframes up { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.sheet h3 { font-size: 22px; }
+.bookhead { display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: end; }
+.bookhead h3 { font-size: 24px; overflow-wrap: anywhere; }
+.moods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.mood { border: 1.5px solid var(--line); background: var(--surface); border-radius: 14px; padding: 10px 2px 8px; display: grid; justify-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.mood svg { width: 26px; height: 26px; }
+.mood[aria-pressed="true"] { border-color: var(--tinta); background: var(--tinta-soft); color: var(--tinta); }
+.stamp { justify-self: center; font-family: var(--f-display); font-size: 48px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; color: var(--tinta); }
+.sci { display: grid; gap: 14px; }
+.sci div { display: grid; gap: 3px; }
+.sci b { font-family: var(--f-display); font-size: 18px; font-weight: 600; }
+.sci p { font-size: 14.5px; color: var(--muted); }
+.sci a { color: var(--tinta); font-size: 13px; font-weight: 600; }
+
+/* Modo lectura */
+.session { position: fixed; inset: 0; z-index: 30; background: radial-gradient(120% 70% at 50% 0%, #1E2443 0%, var(--night) 60%); color: var(--night-ink); display: grid; grid-template-rows: auto 1fr auto; padding: calc(12px + env(safe-area-inset-top, 0px)) 18px calc(18px + env(safe-area-inset-bottom, 0px)); color-scheme: dark; }
+.session .in { max-width: 480px; width: 100%; margin: 0 auto; display: grid; gap: 18px; align-content: center; }
+.session .top { max-width: 480px; width: 100%; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.session .top .eyebrow { color: var(--night-muted); }
+.session .min { background: var(--night-2); border: 1px solid var(--night-line); color: var(--night-ink); border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: 14px; }
+.session .booksel { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.session .bk { flex: 0 0 auto; border: 1.5px solid var(--night-line); background: var(--night-2); color: var(--night-ink); border-radius: 999px; padding: 9px 14px; font-size: 14px; font-weight: 600; max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.session .bk[aria-pressed="true"] { border-color: var(--lamp); color: var(--lamp); }
+.session .seg { background: var(--night-2); }
+.session .seg button { color: var(--night-muted); }
+.session .seg button[aria-checked="true"] { background: #2A3050; color: var(--night-ink); box-shadow: none; }
+.session .chip { background: var(--night-2); border-color: var(--night-line); color: var(--night-ink); }
+.session .chip[aria-pressed="true"] { background: var(--lamp); border-color: var(--lamp); color: #2A1B00; }
+.dial { position: relative; width: min(74vw, 300px); aspect-ratio: 1; justify-self: center; display: grid; place-items: center; }
+.dial svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.dial .tr { fill: none; stroke: var(--night-line); stroke-width: 6; }
+.dial .fl { fill: none; stroke: var(--lamp); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+.dial .glow { position: absolute; inset: 14%; border-radius: 50%; background: radial-gradient(circle, rgba(242,184,91,.16), transparent 70%); }
+.dial.run .glow { animation: breathe 5s ease-in-out infinite; }
+@keyframes breathe { 0%,100% { transform: scale(.92); opacity: .6; } 50% { transform: scale(1.05); opacity: 1; } }
+.clock { position: relative; text-align: center; display: grid; gap: 4px; }
+.clock b { font-family: var(--f-ui); font-weight: 300; font-size: clamp(52px, 17vw, 76px); letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.clock small { color: var(--night-muted); font-size: 13px; }
+.session .booktitle { text-align: center; font-family: var(--f-display); font-style: italic; font-size: 20px; color: var(--night-ink); overflow-wrap: anywhere; }
+.session .hint { text-align: center; color: var(--night-muted); font-size: 14px; }
+.session .actions { max-width: 480px; width: 100%; margin: 0 auto; display: grid; gap: 10px; }
+.session .btn.primary { background: var(--lamp); color: #2A1B00; font-size: 17px; padding: 17px; }
+.session .btn.ghost { background: var(--night-2); color: var(--night-ink); border: 1px solid var(--night-line); }
+.session .discard { background: none; border: none; color: var(--night-muted); font-size: 14px; padding: 6px; justify-self: center; }
+.session label.f { color: var(--night-muted); }
+.session input { background: var(--night-2); border-color: var(--night-line); color: var(--night-ink); }
+
+.toast { position: fixed; left: 50%; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-weight: 600; font-size: 14.5px; z-index: 60; white-space: nowrap; max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis; }
+.tip { position: fixed; z-index: 50; background: var(--ink); color: var(--bg); font-size: 12.5px; font-weight: 600; padding: 6px 10px; border-radius: 8px; pointer-events: none; transform: translate(-50%, calc(-100% - 8px)); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.loading { text-align: center; color: var(--muted); padding: 60px 0; }
+@media (prefers-reduced-motion: reduce) { .sheet, .dial.run .glow { animation: none; } .ring .fill, .dial .fl { transition: none; } }
+@media (min-width: 700px) { .wrap { padding-top: 28px; } }
+</style>
+
+<div class="wrap" id="app"><p class="loading">Abriendo tu registro de lectura…</p></div>
+<nav class="nav" id="nav" aria-label="Secciones"><div class="in" id="navin"></div></nav>
+<div class="session" id="session" hidden></div>
+<div class="drawer" id="drawer" hidden></div>
+<div class="toast" id="toast" hidden></div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+/* ============ utilidades ============ */
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const DOW = ['L','M','M','J','V','S','D'];
+const DOW_LONG = ['lunes','martes','miércoles','jueves','viernes','sábado','domingo'];
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const todayStr = () => ymd(new Date());
+const monthOf = s => s.slice(0, 7);
+const parseYmd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (k, n) => { const d = parseYmd(k); d.setDate(d.getDate() + n); return ymd(d); };
+const daysIn = ym => { const [y, m] = ym.split('-').map(Number); return new Date(y, m, 0).getDate(); };
+const shiftMonth = (ym, k) => { const [y, m] = ym.split('-').map(Number); const d = new Date(y, m - 1 + k, 1); return d.getFullYear() + '-' + pad(d.getMonth() + 1); };
+const monthName = ym => MESES[Number(ym.slice(5)) - 1] + ' ' + ym.slice(0, 4);
+const niceDate = s => { const d = parseYmd(s); return DIAS[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()]; };
+const shortDate = k => { const d = parseYmd(k); return d.getDate() + ' ' + MESES[d.getMonth()].slice(0, 3); };
+const daysBetween = (a, b) => Math.round((parseYmd(b) - parseYmd(a)) / 86400000) + 1;
+const mondayOf = k => { const d = parseYmd(k); return addDays(k, -((d.getDay() + 6) % 7)); };
+const fmtMin = m => { const t = Math.round(m * 60); if (!t) return '0 min'; const h = Math.floor(t / 3600), mi = Math.floor(t / 60) % 60, se = t % 60; return [h && h + ' h', mi && mi + ' min', se && se + ' s'].filter(Boolean).join(' '); };
+const fmtShort = m => { const t = Math.round(m); if (t < 60) return t + ' min'; const h = Math.floor(t / 60), r = t % 60; return h + ' h' + (r ? ' ' + r + ' min' : ''); };
+const fmtNum = m => Number(m.toFixed(1)).toLocaleString('es-CL');
+const dec1 = v => v.toFixed(1).replace('.', ',');
+const plural = (n, a, b) => n === 1 ? a : b;
+const secOf = s => Number(s.seconds ?? (Number(s.minutes) || 0) * 60) || 0;
+const minOf = s => secOf(s) / 60;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = p => p + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+const COVERS = ['#2F3F86', '#7B3F63', '#2D6A5C', '#9A5A2B', '#4A4F72', '#8B3A42', '#35698E', '#5F5B2B', '#6A4A8C', '#2E5A3E'];
+const coverColor = b => { if (!b) return '#4A4F72'; let h = 0; for (const ch of (b.title || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return COVERS[h % COVERS.length]; };
+const MOODS = [
+  ['tranquilo', 'Tranquilo', '<path d="M8 14c1.2 1.3 2.5 2 4 2s2.8-.7 4-2M8.5 10h1M14.5 10h1"/>'],
+  ['concentrado', 'Enfocado', '<path d="M9 15h6M8 9.5l2 1M16 9.5l-2 1"/>'],
+  ['inspirado', 'Inspirado', '<path d="M7.5 13.5c1.3 2.2 2.8 3.2 4.5 3.2s3.2-1 4.5-3.2zM8.5 9.5l1.5-1 1.5 1M12.5 9.5l1.5-1 1.5 1"/>'],
+  ['disperso', 'Disperso', '<path d="M8.5 15.5c1-.8 2-.8 3 0s2 .8 3 0M8.5 10h1M14.5 10h1"/>'],
+  ['cansado', 'Cansado', '<path d="M9.5 15.5h5M8 10.5h2.5M13.5 10.5H16"/>'],
+];
+const moodIcon = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/>${p}</svg>`;
+const ICON = {
+  hoy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5c2.8-1.3 5.8-1.3 9 .8 3.2-2.1 6.2-2.1 9-.8v13c-2.8-1.3-5.8-1.3-9 .8-3.2-2.1-6.2-2.1-9-.8z"/><path d="M12 6.3v13"/></svg>',
+  mes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/></svg>',
+  estante: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.5h18"/><rect x="4.5" y="6" width="3.5" height="14.5" rx="1"/><rect x="9" y="3.5" width="3.5" height="17" rx="1"/><path d="M14.2 7.6l3.3-1 3.6 13.2-3.3 1z"/></svg>',
+  libros: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h10.5a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z"/><path d="M5 18.5a2 2 0 0 1 2-2h10.5M9 8.5h5"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.2-6.5a1 1 0 0 0 0-1.7L9.5 4.6A1 1 0 0 0 8 5.5z"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.01"/></svg>',
+};
+
+/* ============ estado ============ */
+const S = {
+  view: 'hoy', month: monthOf(todayStr()), shelf: 'año', lib: 'leyendo',
+  sessions: [], books: [], settings: { goal: 20, yearGoal: 12, weekDays: 5, plan: null },
+  ready: false, mode: 'cargando', confirm: null, sheet: null,
+};
+try { const v = localStorage.getItem('foco-lectura-view'); if (['hoy', 'mes', 'estante', 'libros'].includes(v)) S.view = v; } catch (e) {}
+let timer = { mode: 'crono', target: 1200, start: null, acc: 0, bookId: '' };
+try { const t = JSON.parse(localStorage.getItem('foco-lectura-timer') || 'null'); if (t) timer = { ...timer, ...t }; } catch (e) {}
+const saveTimer = () => { try { localStorage.setItem('foco-lectura-timer', JSON.stringify(timer)); } catch (e) {} };
+const resetTimer = () => { timer = { mode: timer.mode, target: timer.target, start: null, acc: 0, bookId: timer.bookId }; saveTimer(); };
+let sessionOpen = !!timer.start;
+
+/* ============ almacenamiento ============ */
+let col = null;
+const LKEY = 'foco-lectura-v1';
+function localAll() { try { return JSON.parse(localStorage.getItem(LKEY) || '{}'); } catch (e) { return {}; } }
+function localPut(all) { try { localStorage.setItem(LKEY, JSON.stringify(all)); } catch (e) {} }
+function ingest(items) {
+  const sessions = [], books = []; let settings = {};
+  for (const [id, d] of items) {
+    if (!d) continue;
+    if (d.kind === 'session') sessions.push({ id, ...d });
+    else if (d.kind === 'book') books.push({ id, ...d });
+    else if (d.kind === 'settings') settings = d;
+  }
+  sessions.sort((a, b) => (a.date === b.date ? (a.createdAt || 0) - (b.createdAt || 0) : a.date < b.date ? -1 : 1));
+  books.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  S.sessions = sessions; S.books = books;
+  S.settings = { goal: 20, yearGoal: 12, weekDays: 5, plan: null, ...settings };
+  S.ready = true;
+  render();
+}
+async function putDoc(id, data) {
+  if (col) await col.doc(id).set(data);
+  else { const all = localAll(); all[id] = data; localPut(all); ingest(Object.entries(all)); }
+}
+async function delDoc(id) {
+  if (col) await col.doc(id).delete();
+  else { const all = localAll(); delete all[id]; localPut(all); ingest(Object.entries(all)); }
+}
+async function safe(fn, okMsg) {
+  try { await fn(); if (okMsg) toast(okMsg); return true; }
+  catch (e) { toast(e && e.code === 'quota_exceeded' ? 'Sin espacio para guardar más' : 'No se pudo guardar. Inténtalo otra vez.'); return false; }
+}
+function saveSettings(patch) {
+  S.settings = { ...S.settings, ...patch };
+  const { goal, yearGoal, weekDays, plan } = S.settings;
+  render();
+  return safe(() => putDoc('settings', { kind: 'settings', goal, yearGoal, weekDays, plan: plan || null }));
+}
+function useLocal() { S.mode = 'local'; ingest(Object.entries(localAll())); }
+async function boot() {
+  render();
+  if (!window.claude || !window.claude.use) { useLocal(); return; }
+  try {
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    const id = user ? await user.id() : null;
+    if (!db || !id) { useLocal(); return; }
+    col = db.collection('data/users/' + id);
+    S.mode = 'nube';
+    col.onSnapshot(snap => ingest(snap.docs.map(d => [d.id, d.data()])), () => { col = null; useLocal(); });
+  } catch (e) { useLocal(); }
+}
+
+/* ============ cálculos ============ */
+function minutesByDay() { const m = {}; for (const s of S.sessions) m[s.date] = (m[s.date] || 0) + minOf(s); return m; }
+function streakDays(byDay) {
+  let k = todayStr(); if (!byDay[k]) k = addDays(k, -1);
+  let n = 0; while (byDay[k]) { n++; k = addDays(k, -1); } return n;
+}
+function weekCount(byDay, monday) { let n = 0; for (let i = 0; i < 7; i++) if (byDay[addDays(monday, i)]) n++; return n; }
+function weekStreak(byDay) {
+  const target = S.settings.weekDays || 5; let w = mondayOf(todayStr()), n = 0;
+  if (weekCount(byDay, w) < target) w = addDays(w, -7);
+  while (weekCount(byDay, w) >= target) { n++; w = addDays(w, -7); }
+  return n;
+}
+const pendingTitles = {};
+const bookById = id => S.books.find(x => x.id === id);
+function bookTitle(id) { const b = bookById(id); return b ? b.title : pendingTitles[id] || (id ? 'Libro borrado' : 'Sin libro'); }
+function bookStats(b) {
+  const list = S.sessions.filter(s => s.bookId === b.id);
+  const total = list.reduce((a, s) => a + minOf(s), 0);
+  const dates = [...new Set(list.map(s => s.date))].sort();
+  const start = b.startedAt || dates[0] || null;
+  const end = b.status === 'terminado' ? (b.finishedAt || dates[dates.length - 1] || null) : null;
+  const span = start ? daysBetween(start, end || todayStr()) : 0;
+  const page = b.status === 'terminado' ? (b.pages || 0) : (Number(b.currentPage) || 0);
+  const pct = b.pages ? Math.min(1, page / b.pages) : null;
+  const pph = page > 0 && total > 0.5 ? page / (total / 60) : null;
+  const remainMin = b.pages && pph && b.status !== 'terminado' ? Math.max(0, (b.pages - page) / pph * 60) : null;
+  const avgSession = list.length ? total / list.length : 0;
+  return { list, total, sessions: list.length, daysRead: dates.length, first: dates[0] || null, last: dates[dates.length - 1] || null, start, end, span, page, pct, pph, remainMin, avgSession };
+}
+const reading = () => S.books.filter(b => b.status === 'leyendo');
+function defaultBookId() {
+  const last = [...S.sessions].reverse().find(s => s.bookId && reading().some(b => b.id === s.bookId));
+  return last ? last.bookId : (reading()[0]?.id || '');
+}
+function heat(m, goal) { if (!m) return 0; if (m >= goal * 2) return 4; if (m >= goal) return 3; if (m >= goal / 2) return 2; return 1; }
+function slotOf(s) {
+  if (s.source !== 'timer' || !s.createdAt) return null;
+  const h = new Date(s.createdAt - secOf(s) * 1000).getHours();
+  return h < 6 ? 3 : h < 12 ? 0 : h < 19 ? 1 : 2;
+}
+const SLOTS = ['Mañana', 'Tarde', 'Noche', 'Madrugada'];
+function monthStats(ym) {
+  const byDay = minutesByDay(), goal = S.settings.goal || 20, n = daysIn(ym), today = todayStr();
+  const isCurrent = ym === monthOf(today), isFuture = ym > monthOf(today);
+  const elapsed = isFuture ? 0 : isCurrent ? Number(today.slice(8)) : n;
+  const days = []; let total = 0, read = 0, met = 0, best = { d: null, m: 0 }, run = 0, maxRun = 0;
+  for (let i = 1; i <= n; i++) {
+    const key = ym + '-' + pad(i), m = byDay[key] || 0;
+    days.push({ day: i, key, m }); total += m;
+    if (m) { read++; run++; maxRun = Math.max(maxRun, run); } else run = 0;
+    if (m >= goal) met++;
+    if (m > best.m) best = { d: key, m };
+  }
+  const ses = S.sessions.filter(s => monthOf(s.date) === ym);
+  const byBook = {}; for (const s of ses) byBook[s.bookId || ''] = (byBook[s.bookId || ''] || 0) + minOf(s);
+  const wd = Array(7).fill(0), wdN = Array(7).fill(0);
+  for (const d of days) { if (d.day > elapsed) break; const w = (parseYmd(d.key).getDay() + 6) % 7; wd[w] += d.m; wdN[w]++; }
+  const slots = [0, 0, 0, 0]; for (const s of ses) { const k = slotOf(s); if (k != null) slots[k] += minOf(s); }
+  const moods = {}; for (const s of ses) if (s.mood) moods[s.mood] = (moods[s.mood] || 0) + 1;
+  const notes = ses.filter(s => s.note).reverse();
+  return { ym, n, elapsed, isCurrent, total, read, met, best, maxRun, days, byBook, wdAvg: wd.map((v, i) => wdN[i] ? v / wdN[i] : 0), slots, moods, notes, sessions: ses.length, goal, avgDay: elapsed ? total / elapsed : 0, avgRead: read ? total / read : 0 };
+}
+
+/* ============ piezas ============ */
+const $app = document.getElementById('app'), $drawer = document.getElementById('drawer'), $session = document.getElementById('session');
+function cover(b, fs = 15) {
+  return `<div class="cover" style="--c:${coverColor(b)};--fs:${fs}px"><span class="ct">${esc(b ? b.title : 'Sin libro')}</span><span><span class="rule" style="display:block;margin-bottom:6px"></span><span class="ca">${esc(b && b.author ? b.author : '')}</span></span></div>`;
+}
+function ring(m, goal, size = 112) {
+  const C = 2 * Math.PI * 50, pct = Math.min(1, m / goal);
+  return `<div class="ring ${m >= goal ? 'done' : ''}" style="width:${size}px;height:${size}px"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="50"/><circle class="fill" cx="60" cy="60" r="50" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - pct)).toFixed(1)}"/></svg>
+    <div class="lbl"><b>${Math.floor(m)}</b><small>de ${goal} min</small></div></div>`;
+}
+function monthNav(ym) {
+  return `<div class="monthnav"><button class="navbtn" data-act="month" data-d="-1" aria-label="Mes anterior">‹</button><h2>${monthName(ym)}</h2><button class="navbtn" data-act="month" data-d="1" aria-label="Mes siguiente" ${ym >= monthOf(todayStr()) ? 'disabled' : ''}>›</button></div>`;
+}
+const rbar = (x, y, w, h, r) => { r = Math.min(r, w / 2, h); return `M${x.toFixed(1)},${(y + h).toFixed(1)}V${(y + r).toFixed(1)}Q${x.toFixed(1)},${y.toFixed(1)} ${(x + r).toFixed(1)},${y.toFixed(1)}H${(x + w - r).toFixed(1)}Q${(x + w).toFixed(1)},${y.toFixed(1)} ${(x + w).toFixed(1)},${(y + r).toFixed(1)}V${(y + h).toFixed(1)}Z`; };
+function hbars(rows, total, unit = 'min') {
+  const max = Math.max(...rows.map(r => r[1]), 0.0001);
+  return `<div class="hbars">${rows.map(([label, v, extra]) => `<div class="hb"><div class="top"><span>${esc(label)}</span><span>${unit === 'min' ? fmtShort(v) : v}${total ? ' · ' + Math.round(v / total * 100) + '%' : ''}${extra || ''}</span></div><div class="bar"><i style="width:${(v / max * 100).toFixed(1)}%"></i></div></div>`).join('')}</div>`;
+}
+function columns(vals, labels, fmt) {
+  const max = Math.max(...vals, 0.0001), top = vals.indexOf(Math.max(...vals));
+  return `<div class="cols ${vals.length === 4 ? 'four' : ''}">${vals.map((v, i) => `<div class="col" data-tip="${esc(labels[i] + ': ' + fmt(v))}"><span class="v">${v ? fmt(v) : ''}</span><span class="b ${i === top && v > 0 ? 'top' : ''}" style="height:${(v / max * 100).toFixed(1)}%"></span><span class="n">${labels[i].slice(0, vals.length === 4 ? 9 : 1).replace(/^./, c => c.toUpperCase())}</span></div>`).join('')}</div>`;
+}
+
+/* ============ render ============ */
+function render() {
+  renderNav();
+  if (!S.ready) { $app.innerHTML = '<p class="loading">Abriendo tu registro de lectura…</p>'; return; }
+  let html = S.mode === 'local' ? `<p class="notice">Tus datos se guardan en este teléfono. Descarga un respaldo desde el menú de Foco+ de vez en cuando.</p>` : '';
+  html += S.view === 'hoy' ? viewHoy() : S.view === 'mes' ? viewMes() : S.view === 'estante' ? viewEstante() : viewLibros();
+  $app.innerHTML = html;
+  if (sessionOpen) renderSession();
+}
+function renderNav() {
+  const it = ([k, l]) => `<button data-view="${k}" ${S.view === k ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`;
+  const live = timer.start || timer.acc;
+  const play = `<button class="play ${live ? 'live' : ''}" data-act="open-session" aria-label="${live ? 'Volver a la sesión en curso' : 'Empezar a leer'}">${ICON.play}${live ? `<span id="fabclock">${clockText()}</span>` : ''}</button>`;
+  document.getElementById('navin').innerHTML = it(['hoy', 'Hoy']) + it(['mes', 'Mes']) + play + it(['estante', 'Estante']) + it(['libros', 'Libros']);
+}
+const renderFab = renderNav;
+function greeting() { const h = new Date().getHours(); return h < 6 ? 'Buenas noches' : h < 13 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches'; }
+
+function insightFor(byDay) {
+  const t = todayStr(), y = addDays(t, -1), d = parseYmd(t);
+  const weekN = weekCount(byDay, mondayOf(t));
+  if (!byDay[t] && !byDay[y] && byDay[addDays(t, -2)])
+    return ['Ayer no leíste, y no pasa nada. Saltarse <b>un día suelto</b> no afectó la formación del hábito en el estudio más citado sobre el tema. Lo que importa es retomar hoy.', 'Lally et al., 2010 · European Journal of Social Psychology'];
+  if ((d.getDate() <= 3 || d.getDay() === 1) && weekN === 0)
+    return [d.getDate() <= 3 ? '<b>Mes nuevo, página en blanco.</b> Los comienzos de mes o de semana son el mejor momento para retomar una meta.' : '<b>Semana nueva.</b> Los lunes y los inicios de mes funcionan como “borrón y cuenta nueva”: es más fácil retomar una meta ahí.', 'Dai, Milkman y Riis, 2014 · Management Science'];
+  if (!S.settings.plan)
+    return ['Decidir <b>cuándo y dónde</b> vas a leer tiene un efecto fuerte sobre cumplir una meta, mucho mayor que solo tener la intención.', 'Gollwitzer y Sheeran, 2006 · meta-análisis de 94 estudios'];
+  if ((byDay[t] || 0) >= S.settings.goal)
+    return ['<b>Meta de hoy cumplida.</b> Anotar lo que haces es parte del efecto: registrar el avance aumenta la probabilidad de lograr una meta.', 'Harkin et al., 2016 · Psychological Bulletin'];
+  const tips = [
+    ['Leer libros con regularidad se asoció con <b>vivir más</b> en un seguimiento de 12 años a 3.635 adultos, y el efecto pasaba por una mejor salud cognitiva.', 'Bavishi, Slade y Levy, 2016 · Social Science & Medicine'],
+    ['Al terminar una sesión, anota <b>una idea</b> con tus palabras. Recordar y escribir lo leído ayuda a fijarlo mejor que releer.', 'Roediger y Karpicke, 2006 · Psychological Science'],
+    ['Cuando te acercas a una meta, el esfuerzo se acelera. Por eso tu anillo diario y la barra de cada libro muestran lo que <b>falta</b>.', 'Kivetz, Urminsky y Zheng, 2006 · efecto del gradiente de meta'],
+  ];
+  return tips[d.getDate() % tips.length];
+}
+
+function perBookHint(goal) {
+  const fin = S.books.filter(b => b.status === 'terminado').map(bookStats).filter(x => x.total > 0);
+  if (!fin.length) return 'Una sesión corta también cuenta: lo importante es volver mañana.';
+  const avg = fin.reduce((a, x) => a + x.total, 0) / fin.length;
+  return `Un libro te toma ~${fmtShort(avg)}. Con ${goal} min al día serían unos ${Math.max(1, Math.round(goal * 365 / avg))} libros al año.`;
+}
+function viewHoy() {
+  const byDay = minutesByDay(), t = todayStr(), m = byDay[t] || 0, goal = S.settings.goal || 20;
+  const monday = mondayOf(t), wTarget = S.settings.weekDays || 5, wDone = weekCount(byDay, monday);
+  const sd = streakDays(byDay), ws = weekStreak(byDay);
+  const todays = S.sessions.filter(s => s.date === t);
+  const books = reading();
+  const [ins, cite] = insightFor(byDay);
+  const plan = S.settings.plan;
+  let week = '';
+  for (let i = 0; i < 7; i++) {
+    const k = addDays(monday, i), v = byDay[k] || 0;
+    week += `<div class="wd ${v >= goal ? 'met' : v ? 'read' : ''} ${k === t ? 'today' : ''} ${k > t ? 'future' : ''}" data-tip="${esc(niceDate(k) + ': ' + fmtMin(v))}"><i></i><span>${DOW[i]}</span></div>`;
+  }
+  return `
+  <header class="hd"><div><p class="eyebrow">${esc(niceDate(t))}</p><h1>${greeting()}</h1></div>
+    <button class="iconbtn" data-act="science" aria-label="Por qué la app funciona así">${ICON.info}</button></header>
+
+  <section class="card">
+    <div class="ringrow">
+      ${ring(m, goal)}
+      <div style="display:grid;gap:8px;min-width:0">
+        <h2>${m >= goal ? 'Meta del día cumplida' : m ? `Te faltan ${fmtShort(goal - m)}` : 'Aún no lees hoy'}</h2>
+        <p class="small muted">${m ? `Llevas ${fmtMin(m)} hoy.` : perBookHint(goal)}</p>
+        <div class="stepper">Meta <button data-act="goal" data-d="-5" aria-label="Bajar meta diaria">−</button><b>${goal} min</b><button data-act="goal" data-d="5" aria-label="Subir meta diaria">+</button></div>
+      </div>
+    </div>
+    <div class="weekrow">${week}</div>
+    <div class="streaks">
+      <span class="chip-stat"><b>${wDone}/${wTarget}</b> días esta semana</span>
+      <span class="chip-stat"><b>${sd}</b> ${plural(sd, 'día seguido', 'días seguidos')}</span>
+      <span class="chip-stat"><b>${ws}</b> ${plural(ws, 'semana cumplida', 'semanas cumplidas')}</span>
+    </div>
+  </section>
+
+  <div class="sec-title"><h2>Leyendo ahora</h2><button class="link" data-view="libros">Ver libros</button></div>
+  <div class="reel">
+    ${books.map(b => { const st = bookStats(b); return `
+      <div class="now ${books.length === 1 ? 'solo' : ''}">
+        <button style="all:unset;cursor:pointer" data-act="book" data-id="${esc(b.id)}" aria-label="Ver ${esc(b.title)}">${cover(b, 13)}</button>
+        <div class="info">
+          <div style="display:grid;gap:4px"><h3>${esc(b.title)}</h3>
+            <span class="sub">${st.pct != null ? `Página ${st.page} de ${b.pages} · ${Math.round(st.pct * 100)}%` : st.start ? `Día ${st.span} · ${fmtShort(st.total)} leídos` : 'Recién empezado'}</span></div>
+          ${st.pct != null ? `<div class="bar cinta"><i style="width:${(st.pct * 100).toFixed(1)}%"></i></div>` : ''}
+          ${st.remainMin != null ? `<span class="sub">Te quedan ~${fmtShort(st.remainMin)}</span>` : ''}
+          <button class="btn-play" data-act="read-book" data-id="${esc(b.id)}">${ICON.play}Seguir leyendo</button>
+        </div>
+      </div>`; }).join('')}
+    <button class="add-now" data-act="new-book"><b>+</b>${books.length ? 'Otro libro' : 'Agrega el libro que estás leyendo'}</button>
+  </div>
+
+  ${plan ? `<section class="card plan">
+      <p class="eyebrow">Mi plan de lectura</p>
+      <p class="big">Cuando <em>${esc(plan.cuando)}</em>, leo en <em>${esc(plan.donde)}</em>.</p>
+      <button class="link" data-act="plan">Cambiar plan</button></section>`
+    : `<section class="card plan">
+      <p class="eyebrow">Arma tu plan</p>
+      <p class="big">Cuando <em>…</em>, leo en <em>…</em>.</p>
+      <p style="opacity:.8;font-size:14px">Un plan con hora y lugar concreto convierte la intención en costumbre.</p>
+      <button class="btn" style="background:#fff;color:#2F3F86;justify-self:start;padding:11px 16px" data-act="plan">Definir mi plan</button></section>`}
+
+  <div class="insight"><div><p>${ins}</p><cite>${cite}</cite></div></div>
+
+  <section class="card">
+    <div class="sec-title" style="padding:0"><h2 style="font-size:19px">Lecturas de hoy</h2><button class="link" data-act="add">+ Anotar a mano</button></div>
+    ${todays.length ? `<div class="list">${todays.slice().reverse().map(sessionRow).join('')}</div>` : `<p class="empty">Toca <b>Leer</b> para empezar una sesión, o anota a mano lo que ya leíste.</p>`}
+  </section>`;
+}
+function sessionRow(s) {
+  const mood = MOODS.find(x => x[0] === s.mood);
+  const conf = S.confirm === s.id;
+  return `<div class="row"><span class="dot" style="background:${coverColor(bookById(s.bookId))}"></span>
+    <span class="t">${esc(bookTitle(s.bookId))}<small>${s.source === 'timer' ? 'Sesión con reloj' : 'Anotado a mano'}${s.pageEnd ? ' · hasta pág. ' + s.pageEnd : ''}${mood ? ' · ' + mood[1].toLowerCase() : ''}</small></span>
+    <span class="v">${fmtMin(minOf(s))}</span>
+    ${conf ? `<button class="x danger" data-act="del-yes" data-id="${esc(s.id)}">Borrar</button>` : `<button class="x" data-act="del" data-id="${esc(s.id)}" aria-label="Quitar lectura">✕</button>`}</div>`;
+}
+
+function dailyChart(st) {
+  const W = 340, H = 150, L = 26, R = 4, T = 16, B = 20, pw = W - L - R, ph = H - T - B;
+  const maxM = Math.max(st.goal, ...st.days.map(d => d.m));
+  const steps = [10, 20, 30, 45, 60, 90, 120, 180, 240, 300, 360, 480, 600];
+  const top = steps.find(s => s >= maxM * 1.1) || Math.ceil(maxM / 60) * 60;
+  const y = v => T + ph - (v / top) * ph, slot = pw / st.n, bw = Math.max(3, slot * .62);
+  let g = '';
+  [0, top].forEach(v => { g += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/><text class="ax" x="${L - 5}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v}</text>`; });
+  st.days.forEach((d, i) => {
+    const x = L + i * slot + (slot - bw) / 2;
+    if (d.m) { const h = Math.max(2, (d.m / top) * ph); g += `<path class="b ${d.m >= st.goal ? 'met' : ''}" d="${rbar(x, T + ph - h, bw, h, 3)}"/>`; }
+    g += `<rect class="hit" x="${(L + i * slot).toFixed(1)}" y="${T}" width="${slot.toFixed(1)}" height="${ph}" data-tip="${esc(d.day + ' ' + MESES[Number(st.ym.slice(5)) - 1].slice(0, 3) + ': ' + fmtMin(d.m))}"/>`;
+  });
+  [1, 8, 15, 22, st.n].forEach(d => { g += `<text class="ax" x="${(L + (d - .5) * slot).toFixed(1)}" y="${H - 4}" text-anchor="middle">${d}</text>`; });
+  const gy = y(st.goal);
+  g += `<line class="goal" x1="${L}" x2="${W - R}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}"/><text class="gl" x="${W - R}" y="${(gy - 5).toFixed(1)}" text-anchor="end">meta ${st.goal}</text>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Minutos leídos por día">${g}</svg>`;
+}
+
+function viewMes() {
+  const st = monthStats(S.month), prev = monthStats(shiftMonth(S.month, -1)), t = todayStr(), byDay = minutesByDay();
+  const first = (parseYmd(S.month + '-01').getDay() + 6) % 7;
+  let cells = DOW.map(d => `<div class="dow">${d}</div>`).join('');
+  for (let i = 0; i < first; i++) cells += `<div class="day blank"></div>`;
+  for (const d of st.days) {
+    const fut = d.key > t;
+    cells += `<button class="day h${heat(d.m, st.goal)} ${d.key === t ? 'today' : ''} ${fut ? 'future' : ''}" ${fut ? 'disabled' : ''} data-act="day" data-key="${d.key}" aria-label="${esc(niceDate(d.key))}: ${fmtMin(d.m)}">${d.day}</button>`;
+  }
+  let delta = '';
+  if (prev.total > 0 && st.total > 0) { const p = Math.round((st.total - prev.total) / prev.total * 100); delta = `<span class="delta ${p < 0 ? 'down' : ''}">${p >= 0 ? '+' : ''}${p}% vs ${MESES[Number(prev.ym.slice(5)) - 1]}</span>`; }
+  const finished = S.books.filter(b => b.status === 'terminado' && b.finishedAt && monthOf(b.finishedAt) === S.month);
+  const head = `${monthNav(S.month)}
+    <section class="card">
+      <div class="hero"><b>${fmtNum(st.total)}</b><span>minutos leídos${st.isCurrent ? ` · día ${st.elapsed} de ${st.n}` : ''}</span>${delta}</div>
+      <div class="cal">${cells}</div>
+      <div class="legend">Menos <i></i><i class="h1"></i><i class="h2"></i><i class="h3"></i><i class="h4"></i> Más <span style="margin-left:auto">Oscuro = meta cumplida</span></div>
+    </section>`;
+  if (!st.total && !finished.length) return head + `<section class="card"><p class="empty">Este mes todavía no tiene lecturas. Cuando registres sesiones verás aquí tu ritmo, tus mejores días y las ideas que anotes.</p></section>`;
+  const books = Object.entries(st.byBook).sort((a, b) => b[1] - a[1]);
+  const pace = st.isCurrent && st.elapsed ? st.avgDay * st.n : null;
+  const slotsTotal = st.slots.reduce((a, b) => a + b, 0);
+  const moodTotal = Object.values(st.moods).reduce((a, b) => a + b, 0);
+  return head + `
+  <section class="card">
+    <div class="kpis">
+      <div class="kpi"><b>${Math.round(st.avgDay)}<small style="font-size:15px"> min</small></b><span>promedio diario</span></div>
+      <div class="kpi"><b>${st.read}<small style="font-size:15px">/${st.elapsed || st.n}</small></b><span>días con lectura</span></div>
+      <div class="kpi"><b>${st.met}</b><span>días con meta cumplida</span></div>
+      <div class="kpi"><b>${st.maxRun}</b><span>racha más larga (días)</span></div>
+      <div class="kpi"><b>${fmtShort(st.best.m)}</b><span>mejor día${st.best.d ? ' · ' + shortDate(st.best.d) : ''}</span></div>
+      <div class="kpi"><b>${finished.length}</b><span>${plural(finished.length, 'libro terminado', 'libros terminados')}</span></div>
+    </div>
+    ${pace ? `<p class="small muted">A este ritmo cerrarías ${MESES[Number(S.month.slice(5)) - 1]} con <b style="color:var(--ink)">${fmtShort(pace)}</b> de lectura.</p>` : ''}
+  </section>
+  <section class="card"><p class="eyebrow">Minutos por día</p>${dailyChart(st)}</section>
+  <section class="card">
+    <p class="eyebrow">Cuándo lees</p>
+    ${columns(st.wdAvg, DOW_LONG, v => Math.round(v) + "'")}
+    <p class="small muted">Promedio de minutos según el día de la semana.${st.wdAvg.some(v => v) ? ` Tu mejor día es el <b style="color:var(--ink)">${DOW_LONG[st.wdAvg.indexOf(Math.max(...st.wdAvg))]}</b>.` : ''}</p>
+    ${slotsTotal ? `${columns(st.slots, SLOTS, v => fmtShort(v))}<p class="small muted">Momento del día, según tus sesiones con reloj. Lees más en la <b style="color:var(--ink)">${SLOTS[st.slots.indexOf(Math.max(...st.slots))].toLowerCase()}</b>: ese es un buen horario para tu plan.</p>` : ''}
+  </section>
+  ${books.length ? `<section class="card"><p class="eyebrow">En qué libros se fue tu tiempo</p>${hbars(books.map(([id, m]) => [bookTitle(id), m]), st.total)}</section>` : ''}
+  ${moodTotal ? `<section class="card"><p class="eyebrow">Cómo te sentiste leyendo</p>${hbars(MOODS.filter(x => st.moods[x[0]]).map(x => [x[1], st.moods[x[0]]]).sort((a, b) => b[1] - a[1]), moodTotal, 'n')}</section>` : ''}
+  ${finished.length ? `<section class="card"><p class="eyebrow">Terminaste este mes</p><div class="list">${finished.map(b => { const s = bookStats(b); return `<button class="bookrow" data-act="book" data-id="${esc(b.id)}">${cover(b, 8)}<div><h3>${esc(b.title)}</h3><div class="meta">${s.span} ${plural(s.span, 'día', 'días')} · ${fmtShort(s.total)} de lectura</div></div><span class="pill terminado">${shortDate(b.finishedAt)}</span></button>`; }).join('')}</div></section>` : ''}
+  ${st.notes.length ? `<section class="card"><p class="eyebrow">Ideas que te llevaste · ${st.notes.length}</p>${st.notes.slice(0, 8).map(s => `<div class="quote"><p>${esc(s.note)}</p><small>${esc(bookTitle(s.bookId))} · ${shortDate(s.date)}</small></div>`).join('')}</section>` : ''}`;
+}
+
+function shelfChart(counts) {
+  const W = 340, H = 130, L = 18, R = 4, T = 16, B = 20, pw = W - L - R, ph = H - T - B;
+  const max = Math.max(2, ...counts.map(c => c.n)), slot = pw / counts.length, bw = slot * .56;
+  const y = v => T + ph - (v / max) * ph;
+  let g = `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/>`;
+  counts.forEach((c, i) => {
+    const x = L + i * slot + (slot - bw) / 2;
+    if (c.n) g += `<path class="b ${c.cur ? 'met' : ''}" d="${rbar(x, y(c.n), bw, T + ph - y(c.n), 4)}"/><text class="vl" x="${(x + bw / 2).toFixed(1)}" y="${(y(c.n) - 5).toFixed(1)}" text-anchor="middle">${c.n}</text>`;
+    g += `<rect class="hit" x="${(L + i * slot).toFixed(1)}" y="${T}" width="${slot.toFixed(1)}" height="${ph}" data-tip="${esc(c.label + ': ' + c.n + ' ' + plural(c.n, 'libro', 'libros'))}"/><text class="ax" x="${(x + bw / 2).toFixed(1)}" y="${H - 4}" text-anchor="middle">${c.short}</text>`;
+  });
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Libros terminados por mes">${g}</svg>`;
+}
+function viewEstante() {
+  const all = S.books.filter(b => b.status === 'terminado' && b.finishedAt).map(b => ({ b, st: bookStats(b) }));
+  const year = S.month.slice(0, 4), curYear = todayStr().slice(0, 4);
+  const inP = x => S.shelf === 'mes' ? monthOf(x.b.finishedAt) === S.month : S.shelf === 'año' ? x.b.finishedAt.slice(0, 4) === year : true;
+  const fin = all.filter(inP).sort((a, b) => (a.b.finishedAt < b.b.finishedAt ? -1 : 1));
+  const periodName = S.shelf === 'mes' ? monthName(S.month) : S.shelf === 'año' ? year : 'todo tu historial';
+  const seg = `<div class="seg" role="radiogroup" aria-label="Periodo">${[['mes', 'Mes'], ['año', 'Año'], ['todo', 'Todo']].map(([k, l]) => `<button role="radio" aria-checked="${S.shelf === k}" data-act="shelf" data-p="${k}">${l}</button>`).join('')}</div>`;
+  const nav = S.shelf === 'mes' ? monthNav(S.month) : S.shelf === 'año' ? `<div class="monthnav"><button class="navbtn" data-act="year" data-d="-1" aria-label="Año anterior">‹</button><h2>${year}</h2><button class="navbtn" data-act="year" data-d="1" aria-label="Año siguiente" ${year >= curYear ? 'disabled' : ''}>›</button></div>` : '';
+  const maxPages = Math.max(1, ...fin.map(x => x.b.pages || 0)), maxSpan = Math.max(1, ...fin.map(x => x.st.span));
+  const spines = fin.map(x => {
+    const h = x.b.pages ? 120 + 60 * (x.b.pages / maxPages) : 130 + (x.b.title.length % 5) * 9;
+    const w = 26 + Math.round(18 * (x.st.span / maxSpan));
+    return `<button class="spine" style="--c:${coverColor(x.b)};height:${h.toFixed(0)}px;width:${w}px" data-act="book" data-id="${esc(x.b.id)}" aria-label="${esc(x.b.title)}"><span>${esc(x.b.title)}</span></button>`;
+  }).join('');
+  const shelfCard = `<section class="card"><div class="shelf">${spines || `<p class="shelf-empty">Tu estante de ${esc(periodName)} está vacío. Cada libro que termines aparecerá aquí como un lomo: más alto si tiene más páginas, más ancho si te tomó más días.</p>`}</div>
+    <div style="display:flex;align-items:baseline;gap:8px"><b style="font-family:var(--f-display);font-size:40px;line-height:1">${fin.length}</b><span class="muted">${plural(fin.length, 'libro terminado', 'libros terminados')} en ${esc(periodName)}</span></div></section>`;
+
+  let kpis = '';
+  if (fin.length) {
+    const avgSpan = fin.reduce((a, x) => a + x.st.span, 0) / fin.length;
+    const timed = fin.filter(x => x.st.total > 0);
+    const avgTime = timed.length ? timed.reduce((a, x) => a + x.st.total, 0) / timed.length : 0;
+    const fast = [...fin].sort((a, b) => a.st.span - b.st.span)[0];
+    const pagesTotal = fin.reduce((a, x) => a + (x.b.pages || 0), 0);
+    const withP = fin.filter(x => x.b.pages && x.st.total > 0);
+    const pph = withP.length ? withP.reduce((a, x) => a + x.b.pages, 0) / (withP.reduce((a, x) => a + x.st.total, 0) / 60) : null;
+    kpis = `<section class="card"><div class="kpis">
+      <div class="kpi"><b>${Math.round(avgSpan)}</b><span>días promedio por libro</span></div>
+      <div class="kpi"><b>${avgTime ? fmtShort(avgTime) : '–'}</b><span>de lectura por libro</span></div>
+      <div class="kpi"><b>${fast.st.span} ${plural(fast.st.span, 'día', 'días')}</b><span>el más rápido: ${esc(fast.b.title)}</span></div>
+      <div class="kpi"><b>${pagesTotal ? pagesTotal.toLocaleString('es-CL') : '–'}</b><span>${pagesTotal ? 'páginas leídas' : 'páginas (anótalas al terminar)'}</span></div>
+      ${pph ? `<div class="kpi"><b>${Math.round(pph)}</b><span>páginas por hora</span></div>` : ''}
+      <div class="kpi"><b>${Math.round(365 / Math.max(1, avgSpan))}</b><span>libros al año a este ritmo</span></div>
+    </div></section>
+    <section class="card"><p class="eyebrow">Cuánto te demoraste en cada libro</p>
+      <div class="hbars">${[...fin].reverse().map(x => `<div class="hb"><div class="top"><span>${esc(x.b.title)}</span><span>${x.st.span} ${plural(x.st.span, 'día', 'días')}</span></div><div class="bar"><i style="width:${(x.st.span / maxSpan * 100).toFixed(1)}%;background:${coverColor(x.b)}"></i></div>
+        <div class="small muted" style="display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px"><span>${shortDate(x.st.start || x.b.finishedAt)} → ${shortDate(x.b.finishedAt)}</span>${x.st.total ? `<span>${fmtShort(x.st.total)}</span>` : ''}${x.st.daysRead ? `<span>${x.st.daysRead} ${plural(x.st.daysRead, 'día leído', 'días leídos')}</span>` : ''}${x.b.pages ? `<span>${x.b.pages} pág.</span>` : ''}</div></div>`).join('')}</div>
+    </section>`;
+  }
+  const yGoal = S.settings.yearGoal || 12, yDone = all.filter(x => x.b.finishedAt.slice(0, 4) === curYear).length;
+  const daysLeft = Math.max(1, daysBetween(todayStr(), curYear + '-12-31')), left = yGoal - yDone;
+  const avgAll = all.length ? all.reduce((a, x) => a + x.st.span, 0) / all.length : null;
+  const C = 2 * Math.PI * 50, gp = Math.min(1, yDone / yGoal);
+  const goalCard = `<section class="card"><p class="eyebrow">Reto ${curYear}</p>
+    <div class="ringrow"><div class="ring ${yDone >= yGoal ? 'done' : ''}" style="width:100px;height:100px"><svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="50"/><circle class="fill" cx="60" cy="60" r="50" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - gp)).toFixed(1)}" style="stroke:var(--cinta)"/></svg><div class="lbl"><b>${yDone}</b><small>de ${yGoal}</small></div></div>
+    <div style="display:grid;gap:8px;min-width:0"><p class="small muted">${yDone >= yGoal ? '<b style="color:var(--ink)">¡Reto cumplido!</b> Todo lo que viene es extra.' : `Te ${left === 1 ? 'falta 1 libro' : 'faltan ' + left + ' libros'} en ${daysLeft} días: uno cada <b style="color:var(--ink)">${Math.max(1, Math.round(daysLeft / left))} días</b>.${avgAll ? (avgAll <= daysLeft / left ? ' Tu ritmo actual te alcanza.' : ` Hoy te demoras ${Math.round(avgAll)} días por libro.`) : ''}`}</p>
+    <div class="stepper">Meta <button data-act="ygoal" data-d="-1" aria-label="Bajar meta anual">−</button><b>${yGoal} libros</b><button data-act="ygoal" data-d="1" aria-label="Subir meta anual">+</button></div></div></div></section>`;
+  const counts = [];
+  for (let k = 11; k >= 0; k--) { const ym = shiftMonth(monthOf(todayStr()), -k); counts.push({ n: all.filter(x => monthOf(x.b.finishedAt) === ym).length, short: MESES[Number(ym.slice(5)) - 1].slice(0, 1).toUpperCase(), label: monthName(ym), cur: k === 0 }); }
+  const pend = S.books.filter(b => b.status === 'pendiente');
+  return `<header class="hd"><div><p class="eyebrow">Tus libros terminados</p><h1>Estantería</h1></div></header>
+  ${seg}${nav}${shelfCard}${kpis}${goalCard}
+  <section class="card"><p class="eyebrow">Libros terminados · últimos 12 meses</p>${shelfChart(counts)}</section>
+  ${pend.length ? `<section class="card"><p class="eyebrow">Por leer · ${pend.length}</p><div class="chips">${pend.map(b => `<button class="chip" data-act="book" data-id="${esc(b.id)}">${esc(b.title)}</button>`).join('')}</div>${avgAll ? `<p class="small muted">A tu ritmo, terminarlos todos te tomaría unos ${Math.round(pend.length * avgAll)} días.</p>` : ''}</section>` : ''}`;
+}
+
+const SUGERIDOS = ['Cuatro mil semanas', 'Deja de ser tú', 'El hombre en busca de sentido', 'La quietud es la clave', 'Cuando todo se derrumba', 'El arte de amar', 'El poder de ser vulnerable', 'Siddhartha'];
+function viewLibros() {
+  const groups = { leyendo: [], pendiente: [], terminado: [] };
+  for (const b of S.books) (groups[b.status] || groups.pendiente).push(b);
+  groups.terminado.sort((a, b) => ((a.finishedAt || '') < (b.finishedAt || '') ? 1 : -1));
+  const list = groups[S.lib] || [];
+  const sug = SUGERIDOS.filter(t => !S.books.some(b => b.title.toLowerCase() === t.toLowerCase()));
+  const label = { leyendo: 'Leyendo', pendiente: 'Por leer', terminado: 'Terminados' };
+  const empty = { leyendo: 'No tienes libros en curso. Agrega uno o pasa uno de “Por leer”.', pendiente: 'Tu lista de por leer está vacía.', terminado: 'Aún no terminas libros. Cuando termines uno, márcalo desde su ficha.' };
+  return `<header class="hd"><div><p class="eyebrow">${S.books.length} ${plural(S.books.length, 'libro', 'libros')}</p><h1>Mis libros</h1></div>
+    <button class="btn tinta" style="padding:11px 16px;font-size:15px" data-act="new-book">+ Agregar</button></header>
+  <div class="seg" role="radiogroup" aria-label="Filtro">${Object.keys(label).map(k => `<button role="radio" aria-checked="${S.lib === k}" data-act="lib" data-k="${k}">${label[k]} · ${groups[k].length}</button>`).join('')}</div>
+  <section class="card" style="padding-block:6px">
+    ${list.length ? `<div class="list">${list.map(b => { const st = bookStats(b); return `<button class="bookrow" data-act="book" data-id="${esc(b.id)}">${cover(b, 8)}
+      <div style="min-width:0"><h3>${esc(b.title)}</h3><div class="meta">
+        ${b.status === 'terminado' ? `<span>${st.span} ${plural(st.span, 'día', 'días')} · ${st.total ? fmtShort(st.total) : 'sin sesiones'} · ${b.finishedAt ? shortDate(b.finishedAt) : ''}</span>`
+          : b.status === 'leyendo' ? `${st.pct != null ? `<div class="bar cinta"><i style="width:${(st.pct * 100).toFixed(1)}%"></i></div><span>Pág. ${st.page} de ${b.pages}${st.remainMin != null ? ' · quedan ~' + fmtShort(st.remainMin) : ''}</span>` : `<span>${st.start ? 'Día ' + st.span + ' · ' : ''}${fmtShort(st.total)} leídos</span>`}`
+          : `<span>${esc(b.author || 'Por empezar')}</span>`}
+      </div></div><span class="pill ${b.status}">${b.status === 'terminado' ? '✓' : b.status === 'leyendo' ? (st.pct != null ? Math.round(st.pct * 100) + '%' : 'Leyendo') : '—'}</span></button>`; }).join('')}</div>` : `<p class="empty" style="padding:22px 6px">${empty[S.lib]}</p>`}
+  </section>
+  ${sug.length ? `<section class="card flat"><p class="eyebrow">Ideas para tu lista</p><div class="chips">${sug.map(t => `<button class="chip" data-act="book-sug" data-t="${esc(t)}">+ ${esc(t)}</button>`).join('')}</div></section>` : ''}`;
+}
+
+/* ============ modo lectura ============ */
+function elapsedMs() { return timer.acc + (timer.start ? Date.now() - timer.start : 0); }
+function clockText() {
+  const temp = timer.mode === 'temp';
+  const s = temp ? Math.max(0, Math.ceil((timer.target * 1000 - elapsedMs()) / 1000)) : Math.floor(elapsedMs() / 1000);
+  const h = Math.floor(s / 3600);
+  return (h ? h + ':' : '') + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60);
+}
+function renderSession() {
+  if (!sessionOpen) { $session.hidden = true; $session.innerHTML = ''; return; }
+  $session.hidden = false;
+  const live = timer.start || timer.acc, b = bookById(timer.bookId), temp = timer.mode === 'temp';
+  const C = 2 * Math.PI * 47;
+  const pct = temp ? Math.min(1, elapsedMs() / (timer.target * 1000)) : (elapsedMs() / 1000 % 60) / 60;
+  let body;
+  if (!live) {
+    const books = reading();
+    body = `<div class="in">
+      <div style="display:grid;gap:8px"><p class="eyebrow" style="color:var(--night-muted)">¿Qué vas a leer?</p>
+        <div class="booksel">${books.map(x => `<button class="bk" data-act="pick" data-id="${esc(x.id)}" aria-pressed="${timer.bookId === x.id}">${esc(x.title)}</button>`).join('')}
+          <button class="bk" data-act="pick" data-id="" aria-pressed="${!timer.bookId}">Sin libro</button>
+          <button class="bk" data-act="new-book" data-where="session">+ Nuevo</button></div></div>
+      <div class="seg" role="radiogroup" aria-label="Modo"><button role="radio" aria-checked="${!temp}" data-act="mode" data-m="crono">Cronómetro</button><button role="radio" aria-checked="${temp}" data-act="mode" data-m="temp">Temporizador</button></div>
+      <div class="dial"><div class="glow"></div><svg viewBox="0 0 100 100"><circle class="tr" cx="50" cy="50" r="47"/></svg>
+        <div class="clock"><b>${temp ? clockText() : '00:00'}</b><small>${temp ? 'tiempo de lectura' : 'cuenta hacia arriba'}</small></div></div>
+      ${temp ? `<div class="chips" style="justify-content:center">${[10, 15, 20, 30, 45, 60].map(v => `<button class="chip" data-act="tdur" data-v="${v}" aria-pressed="${timer.target === v * 60}">${v}</button>`).join('')}</div>` : `<p class="hint">El reloj sigue corriendo aunque cierres la página.</p>`}
+    </div>`;
+  } else {
+    body = `<div class="in">
+      <p class="booktitle">${esc(b ? b.title : 'Lectura libre')}</p>
+      <div class="dial ${timer.start ? 'run' : ''}"><div class="glow"></div><svg viewBox="0 0 100 100"><circle class="tr" cx="50" cy="50" r="47"/><circle class="fl" id="dialfl" cx="50" cy="50" r="47" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - pct)).toFixed(1)}"/></svg>
+        <div class="clock"><b id="clock">${clockText()}</b><small id="clockstate">${timer.start ? (temp ? 'quedan' : 'leyendo') : 'en pausa · llevas ' + fmtMin(elapsedMs() / 60000)}</small></div></div>
+      <p class="hint">${timer.start ? 'Deja el celular boca abajo. Te avisamos cuando termine.' : 'Tómate un respiro y sigue cuando quieras.'}</p>
+    </div>`;
+  }
+  const actions = !live
+    ? `<button class="btn primary" data-act="timer-start">${temp ? 'Empezar · ' + Math.round(timer.target / 60) + ' min' : 'Empezar a leer'}</button>`
+    : `<div class="btns"><button class="btn ghost" data-act="${timer.start ? 'timer-pause' : 'timer-start'}">${timer.start ? 'Pausar' : 'Seguir'}</button><button class="btn primary" data-act="timer-stop">Terminar</button></div>
+       <button class="discard" data-act="timer-reset">Descartar sesión</button>`;
+  $session.innerHTML = `<div class="top"><p class="eyebrow">Modo lectura</p><button class="min" data-act="close-session">${live ? 'Minimizar' : 'Cerrar'}</button></div>${body}<div class="actions">${actions}</div>`;
+  if (timer.mode === 'crono' && live) { const fl = document.getElementById('dialfl'); if (fl) fl.style.transition = 'none'; }
+}
+function tick() {
+  const c = document.getElementById('clock'); if (c) c.textContent = clockText();
+  const f = document.getElementById('fabclock'); if (f) f.textContent = clockText();
+  const fl = document.getElementById('dialfl');
+  if (fl) { const C = 2 * Math.PI * 47, pct = timer.mode === 'temp' ? Math.min(1, elapsedMs() / (timer.target * 1000)) : (elapsedMs() / 1000 % 60) / 60; fl.setAttribute('stroke-dashoffset', (C * (1 - pct)).toFixed(1)); }
+}
+setInterval(() => {
+  if (S.ready && timer.start && timer.mode === 'temp' && elapsedMs() >= timer.target * 1000) { finishTimer(true); return; }
+  if (timer.start) tick();
+}, 500);
+let wake = null;
+async function keepAwake(on) {
+  try { if (on && navigator.wakeLock && !wake) { wake = await navigator.wakeLock.request('screen'); wake.addEventListener?.('release', () => { wake = null; }); } else if (!on && wake) { await wake.release(); wake = null; } } catch (e) { wake = null; }
+}
+let audioCtx = null;
+function unlockAudio() { try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {} }
+function chime() {
+  try { if (audioCtx) [0, .4, .8].forEach((t, i) => { const o = audioCtx.createOscillator(), g = audioCtx.createGain(), at = audioCtx.currentTime + t; o.type = 'sine'; o.frequency.value = [523, 659, 784][i]; g.gain.setValueAtTime(.0001, at); g.gain.exponentialRampToValueAtTime(.22, at + .04); g.gain.exponentialRampToValueAtTime(.0001, at + .9); o.connect(g).connect(audioCtx.destination); o.start(at); o.stop(at + 1); }); } catch (e) {}
+  try { navigator.vibrate && navigator.vibrate([180, 90, 180]); } catch (e) {}
+}
+let finishing = false;
+async function finishTimer(auto) {
+  if (finishing) return; finishing = true;
+  try {
+    const secs = auto ? timer.target : Math.round(elapsedMs() / 1000), bookId = timer.bookId;
+    if (secs < 1) { toast('No hay tiempo para guardar'); return; }
+    resetTimer(); keepAwake(false);
+    if (auto) chime();
+    const id = await addSession(todayStr(), null, bookId, 'timer', secs);
+    sessionOpen = false; $session.hidden = true; $session.innerHTML = '';
+    render();
+    if (id) sheetCapture(id, secs, bookId, auto);
+  } finally { finishing = false; }
+}
+
+/* ============ hojas ============ */
+function openSheet(html, ctx) { S.sheet = ctx || 'x'; $drawer.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${html}</div>`; $drawer.hidden = false; }
+function closeSheet() { $drawer.hidden = true; $drawer.innerHTML = ''; S.sheet = null; S.sheetDay = null; S.confirm = null; }
+const head = t => `<div class="sheet-head"><h3>${t}</h3><button class="x" data-act="close">Cerrar</button></div>`;
+function bookSelect(id, sel) {
+  const opts = reading().map(b => `<option value="${esc(b.id)}" ${b.id === sel ? 'selected' : ''}>${esc(b.title)}</option>`);
+  if (sel && !reading().some(b => b.id === sel) && (bookById(sel) || pendingTitles[sel])) opts.unshift(`<option value="${esc(sel)}" selected>${esc(bookTitle(sel))}</option>`);
+  return `<select id="${id}"><option value="" ${!sel ? 'selected' : ''}>Sin libro</option>${opts.join('')}</select>`;
+}
+function sheetCapture(sid, secs, bookId, auto) {
+  const b = bookById(bookId);
+  S.capture = { sid, mood: null };
+  openSheet(`
+    <p class="eyebrow" style="text-align:center">${auto ? 'Tiempo cumplido' : 'Sesión guardada'}</p>
+    <div class="stamp">${Math.floor(secs / 60)}:${pad(secs % 60)}</div>
+    <p class="muted" style="text-align:center">${b ? `Sumaste ${fmtMin(secs / 60)} a <b style="color:var(--ink)">${esc(b.title)}</b>.` : `Sumaste ${fmtMin(secs / 60)}.`} Estos datos son opcionales.</p>
+    ${b ? `<div class="fields">
+      <label class="f" for="c-page">¿En qué página quedaste?<input type="number" id="c-page" min="1" inputmode="numeric" value="${b.currentPage || ''}" placeholder="Ej: 84"></label>
+      <label class="f" for="c-pages">Páginas del libro<input type="number" id="c-pages" min="1" inputmode="numeric" value="${b.pages || ''}" placeholder="Ej: 240"></label></div>` : ''}
+    <div style="display:grid;gap:8px"><p class="small muted" style="font-weight:600">¿Cómo te sentiste?</p>
+      <div class="moods">${MOODS.map(([k, l, p]) => `<button class="mood" data-act="mood" data-k="${k}" aria-pressed="false">${moodIcon(p)}${l}</button>`).join('')}</div></div>
+    <label class="f" for="c-note">Una idea que te llevas<textarea id="c-note" placeholder="Escríbela con tus palabras: así se fija mejor."></textarea></label>
+    <div class="btns"><button class="btn ghost" data-act="close">Saltar</button><button class="btn primary" data-act="capture-save">Guardar</button></div>`, 'capture');
+}
+function sheetAdd(dateKey, bookId) {
+  S.sheetDate = dateKey || todayStr();
+  openSheet(`${head('Anotar lectura')}
+    <div class="fields"><label class="f" for="a-date">Día<input type="date" id="a-date" value="${S.sheetDate}" max="${todayStr()}"></label>
+    <label class="f" for="a-min">Minutos<input type="number" id="a-min" min="1" max="600" step="any" inputmode="decimal" value="${S.settings.goal || 20}"></label></div>
+    <div class="chips">${[10, 15, 20, 30, 45, 60].map(v => `<button class="chip" data-act="amin" data-v="${v}">${v} min</button>`).join('')}</div>
+    <label class="f" for="a-book">Libro${bookSelect('a-book', bookId || defaultBookId())}</label>
+    <button class="btn primary" data-act="add-save">Guardar lectura</button>`, 'add');
+}
+function sheetDay(key) {
+  S.sheetDay = key;
+  const list = S.sessions.filter(s => s.date === key), tot = list.reduce((a, s) => a + minOf(s), 0);
+  openSheet(`${head(esc(niceDate(key)).replace(/^./, c => c.toUpperCase()))}
+    <p class="muted">${tot ? `Leíste <b style="color:var(--ink)">${fmtMin(tot)}</b> este día.` : 'Este día no tiene lecturas registradas.'}</p>
+    ${list.length ? `<div class="list">${list.map(sessionRow).join('')}</div>` : ''}
+    ${list.filter(s => s.note).map(s => `<div class="quote"><p>${esc(s.note)}</p><small>${esc(bookTitle(s.bookId))}</small></div>`).join('')}
+    <button class="btn tinta" data-act="add-for" data-key="${key}">+ Agregar lectura a este día</button>`, 'day');
+}
+function sheetBook(id) {
+  const b = bookById(id); if (!b) return;
+  const st = bookStats(b), conf = S.confirm === id;
+  const notes = st.list.filter(s => s.note).reverse();
+  const statusLbl = { leyendo: 'Leyendo', pendiente: 'Por leer', terminado: 'Terminado' };
+  openSheet(`
+    <div class="bookhead">${cover(b, 14)}<div style="display:grid;gap:8px;min-width:0"><span class="pill ${b.status}" style="justify-self:start">${statusLbl[b.status] || 'Por leer'}</span><h3>${esc(b.title)}</h3>${b.author ? `<p class="muted small">${esc(b.author)}</p>` : ''}</div></div>
+    ${b.status === 'leyendo' && b.pages ? `<div style="display:grid;gap:6px"><div class="bar cinta" style="height:8px"><i style="width:${((st.pct || 0) * 100).toFixed(1)}%"></i></div><p class="small muted">Página ${st.page} de ${b.pages}${st.remainMin != null ? ` · a tu ritmo te quedan <b style="color:var(--ink)">~${fmtShort(st.remainMin)}</b>${st.avgSession ? ` (unas ${Math.max(1, Math.round(st.remainMin / st.avgSession))} sesiones)` : ''}` : ''}</p></div>` : ''}
+    <div class="kpis">
+      <div class="kpi"><b>${fmtShort(st.total)}</b><span>de lectura</span></div>
+      <div class="kpi"><b>${st.span || '–'}</b><span>${b.status === 'terminado' ? 'días en leerlo' : 'días desde que empezaste'}</span></div>
+      <div class="kpi"><b>${st.sessions}</b><span>${plural(st.sessions, 'sesión', 'sesiones')} · ${st.daysRead} ${plural(st.daysRead, 'día', 'días')}</span></div>
+      <div class="kpi"><b>${st.pph ? Math.round(st.pph) : '–'}</b><span>páginas por hora</span></div>
+    </div>
+    ${st.start ? `<p class="small muted">${b.status === 'terminado' ? `Del ${shortDate(st.start)} al ${shortDate(st.end || st.start)}.` : `Empezaste el ${shortDate(st.start)}.`}</p>` : ''}
+    ${b.status === 'leyendo' ? `<div class="fields"><label class="f" for="bk-page">Voy en la página<input type="number" id="bk-page" min="0" inputmode="numeric" value="${b.currentPage || ''}"></label><label class="f" for="bk-pages">Páginas totales<input type="number" id="bk-pages" min="1" inputmode="numeric" value="${b.pages || ''}"></label></div>
+      <button class="btn ghost" data-act="book-progress" data-id="${esc(id)}">Actualizar avance</button>` : ''}
+    ${notes.length ? `<p class="eyebrow">Tus ideas · ${notes.length}</p>${notes.map(s => `<div class="quote"><p>${esc(s.note)}</p><small>${shortDate(s.date)}</small></div>`).join('')}` : ''}
+    <div style="display:grid;gap:10px">
+      ${b.status === 'leyendo' ? `<button class="btn primary" data-act="read-book" data-id="${esc(id)}">Seguir leyendo</button><button class="btn tinta" data-act="book-finish" data-id="${esc(id)}">Terminé este libro</button>` : ''}
+      ${b.status === 'pendiente' ? `<button class="btn primary" data-act="book-start" data-id="${esc(id)}">Empezar a leerlo</button>` : ''}
+      ${b.status === 'terminado' ? `<button class="btn ghost" data-act="book-reopen" data-id="${esc(id)}">Volver a “Leyendo”</button>` : `<button class="btn ghost" data-act="book-later" data-id="${esc(id)}" ${b.status === 'pendiente' ? 'hidden' : ''}>Pasar a “Por leer”</button>`}
+      ${conf ? `<div class="btns"><button class="btn ghost" data-act="book-del-no" data-id="${esc(id)}">No</button><button class="btn" style="background:var(--bad);color:#fff" data-act="book-del-yes" data-id="${esc(id)}">Borrar libro</button></div>` : `<button class="x" style="justify-self:center;border:none" data-act="book-del" data-id="${esc(id)}">Borrar este libro</button>`}
+    </div>`, 'book:' + id);
+}
+function sheetFinish(b) {
+  const st = bookStats(b);
+  S.finishId = b.id;
+  openSheet(`${head('Terminé «' + esc(b.title) + '»')}
+    <p class="small muted">Revisa las fechas para calcular cuánto te demoraste.</p>
+    <div class="fields"><label class="f" for="f-start">Empecé el<input type="date" id="f-start" value="${st.start || todayStr()}" max="${todayStr()}"></label>
+    <label class="f" for="f-end">Terminé el<input type="date" id="f-end" value="${todayStr()}" max="${todayStr()}"></label></div>
+    <label class="f" for="f-pages">Páginas del libro (opcional)<input type="number" id="f-pages" min="1" inputmode="numeric" value="${b.pages || ''}"></label>
+    <button class="btn primary" data-act="finish-save">Marcar como terminado</button>`, 'finish');
+}
+function sheetNewBook(where) {
+  S.newWhere = where || '';
+  openSheet(`${head('Libro nuevo')}
+    <label class="f" for="nb-title">Título<input type="text" id="nb-title" autocomplete="off" placeholder="Ej: La quietud es la clave"></label>
+    <div class="fields"><label class="f" for="nb-author">Autor<input type="text" id="nb-author" autocomplete="off" placeholder="Opcional"></label>
+    <label class="f" for="nb-pages">Páginas<input type="number" id="nb-pages" min="1" inputmode="numeric" placeholder="Opcional"></label></div>
+    <div class="seg" role="radiogroup" aria-label="Estado"><button role="radio" aria-checked="true" data-act="nb-status" data-s="leyendo">Lo estoy leyendo</button><button role="radio" aria-checked="false" data-act="nb-status" data-s="pendiente">Por leer</button></div>
+    <button class="btn primary" data-act="nb-save">Agregar libro</button>`, 'newbook');
+  S.nbStatus = 'leyendo';
+  setTimeout(() => document.getElementById('nb-title')?.focus(), 80);
+}
+function sheetPlan() {
+  const p = S.settings.plan || {};
+  const CUANDO = ['me acuesto', 'termine de cenar', 'tome el café de la mañana', 'llegue a la casa', 'vaya en el metro'];
+  const DONDE = ['mi rincón de lectura', 'la cama', 'el sillón', 'el metro', 'la terraza'];
+  openSheet(`${head('Mi plan de lectura')}
+    <p class="small muted">Un plan del tipo “cuando pase X, haré Y” ata la lectura a algo que ya haces todos los días.</p>
+    <label class="f" for="p-cuando">Cuando…<input type="text" id="p-cuando" value="${esc(p.cuando || '')}" placeholder="me acueste"></label>
+    <div class="chips">${CUANDO.map(t => `<button class="chip" data-act="plan-fill" data-f="p-cuando" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+    <label class="f" for="p-donde">…leo en…<input type="text" id="p-donde" value="${esc(p.donde || '')}" placeholder="la cama"></label>
+    <div class="chips">${DONDE.map(t => `<button class="chip" data-act="plan-fill" data-f="p-donde" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+    <div class="stepper">Días de lectura por semana <button data-act="wdays" data-d="-1" aria-label="Menos días">−</button><b id="wd-n">${S.settings.weekDays || 5}</b><button data-act="wdays" data-d="1" aria-label="Más días">+</button></div>
+    <button class="btn primary" data-act="plan-save">Guardar plan</button>
+    ${S.settings.plan ? `<button class="x" style="justify-self:center;border:none" data-act="plan-clear">Quitar plan</button>` : ''}`, 'plan');
+}
+function sheetScience() {
+  const items = [
+    ['Registrar funciona', 'Un meta-análisis de 138 estudios encontró que monitorear el avance aumenta la probabilidad de cumplir una meta, sobre todo cuando queda registrado.', 'Harkin et al., 2016', 'https://eprints.whiterose.ac.uk/id/eprint/87431/'],
+    ['Plan con hora y lugar', 'Las intenciones “cuando X, haré Y” tuvieron un efecto de tamaño medio-grande sobre el logro de metas (d = 0,65). Por eso existe tu plan.', 'Gollwitzer y Sheeran, 2006', 'https://www.researchgate.net/publication/37367696_Implementation_Intentions_and_Goal_Achievement_A_Meta-Analysis_of_Effects_and_Processes'],
+    ['Rachas que perdonan', 'Saltarse un día suelto no frenó la formación de hábitos, que tomó en promedio 66 días. Una racha rota sí baja la motivación, así que la app también cuenta semanas cumplidas.', 'Lally et al., 2010 · Silverman y Barasch, 2023', 'https://onlinelibrary.wiley.com/doi/abs/10.1002/ejsp.674'],
+    ['Empezar de nuevo', 'Los lunes y los inicios de mes aumentan la motivación para retomar metas. La app te lo recuerda en esos días.', 'Dai, Milkman y Riis, 2014', 'https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2204126'],
+    ['Lo que falta motiva', 'Mientras más cerca está la meta, más se acelera el esfuerzo. Los anillos y barras muestran cuánto te queda.', 'Kivetz, Urminsky y Zheng, 2006', 'https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2733214'],
+    ['Una idea por sesión', 'Recuperar y escribir lo aprendido fija la memoria mejor que releer. Por eso, al cerrar una sesión, te pregunta qué idea te llevas.', 'Roediger y Karpicke, 2006', 'https://journals.sagepub.com/doi/10.1111/j.1467-9280.2006.01693.x'],
+    ['Por qué vale la pena', 'Leer libros se asoció con 20% menos riesgo de mortalidad en 12 años, y leer por placer con menos estrés y mejor salud cognitiva.', 'Bavishi et al., 2016 · Sahakian et al., 2026', 'https://ideas.repec.org/a/eee/socmed/v164y2016icp44-48.html'],
+  ];
+  openSheet(`${head('Por qué funciona así')}<div class="sci">${items.map(([t, p, c, u]) => `<div><b>${t}</b><p>${p}</p><a href="${u}" target="_blank" rel="noopener">${c} ↗</a></div>`).join('')}</div>`, 'science');
+}
+
+/* ============ acciones ============ */
+let toastT;
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2300); }
+const lastDocs = {};
+async function addSession(date, minutes, bookId, source, exactSeconds) {
+  const seconds = exactSeconds != null ? Math.round(exactSeconds) : Math.round(Number(minutes) * 60);
+  if (!seconds || seconds < 1) { toast('Escribe cuántos minutos leíste'); return null; }
+  if (seconds > 36000) { toast('Máximo 600 minutos por registro'); return null; }
+  if (date > todayStr()) { toast('No puedes registrar días futuros'); return null; }
+  const b = bookById(bookId);
+  if (b && b.status === 'pendiente') { const { id, ...rest } = b; safe(() => putDoc(id, { ...rest, status: 'leyendo', startedAt: rest.startedAt || date })); }
+  else if (b && !b.startedAt && b.status === 'leyendo') { const { id, ...rest } = b; safe(() => putDoc(id, { ...rest, startedAt: date })); }
+  const id = uid('s');
+  const doc = { kind: 'session', date, seconds, minutes: seconds / 60, bookId: bookId || null, source, createdAt: Date.now() };
+  lastDocs[id] = doc;
+  const ok = await safe(() => putDoc(id, doc), source === 'timer' ? null : `Guardado: ${fmtMin(seconds / 60)}`);
+  return ok ? id : null;
+}
+async function addBook(title, author, pages, status) {
+  title = (title || '').trim();
+  if (!title) { toast('Escribe el título del libro'); return null; }
+  const id = uid('b'); pendingTitles[id] = title;
+  const data = { kind: 'book', title, author: (author || '').trim(), status: status || 'leyendo', createdAt: Date.now() };
+  if (Number(pages) > 0) data.pages = Math.round(Number(pages));
+  await safe(() => putDoc(id, data), 'Libro agregado');
+  return id;
+}
+function updateBook(b, patch) { const { id, ...rest } = b; const data = { ...rest, ...patch }; for (const k in data) if (data[k] === undefined) delete data[k]; return safe(() => putDoc(id, data)); }
+const setView = v => { S.view = v; S.confirm = null; try { localStorage.setItem('foco-lectura-view', v); } catch (e) {} render(); window.scrollTo(0, 0); };
+
+document.addEventListener('click', async e => {
+  const nv = e.target.closest('[data-view]');
+  if (nv) { setView(nv.dataset.view); return; }
+  if (e.target === $drawer) { closeSheet(); return; }
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act, id = b.dataset.id;
+  switch (a) {
+    case 'open-session': sessionOpen = true; if (!timer.start && !timer.acc && !bookById(timer.bookId)) timer.bookId = defaultBookId(); renderFab(); renderSession(); break;
+    case 'close-session': sessionOpen = false; renderSession(); renderFab(); break;
+    case 'read-book': closeSheet(); if (!timer.start && !timer.acc) { timer.bookId = id; saveTimer(); } sessionOpen = true; renderFab(); renderSession(); break;
+    case 'pick': timer.bookId = id; saveTimer(); renderSession(); break;
+    case 'mode': timer.mode = b.dataset.m; saveTimer(); renderSession(); break;
+    case 'tdur': timer.target = Number(b.dataset.v) * 60; saveTimer(); renderSession(); break;
+    case 'timer-start': unlockAudio(); timer.start = Date.now(); saveTimer(); keepAwake(true); renderSession(); break;
+    case 'timer-pause': timer.acc = elapsedMs(); timer.start = null; saveTimer(); keepAwake(false); renderSession(); break;
+    case 'timer-reset': resetTimer(); keepAwake(false); renderSession(); toast('Sesión descartada'); break;
+    case 'timer-stop': await finishTimer(false); break;
+    case 'goal': saveSettings({ goal: Math.min(240, Math.max(5, (S.settings.goal || 20) + Number(b.dataset.d))) }); break;
+    case 'ygoal': saveSettings({ yearGoal: Math.min(200, Math.max(1, (S.settings.yearGoal || 12) + Number(b.dataset.d))) }); break;
+    case 'month': S.month = shiftMonth(S.month, Number(b.dataset.d)); render(); break;
+    case 'year': S.month = shiftMonth(S.month, 12 * Number(b.dataset.d)); if (S.month > monthOf(todayStr())) S.month = monthOf(todayStr()); render(); break;
+    case 'shelf': S.shelf = b.dataset.p; render(); break;
+    case 'lib': S.lib = b.dataset.k; render(); break;
+    case 'science': sheetScience(); break;
+    case 'plan': sheetPlan(); break;
+    case 'plan-fill': document.getElementById(b.dataset.f).value = b.dataset.t; break;
+    case 'wdays': { const el = document.getElementById('wd-n'); el.textContent = Math.min(7, Math.max(1, Number(el.textContent) + Number(b.dataset.d))); break; }
+    case 'plan-save': {
+      const cuando = document.getElementById('p-cuando').value.trim(), donde = document.getElementById('p-donde').value.trim(), wd = Number(document.getElementById('wd-n').textContent);
+      if (!cuando || !donde) { toast('Completa el cuándo y el dónde'); return; }
+      closeSheet(); await saveSettings({ plan: { cuando, donde }, weekDays: wd }); toast('Plan guardado'); break;
+    }
+    case 'plan-clear': closeSheet(); saveSettings({ plan: null }); break;
+    case 'add': sheetAdd(todayStr()); break;
+    case 'add-for': sheetAdd(b.dataset.key); break;
+    case 'amin': document.getElementById('a-min').value = b.dataset.v; break;
+    case 'add-save': {
+      const date = document.getElementById('a-date').value;
+      if (!date) { toast('Elige el día'); return; }
+      const ok = await addSession(date, document.getElementById('a-min').value, document.getElementById('a-book').value, 'manual');
+      if (ok) { closeSheet(); render(); } break;
+    }
+    case 'day': sheetDay(b.dataset.key); break;
+    case 'close': closeSheet(); render(); break;
+    case 'del': S.confirm = id; S.sheetDay ? sheetDay(S.sheetDay) : render(); break;
+    case 'del-yes': S.confirm = null; await safe(() => delDoc(id), 'Lectura borrada'); S.sheetDay ? sheetDay(S.sheetDay) : render(); break;
+    case 'mood': { const on = b.getAttribute('aria-pressed') !== 'true'; document.querySelectorAll('.mood').forEach(m => m.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', String(on)); S.capture.mood = on ? b.dataset.k : null; break; }
+    case 'capture-save': {
+      const s = S.sessions.find(x => x.id === S.capture.sid) || (lastDocs[S.capture.sid] && { id: S.capture.sid, ...lastDocs[S.capture.sid] });
+      const note = (document.getElementById('c-note')?.value || '').trim();
+      const page = Math.round(Number(document.getElementById('c-page')?.value || 0)), pages = Math.round(Number(document.getElementById('c-pages')?.value || 0));
+      if (s) { const { id: sid, ...rest } = s; const data = { ...rest }; if (S.capture.mood) data.mood = S.capture.mood; if (note) data.note = note.slice(0, 600); if (page > 0) data.pageEnd = page; await safe(() => putDoc(sid, data)); }
+      const bk = s && bookById(s.bookId);
+      if (bk && (page > 0 || pages > 0)) await updateBook(bk, { currentPage: page > 0 ? page : bk.currentPage, pages: pages > 0 ? pages : bk.pages });
+      closeSheet(); render(); toast('Listo, sesión completa'); break;
+    }
+    case 'new-book': sheetNewBook(b.dataset.where); break;
+    case 'nb-status': S.nbStatus = b.dataset.s; b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-checked', String(x === b))); break;
+    case 'nb-save': {
+      const nid = await addBook(document.getElementById('nb-title').value, document.getElementById('nb-author').value, document.getElementById('nb-pages').value, S.nbStatus);
+      if (!nid) return;
+      closeSheet();
+      if (S.newWhere === 'session') { timer.bookId = nid; saveTimer(); }
+      render(); break;
+    }
+    case 'book-sug': await addBook(b.dataset.t, '', null, 'pendiente'); break;
+    case 'book': S.confirm = null; sheetBook(id); break;
+    case 'book-progress': {
+      const bk = bookById(id), page = Math.round(Number(document.getElementById('bk-page').value)), pages = Math.round(Number(document.getElementById('bk-pages').value));
+      if (pages > 0 && page > pages) { toast('La página no puede pasar del total'); return; }
+      await updateBook(bk, { currentPage: page >= 0 ? page : bk.currentPage, pages: pages > 0 ? pages : bk.pages }); toast('Avance actualizado'); sheetBook(id); break;
+    }
+    case 'book-start': { const bk = bookById(id); await updateBook(bk, { status: 'leyendo', startedAt: bk.startedAt || todayStr() }); closeSheet(); render(); toast('A leer'); break; }
+    case 'book-later': { const bk = bookById(id); await updateBook(bk, { status: 'pendiente', startedAt: undefined, finishedAt: undefined }); closeSheet(); render(); break; }
+    case 'book-reopen': { const bk = bookById(id); await updateBook(bk, { status: 'leyendo', finishedAt: undefined }); closeSheet(); render(); break; }
+    case 'book-finish': sheetFinish(bookById(id)); break;
+    case 'finish-save': {
+      const bk = bookById(S.finishId); if (!bk) { closeSheet(); return; }
+      const st0 = document.getElementById('f-start').value, en = document.getElementById('f-end').value, pg = Math.round(Number(document.getElementById('f-pages').value));
+      if (!st0 || !en) { toast('Completa las dos fechas'); return; }
+      if (st0 > en) { toast('El inicio no puede ser después del término'); return; }
+      const patch = { status: 'terminado', startedAt: st0, finishedAt: en }; if (pg > 0) { patch.pages = pg; patch.currentPage = pg; }
+      await updateBook(bk, patch);
+      const st = bookStats({ ...bk, ...patch });
+      render();
+      openSheet(`<p class="eyebrow" style="text-align:center">Libro terminado</p><div style="width:120px;justify-self:center">${cover({ ...bk }, 15)}</div>
+        <h3 style="text-align:center">${esc(bk.title)}</h3>
+        <p class="muted" style="text-align:center">Te tomó <b style="color:var(--ink)">${st.span} ${plural(st.span, 'día', 'días')}</b>${st.total ? ` y <b style="color:var(--ink)">${fmtMin(st.total)}</b> de lectura en ${st.sessions} ${plural(st.sessions, 'sesión', 'sesiones')}` : ''}. Ya está en tu estantería.</p>
+        <button class="btn primary" data-act="close">Listo</button>`, 'done');
+      break;
+    }
+    case 'book-del': S.confirm = id; sheetBook(id); break;
+    case 'book-del-no': S.confirm = null; sheetBook(id); break;
+    case 'book-del-yes': S.confirm = null; await safe(() => delDoc(id), 'Libro borrado'); closeSheet(); render(); break;
+  }
+});
+
+/* tooltips para gráficos y días */
+const $tip = document.getElementById('tip');
+function showTip(el) { const r = el.getBoundingClientRect(); $tip.textContent = el.dataset.tip; $tip.style.left = (r.left + r.width / 2) + 'px'; $tip.style.top = r.top + 'px'; $tip.hidden = false; }
+document.addEventListener('pointerover', e => { const el = e.target.closest('[data-tip]'); if (el) showTip(el); else $tip.hidden = true; });
+document.addEventListener('pointerdown', e => { const el = e.target.closest('[data-tip]'); if (el) showTip(el); else $tip.hidden = true; });
+document.addEventListener('scroll', () => { $tip.hidden = true; }, { passive: true });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$drawer.hidden) closeSheet(); else if (sessionOpen) { sessionOpen = false; renderSession(); renderFab(); } } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && timer.start) keepAwake(true); });
+
+boot();
+</script>
+
+</body></html>
