@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="es">
+<head>
+<script src="../perfil.js" data-modulo="foco"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Foco · temporizador</title>
+<meta name="theme-color" content="#16213A">
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" type="image/png" href="../iconos/favicon.png">
+<link rel="apple-touch-icon" href="../iconos/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap">
+<style>
+/* Foco · temporizador visual. Empezar fácil, ver el tiempo sin leer números, terminar sin culpa. */
+:root{
+  --bg:#EEF4F2; --surface:#FFFFFF; --surface-2:#E1ECE8; --ink:#14211F; --muted:#566663; --faint:#93A3A0; --line:#D3DFDB;
+  --tl:#0C8F80; --on-tl:#FFFFFF; --tl-soft:#D3EEEA; --tl-ink:#064E46; --tl-light:#9ED6CE;
+  --br:#E2A93B; --on-br:#3A2600; --br-soft:#FBEFD6;
+  --bad:#B4471F;
+  --f-num:"Bricolage Grotesque", system-ui, sans-serif;
+  --f-ui:"Lexend", "Segoe UI", system-ui, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101716; --surface:#19221F; --surface-2:#24302C; --ink:#E7F0ED; --muted:#A3B3AF; --faint:#6E7F7B; --line:#2C3935;
+  --tl:#3FC1B0; --on-tl:#03201C; --tl-soft:#173430; --tl-ink:#A9E8DF; --tl-light:#2C6B63;
+  --br:#F0BE5E; --on-br:#2A1B00; --br-soft:#3A2D14; --bad:#F08A63;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#101716; --surface:#19221F; --surface-2:#24302C; --ink:#E7F0ED; --muted:#A3B3AF; --faint:#6E7F7B; --line:#2C3935;
+  --tl:#3FC1B0; --on-tl:#03201C; --tl-soft:#173430; --tl-ink:#A9E8DF; --tl-light:#2C6B63;
+  --br:#F0BE5E; --on-br:#2A1B00; --br-soft:#3A2D14; --bad:#F08A63;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 var(--f-ui);-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit;color:inherit}
+.wrap{width:min(560px,100%);margin:0 auto;padding:6px 16px calc(96px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.wrap.full{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));min-height:calc(100vh - 60px)}
+h1{margin:0;font:800 26px/1.1 var(--f-num)}
+.sub{font-size:14px;color:var(--muted)}
+.card{background:var(--surface);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.lab{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.durs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.du{background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:10px 4px;text-align:center;font:800 26px/1.1 var(--f-num)}
+.du small{display:block;font:700 11.5px var(--f-ui);color:var(--muted);margin-top:2px}
+.du[aria-pressed="true"]{border-color:var(--tl);background:var(--tl-soft);color:var(--tl-ink)}
+.du.other{font-size:17px}
+input.txt{width:100%;background:var(--surface-2);border:1.5px solid transparent;border-radius:12px;padding:12px 14px;font-size:16px;outline:none}
+input.txt:focus{border-color:var(--tl)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--tl-soft);color:var(--tl-ink);border:0;border-radius:99px;padding:6px 12px;font-weight:700;font-size:13.5px}
+.rowc{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:99px;padding:3px}
+.seg button{border:0;background:none;border-radius:99px;padding:6px 11px;font-weight:700;font-size:13.5px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--tl-ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.sw{width:50px;height:30px;border-radius:99px;background:var(--line);border:0;position:relative;flex:0 0 auto}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s}
+.sw[aria-checked="true"]{background:var(--tl)}.sw[aria-checked="true"]::after{left:23px}
+.go{border:0;background:var(--tl);color:var(--on-tl);border-radius:18px;padding:18px;font-weight:800;font-size:20px;width:100%}
+.go.br{background:var(--br);color:var(--on-br)}
+.ghost{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:15px 8px;font-weight:700;font-size:16px}
+.row{display:flex;gap:10px}
+.link{background:none;border:0;color:var(--tl);font-weight:700;font-size:14px;padding:4px 0}
+.center{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.pill{display:inline-block;background:var(--tl-soft);color:var(--tl-ink);border-radius:99px;padding:4px 12px;font-weight:700;font-size:13px}
+.pill.br{background:var(--br-soft);color:var(--on-br)}
+.task{font-size:19px;font-weight:700;overflow-wrap:anywhere}
+.disc{width:min(320px,82vw);height:auto;display:block}
+.big{font:800 30px/1.15 var(--f-num);margin:0}
+.paused{color:var(--bad);font-weight:700}
+.spacer{flex:1}
+.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:130px}
+.bc{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%;font-size:12px;color:var(--muted);font-weight:700}
+.bc b{font:800 12.5px var(--f-num);color:var(--ink)}
+.bc i{width:100%;border-radius:7px 7px 3px 3px;background:var(--tl-light);min-height:3px}
+.bc.on i{background:var(--tl)}.bc.on{color:var(--ink)}
+.bc i.z{background:var(--surface-2)}
+.ses{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--surface);border:0;border-radius:14px;padding:12px 14px;font-size:15px;width:100%;text-align:left}
+.ses span{min-width:0;overflow-wrap:anywhere}.ses .none{color:var(--faint)}
+.ses b{font:800 16px var(--f-num);white-space:nowrap}
+.wkn{display:flex;align-items:center;justify-content:space-between}
+.nb{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:20px}
+.nb:disabled{opacity:.3}
+.empty{color:var(--muted);text-align:center;padding:8px;font-size:15px}
+.scrim{position:fixed;inset:0;background:rgba(10,20,18,.45);z-index:30}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--surface);border-radius:24px 24px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.sheet .in{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.step{display:flex;align-items:center;justify-content:center;gap:16px}
+.step button{width:52px;height:52px;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);font-size:24px;font-weight:700}
+.step b{font:800 44px var(--f-num);min-width:110px;text-align:center}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:14;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.nav .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr}
+.nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;font-size:12.5px;font-weight:700;color:var(--faint)}
+.nav button svg{width:22px;height:22px}
+.nav button[aria-current="page"]{color:var(--tl)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:700;z-index:50;max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion: no-preference){ .done-in{animation:pop .35s ease-out} @keyframes pop{from{transform:scale(.92);opacity:.4}} }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="layer"></div>
+<nav class="nav" id="navw" aria-label="Secciones"><div class="in" id="nav"></div></nav>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+/* ============ utilidades ============ */
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const today = () => ymd(new Date());
+const parseD = s => new Date(s + 'T12:00:00');
+const addDays = (s, k) => { const d = parseD(s); d.setDate(d.getDate() + k); return ymd(d); };
+const weekOf = s => { const d = parseD(s); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return ymd(d); };
+const MES3 = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const DIA1 = ['L','M','M','J','V','S','D'];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+function fmtMin(m) { m = Math.round(m); if (m < 60) return m + ' min'; const h = Math.floor(m / 60), r = m % 60; return h + ' h' + (r ? ' ' + r + ' min' : ''); }
+const hhmm = t => { const d = new Date(t); return d.getHours() + ':' + pad(d.getMinutes()); };
+const IC = {
+  go: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 13V9M10 2h4"/></svg>',
+  reg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V12M10 20V6M15 20v-9M20 20V4"/></svg>',
+};
+
+/* ============ datos por perfil ============
+   foco-timer-v1 = { ses: [{ id, date, min, task, at }], run: sesión en curso | null, prefs: { dur, brk, sound, vib } }
+   run = { phase: 'foco'|'descanso', task, total (ms), start (ms), pausedAt (ms|null), paused (ms acumulados) } */
+const KEY = 'foco-timer-v1';
+let D = { ses: [], run: null, prefs: { dur: 25, brk: 5, sound: true, vib: true } };
+function load() { try { const x = JSON.parse(localStorage.getItem(KEY) || 'null'); if (x) D = { ses: Array.isArray(x.ses) ? x.ses : [], run: x.run || null, prefs: { ...D.prefs, ...(x.prefs || {}) } }; } catch (e) {} }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast('No se pudo guardar: el teléfono está sin espacio'); } }
+
+/* ============ estado de la pantalla ============ */
+const S = { view: 'go', task: '', done: null, week: weekOf(today()), sheet: null };
+const elapsed = r => (r.pausedAt || Date.now()) - r.start - r.paused;
+const remaining = r => r.total - elapsed(r);
+const todayMin = () => D.ses.filter(s => s.date === today()).reduce((a, s) => a + s.min, 0);
+function recentTasks() { const seen = new Set(), out = []; for (let i = D.ses.length - 1; i >= 0 && out.length < 4; i--) { const t = (D.ses[i].task || '').trim(), k = t.toLowerCase(); if (t && !seen.has(k)) { seen.add(k); out.push(t); } } return out; }
+
+/* ============ sonido y vibración ============ */
+let AC = null;
+function unlockAudio() { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) {} }
+function chime() {
+  if (!D.prefs.sound || !AC) return;
+  try {
+    const t0 = AC.currentTime + 0.02;
+    [[659.25, 0], [880, 0.28]].forEach(([f, d]) => {
+      const o = AC.createOscillator(), g = AC.createGain(); o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0 + d); g.gain.exponentialRampToValueAtTime(0.35, t0 + d + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 1.1);
+      o.connect(g).connect(AC.destination); o.start(t0 + d); o.stop(t0 + d + 1.2);
+    });
+  } catch (e) {}
+}
+function buzz() { if (!D.prefs.vib) return; try { navigator.vibrate && navigator.vibrate([220, 120, 220, 120, 220]); } catch (e) {} }
+let repeatT = null;
+function alertEnd() { chime(); buzz(); clearTimeout(repeatT); repeatT = setTimeout(() => { if (S.done && !S.done.ack) { chime(); buzz(); } }, 60000); }
+function ack() { if (S.done) S.done.ack = true; clearTimeout(repeatT); }
+
+/* ============ pantalla encendida mientras corre ============ */
+let lock = null;
+async function wake() { if (!D.run || lock || document.visibilityState !== 'visible') return; try { if ('wakeLock' in navigator) { lock = await navigator.wakeLock.request('screen'); lock.addEventListener('release', () => { lock = null; }); } } catch (e) {} }
+function release() { try { lock && lock.release(); } catch (e) {} lock = null; }
+
+/* ============ flujo ============ */
+function start(phase, min, task) {
+  unlockAudio();
+  D.run = { phase, task: (task || '').trim().slice(0, 60), total: Math.round(min * 60000), start: Date.now(), pausedAt: null, paused: 0 };
+  S.done = null; save(); wake(); render(); tick();
+}
+function record(min, task) { if (min < 1) return; D.ses.push({ id: uid(), date: today(), min: Math.round(min), task: task || '', at: Date.now() }); }
+function finish(how) {
+  // how: 'time' (terminó el tiempo), 'early' (lo cortaste), 'away' (terminó mientras no mirabas)
+  const r = D.run; if (!r) return;
+  if (r.phase === 'foco') {
+    const min = how === 'early' ? Math.floor(elapsed(r) / 60000) : Math.round(r.total / 60000);
+    record(min, r.task);
+    S.done = { phase: 'foco', min, task: r.task, how, ack: how !== 'time' };
+  } else S.done = { phase: 'descanso', how, ack: how !== 'time' };
+  D.run = null; save(); release(); render();
+  if (how === 'time') alertEnd();
+}
+let timer = null;
+function tick() {
+  clearInterval(timer);
+  if (!D.run) return;
+  timer = setInterval(() => {
+    if (!D.run) { clearInterval(timer); return; }
+    if (remaining(D.run) <= 0 && !D.run.pausedAt) { clearInterval(timer); finish('time'); return; }
+    paintRun();
+  }, 250);
+}
+
+/* ============ disco ============ */
+function discSvg(frac, phase, big, small) {
+  frac = Math.max(0, Math.min(1, frac));
+  const col = phase === 'descanso' ? 'var(--br)' : 'var(--tl)', r = 120, cx = 150, cy = 150;
+  let wedge = '';
+  if (frac >= 0.9995) wedge = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}"/>`;
+  else if (frac > 0.0005) { const a = frac * 2 * Math.PI, x = cx + r * Math.sin(a), y = cy - r * Math.cos(a); wedge = `<path d="M${cx},${cy} L${cx},${cy - r} A${r},${r} 0 ${frac > 0.5 ? 1 : 0} 1 ${x.toFixed(2)},${y.toFixed(2)} Z" fill="${col}"/>`; }
+  let ticks = ''; for (let i = 0; i < 60; i++) ticks += `<line x1="150" y1="${i % 5 ? 22 : 17}" x2="150" y2="28" stroke="var(--faint)" stroke-width="${i % 5 ? 1.2 : 2.5}" transform="rotate(${i * 6} 150 150)"/>`;
+  return `<svg class="disc" viewBox="0 0 300 300" role="img" aria-label="Quedan ${esc(big)} ${esc(small)}"><circle cx="150" cy="150" r="141" fill="var(--surface)"/>${ticks}<circle cx="150" cy="150" r="${r}" fill="var(--surface-2)"/>${wedge}<circle cx="150" cy="150" r="64" fill="var(--surface)"/>
+    <text x="150" y="${small ? 154 : 166}" text-anchor="middle" font-size="${String(big).length > 3 ? 38 : 50}" font-weight="800" fill="var(--ink)" font-family="Bricolage Grotesque, system-ui">${esc(big)}</text>
+    ${small ? `<text x="150" y="184" text-anchor="middle" font-size="15" font-weight="700" fill="var(--muted)" font-family="Lexend, system-ui">${esc(small)}</text>` : ''}</svg>`;
+}
+function bigLabel(ms) {
+  // más de un minuto: solo minutos (redondeado hacia arriba); el último minuto: segundos
+  if (ms > 60000) return [String(Math.ceil(ms / 60000)), 'minutos'];
+  return [String(Math.max(0, Math.ceil(ms / 1000))), 'segundos'];
+}
+
+/* ============ vistas ============ */
+function viewGo() {
+  const p = D.prefs, tm = todayMin(), rec = recentTasks();
+  const durBtn = (m, lab) => `<button class="du" data-act="dur" data-v="${m}" aria-pressed="${p.dur === m}">${m}<small>${lab}</small></button>`;
+  const custom = ![10, 25, 45].includes(p.dur);
+  let h = `<h1>Enfocarme</h1><span class="sub">${tm ? `Hoy llevas <b style="color:var(--tl-ink)">${fmtMin(tm)}</b> de foco` : 'Elige cuánto rato y parte. Lo que hagas, cuenta.'}</span>
+    <div class="card"><span class="lab">¿Cuánto rato?</span><div class="durs">${durBtn(10, 'para partir')}${durBtn(25, 'min')}${durBtn(45, 'min')}
+      <button class="du ${custom ? '' : 'other'}" data-act="dur-other" aria-pressed="${custom}">${custom ? p.dur + '<small>min</small>' : 'otro'}</button></div></div>
+    <div class="card"><span class="lab">¿En qué? (opcional)</span><input class="txt" id="task" maxlength="60" placeholder="Ej: informe de equipos" value="${esc(S.task)}" autocomplete="off">
+      ${rec.length ? `<div class="chips">${rec.map(t => `<button class="chip" data-act="task" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : ''}</div>
+    <div class="card">
+      <div style="display:flex;flex-direction:column;gap:8px"><span style="font-weight:600">Descanso al terminar</span><div class="seg" style="display:grid;grid-template-columns:repeat(4,1fr)">${[0, 5, 10, 15].map(b => `<button data-act="brk" data-v="${b}" aria-pressed="${p.brk === b}">${b ? b + ' min' : 'no'}</button>`).join('')}</div></div>
+      <div class="rowc"><span style="font-weight:600">Sonido al terminar</span><button class="sw" role="switch" aria-checked="${p.sound}" data-act="pref" data-v="sound" aria-label="Sonido al terminar"></button></div>
+      <div class="rowc"><span style="font-weight:600">Vibración al terminar</span><button class="sw" role="switch" aria-checked="${p.vib}" data-act="pref" data-v="vib" aria-label="Vibración al terminar"></button></div>
+      ${p.sound ? `<button class="link" data-act="test" style="align-self:flex-start">🔊 Probar sonido (suena con el volumen multimedia)</button>` : ''}
+    </div>
+    <button class="go" data-act="start">Empezar ${p.dur} min</button>`;
+  return h;
+}
+function viewRun() {
+  const r = D.run, ms = remaining(r), [big, small] = bigLabel(ms), fol = r.phase === 'foco';
+  return `<div class="center" style="margin-top:14px"><span class="pill ${fol ? '' : 'br'}">${fol ? 'Foco' : 'Descanso'}</span>${fol && r.task ? `<span class="task">${esc(r.task)}</span>` : !fol ? '<span class="task">Párate, toma agua, mira lejos</span>' : ''}</div>
+    <div class="center" id="discw">${discSvg(ms / r.total, r.phase, big, small)}</div>
+    <div class="center"><span class="sub" id="endtxt">${r.pausedAt ? '<span class="paused">En pausa</span>' : 'Termina a las ' + hhmm(Date.now() + ms)}</span></div>
+    <div class="spacer"></div>
+    <div class="row"><button class="ghost" data-act="pause">${r.pausedAt ? 'Seguir' : 'Pausar'}</button><button class="ghost" data-act="plus5">+5 min</button><button class="ghost" data-act="stop">Terminar</button></div>`;
+}
+function paintRun() {
+  const r = D.run, w = document.getElementById('discw'); if (!r || !w) return;
+  const ms = remaining(r), [big, small] = bigLabel(ms);
+  w.innerHTML = discSvg(ms / r.total, r.phase, big, small);
+  const e = document.getElementById('endtxt'); if (e && !r.pausedAt) e.textContent = 'Termina a las ' + hhmm(Date.now() + ms);
+}
+function viewDone() {
+  const d = S.done, brk = D.prefs.brk;
+  if (d.phase === 'descanso') return `<div class="center done-in" style="margin-top:50px">${discSvg(0, 'descanso', '✓', '')}</div>
+    <div class="center"><p class="big">Descanso terminado</p><span class="sub" style="font-size:16px">Hoy llevas ${fmtMin(todayMin())} de foco.</span></div><div class="spacer"></div>
+    <button class="go" data-act="again">Otra vuelta de ${D.prefs.dur} min</button><button class="ghost" data-act="enough" style="flex:none">Listo por hoy</button>`;
+  const head = d.how === 'early' ? (d.min >= 1 ? `Hiciste ${fmtMin(d.min)}` : 'Lo intentaste') : `¡${fmtMin(d.min)} de foco!`;
+  const line = d.how === 'early' ? (d.min >= 1 ? 'Cuentan igual.' : 'Menos de un minuto no se anota, pero empezar ya es algo.') : d.how === 'away' ? 'Terminó mientras no mirabas. Quedó anotado.' : 'Párate, toma agua, mira lejos.';
+  return `<div class="center done-in" style="margin-top:36px">${brk ? discSvg(1, 'descanso', String(brk), 'descanso') : discSvg(1, 'foco', '✓', '')}</div>
+    <div class="center"><p class="big">${head}</p><span class="sub" style="font-size:16px">${d.task ? esc(d.task) + ' · ' : ''}hoy llevas ${fmtMin(todayMin())}</span><span class="sub">${line}</span></div><div class="spacer"></div>
+    ${brk ? `<button class="go br" data-act="break">Empezar descanso ${brk} min</button>` : ''}
+    <div class="row"><button class="ghost" data-act="again">Otra vuelta</button><button class="ghost" data-act="enough">Listo por hoy</button></div>`;
+}
+function viewReg() {
+  const cur = weekOf(today()), days = [0, 1, 2, 3, 4, 5, 6].map(i => addDays(S.week, i));
+  const per = days.map(d => D.ses.filter(s => s.date === d).reduce((a, s) => a + s.min, 0)), tot = per.reduce((a, b) => a + b, 0), mx = Math.max(1, ...per);
+  const n = D.ses.filter(s => s.date >= S.week && s.date <= days[6]).length;
+  const a = parseD(S.week), b = parseD(days[6]);
+  let h = `<h1>Mi registro</h1>
+    <div class="wkn"><button class="nb" data-act="wk" data-v="-7" aria-label="Semana anterior">‹</button><b>${S.week === cur ? 'Esta semana' : a.getDate() + ' ' + MES3[a.getMonth()] + ' – ' + b.getDate() + ' ' + MES3[b.getMonth()]}</b><button class="nb" data-act="wk" data-v="7" aria-label="Semana siguiente" ${S.week >= cur ? 'disabled' : ''}>›</button></div>
+    <div class="card"><span class="sub">Minutos de foco</span><p class="big" style="font-size:38px">${tot ? fmtMin(tot) : '0 min'}</p><span class="sub">${n} ${n === 1 ? 'sesión' : 'sesiones'}</span>
+      <div class="bars" role="img" aria-label="Minutos de foco por día">${days.map((d, i) => `<div class="bc ${d === today() ? 'on' : ''}"><b>${per[i] || ''}</b><i class="${per[i] ? '' : 'z'}" style="height:${per[i] ? Math.max(6, Math.round(per[i] / mx * 90)) : 3}px"></i>${DIA1[i]}</div>`).join('')}</div></div>`;
+  const shown = S.week === cur ? today() : null;
+  const list = D.ses.filter(s => shown ? s.date === shown : s.date >= S.week && s.date <= days[6]).slice().reverse();
+  h += `<span class="lab">${shown ? 'Hoy' : 'Sesiones de esa semana'}</span>`;
+  h += list.length ? list.map(s => `<button class="ses" data-act="ses" data-v="${s.id}"><span class="${s.task ? '' : 'none'}">${esc(s.task || 'Sin nombre')}${shown ? '' : ' · ' + parseD(s.date).getDate() + ' ' + MES3[parseD(s.date).getMonth()]}</span><b>${fmtMin(s.min)}</b></button>`).join('')
+    : `<p class="empty">${shown ? 'Hoy todavía nada. Con 10 minutos ya cuenta.' : 'Esa semana no hubo sesiones.'}</p>`;
+  return h;
+}
+
+/* ============ render ============ */
+function render() {
+  const app = document.getElementById('app'), running = !!D.run, done = !!S.done && !running;
+  app.className = 'wrap' + (running || done ? ' full' : '');
+  app.innerHTML = running ? viewRun() : done ? viewDone() : S.view === 'reg' ? viewReg() : viewGo();
+  document.getElementById('navw').hidden = running || done;
+  const tab = (k, l, ic) => `<button data-act="nav" data-v="${k}" ${S.view === k ? 'aria-current="page"' : ''}>${ic}${l}</button>`;
+  document.getElementById('nav').innerHTML = tab('go', 'Enfocarme', IC.go) + tab('reg', 'Mi registro', IC.reg);
+  renderLayer();
+}
+function renderLayer() {
+  const L = document.getElementById('layer'), sh = S.sheet;
+  if (!sh) { L.innerHTML = ''; return; }
+  let b = '';
+  if (sh.type === 'dur') b = `<h2 style="margin:0">¿Cuántos minutos?</h2><div class="step"><button data-act="st" data-v="-5" aria-label="Menos">−</button><b>${sh.v}</b><button data-act="st" data-v="5" aria-label="Más">+</button></div>
+    <button class="go" data-act="dur-ok">Usar ${sh.v} min</button><button class="link" data-act="sheet-x" style="align-self:center">Cancelar</button>`;
+  if (sh.type === 'ses') { const s = D.ses.find(x => x.id === sh.id); if (!s) { S.sheet = null; return renderLayer(); }
+    b = `<h2 style="margin:0">${esc(s.task || 'Sin nombre')}</h2><p class="sub" style="margin:0">${fmtMin(s.min)} · ${parseD(s.date).getDate()} ${MES3[parseD(s.date).getMonth()]}${s.at ? ' · ' + hhmm(s.at) : ''}</p>
+    <button class="go" data-act="ses-del" style="background:var(--bad);color:#fff">Borrar esta sesión</button><button class="link" data-act="sheet-x" style="align-self:center">Cancelar</button>`; }
+  L.innerHTML = `<div class="scrim" data-act="sheet-x"></div><div class="sheet" role="dialog" aria-modal="true"><div class="in">${b}</div></div>`;
+}
+let tt = null;
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => { t.hidden = true; }, 2400); }
+
+/* ============ eventos ============ */
+document.addEventListener('input', e => { if (e.target.id === 'task') S.task = e.target.value; });
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'task') e.target.blur(); if (e.key === 'Escape' && S.sheet) { S.sheet = null; renderLayer(); } });
+document.addEventListener('pointerdown', () => { if (S.done && !S.done.ack) ack(); unlockAudio(); }, true);
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t) return;
+  const a = t.dataset.act, v = t.dataset.v;
+  if (a === 'nav') { S.view = v; render(); window.scrollTo(0, 0); }
+  else if (a === 'dur') { D.prefs.dur = Number(v); save(); render(); }
+  else if (a === 'dur-other') { S.sheet = { type: 'dur', v: [10, 25, 45].includes(D.prefs.dur) ? 60 : D.prefs.dur }; renderLayer(); }
+  else if (a === 'st') { S.sheet.v = Math.max(5, Math.min(180, S.sheet.v + Number(v))); renderLayer(); }
+  else if (a === 'dur-ok') { D.prefs.dur = S.sheet.v; S.sheet = null; save(); render(); }
+  else if (a === 'sheet-x') { S.sheet = null; renderLayer(); }
+  else if (a === 'task') { S.task = v; render(); }
+  else if (a === 'brk') { D.prefs.brk = Number(v); save(); render(); }
+  else if (a === 'pref') { D.prefs[v] = !D.prefs[v]; save(); render(); }
+  else if (a === 'test') { unlockAudio(); setTimeout(() => { chime(); buzz(); }, 60); }
+  else if (a === 'start') start('foco', D.prefs.dur, S.task);
+  else if (a === 'pause') { const r = D.run; if (r.pausedAt) { r.paused += Date.now() - r.pausedAt; r.pausedAt = null; wake(); } else { r.pausedAt = Date.now(); } save(); render(); }
+  else if (a === 'plus5') { D.run.total += 5 * 60000; save(); paintRun(); toast('+5 minutos'); }
+  else if (a === 'stop') finish('early');
+  else if (a === 'break') { const task = S.done.task; S.task = task || S.task; start('descanso', D.prefs.brk, ''); }
+  else if (a === 'again') { ack(); start('foco', D.prefs.dur, S.done && S.done.task != null ? S.done.task : S.task); }
+  else if (a === 'enough') { ack(); S.done = null; S.view = 'reg'; render(); window.scrollTo(0, 0); }
+  else if (a === 'wk') { const n = addDays(S.week, Number(v)); if (n <= weekOf(today())) { S.week = n; render(); } }
+  else if (a === 'ses') { S.sheet = { type: 'ses', id: v }; renderLayer(); }
+  else if (a === 'ses-del') { D.ses = D.ses.filter(s => s.id !== S.sheet.id); S.sheet = null; save(); render(); toast('Sesión borrada'); }
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  if (D.run && remaining(D.run) <= 0 && !D.run.pausedAt) finish('away'); else { wake(); if (D.run) paintRun(); }
+});
+window.addEventListener('storage', e => { if (e.key && e.key.endsWith(KEY)) { load(); render(); tick(); } });
+
+/* ============ arranque ============ */
+load();
+if (D.run && remaining(D.run) <= 0 && !D.run.pausedAt) finish('away');
+render(); tick(); wake();
+</script>
+</body>
+</html>

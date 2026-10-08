@@ -1,15 +1,17 @@
 /* Foco+ · modo sin internet
    Cuando subas cambios a GitHub, sube también este archivo cambiando VERSION
-   (ej. de 'foco-plus-v3' a 'foco-plus-v4'): así los teléfonos saben que hay algo nuevo. */
-const VERSION = 'foco-plus-v3';
+   (ej. de 'foco-plus-v9' a 'foco-plus-v8'): así los teléfonos saben que hay algo nuevo. */
+const VERSION = 'foco-plus-v9';
 const ARCHIVOS = [
   './', './index.html', './manifest.json', './perfil.js',
-  './iconos/icon-192.png', './iconos/icon-512.png', './iconos/apple-touch-icon.png', './iconos/favicon.png',
+  './iconos/foco-luz-192.png', './iconos/foco-luz-512.png', './iconos/apple-touch-icon.png', './iconos/favicon.png',
   './english/', './english/index.html',
   './sql/', './sql/index.html',
   './lectura/', './lectura/index.html',
   './ejercicio/', './ejercicio/index.html',
+  './super/', './super/index.html',
   './finanzas/', './finanzas/index.html',
+  './foco/', './foco/index.html',
   './lib/sql-asm.js'
 ];
 

@@ -8,11 +8,11 @@
   "display": "standalone",
   "orientation": "portrait",
   "lang": "es",
-  "background_color": "#16213A",
+  "background_color": "#0A7A6E",
   "theme_color": "#16213A",
   "icons": [
-    { "src": "iconos/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "iconos/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "iconos/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "iconos/foco-luz-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "iconos/foco-luz-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "iconos/foco-luz-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

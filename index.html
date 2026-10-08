@@ -113,7 +113,21 @@ input[type=text],input[type=number]{width:100%;min-width:0;font:inherit;font-siz
 .pn{min-width:0}
 .pn b{font-family:var(--f-display);font-size:20px;display:block;overflow-wrap:anywhere}
 .pn small{color:var(--muted);font-size:14px}
+.pedit{padding:0 14px;border-radius:var(--r);background:var(--surface);color:var(--ink);font-weight:700;border:2px solid var(--line)}
+.editcard{margin:2px 0 6px}
+.pacts{display:grid;gap:6px;flex:0 0 auto}.pacts button{padding:6px 12px;font-size:14px}
 .pdel{padding:0 14px;border-radius:var(--r);background:var(--bad-soft);color:var(--bad);font-weight:700;border:2px solid var(--bad)}
+.aviso{background:var(--gold-soft);border:2px solid var(--gold);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px;margin-top:12px}
+.aviso h3{font-size:17px;font-weight:800}
+.aviso p{font-size:14.5px;color:var(--ink);opacity:.85}
+.bk-last{font-size:13.5px;color:var(--muted);text-align:center}
+.bk-last b{color:var(--good)}
+.bk-scrim{position:fixed;inset:0;background:rgba(16,22,32,.45);z-index:60}
+.bk-sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--surface);border-radius:24px 24px 0 0;padding:20px 16px calc(22px + env(safe-area-inset-bottom,0px))}
+.bk-sheet .in{max-width:540px;margin:0 auto;display:grid;gap:12px}
+.bk-sheet h3{font-size:20px;font-weight:800}
+.bk-lock{background:var(--gold-soft);border-radius:12px;padding:10px 12px;font-size:14px}
+.btn.teal{background:#0C8F80;color:#fff;border-bottom-color:#06574E}
 .confirm{background:var(--bad-soft);border:2px solid var(--bad);border-radius:var(--r);padding:14px;display:grid;gap:10px}
 
 .foot{margin-top:28px;text-align:center;color:var(--muted);font-size:13px}
@@ -174,11 +188,32 @@ const MODULOS = [
       if (!min) return [];
       return [min + ' min esta semana', dias.size + (dias.size === 1 ? ' día activo' : ' días activos')];
     } },
+  { id:'super', nombre:'Súper', desc:'Calculadora para ir sumando en el supermercado.', href:'super/', color:'#6D44C9',
+    icono:'<svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h3.5l3.5 17h16l3.5-12H11.2" fill="#fff" fill-opacity=".18"/><circle cx="15" cy="31" r="2.2"/><circle cx="27" cy="31" r="2.2"/></svg>',
+    estado: d => {
+      const s = leer(d, 'foco-super-v1'); if (!s) return [];
+      if (s.actual && s.actual.items && s.actual.items.length) return ['🛒 Compra en curso'];
+      const mes = new Date().toLocaleDateString('en-CA').slice(0, 7);
+      const n = (s.compras || []).filter(c => String(c.date || '').startsWith(mes)).length;
+      const l = (s.lista || []).length;
+      return [n ? n + (n === 1 ? ' compra este mes' : ' compras este mes') : '', l ? l + (l === 1 ? ' cosa en la lista' : ' cosas en la lista') : ''].filter(Boolean);
+    } },
   { id:'finanzas', nombre:'Finanzas', desc:'Ordena tus ingresos, gastos y ahorros del mes.', href:'finanzas/', color:'#B7791F',
     icono:'<svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"><rect x="5" y="11" width="30" height="19" rx="3.5" fill="#fff" fill-opacity=".18"/><circle cx="20" cy="20.5" r="4.5"/><path d="M10 16v0M30 25v0" stroke-linecap="round" stroke-width="3.6"/></svg>',
     // Privado: en el menú solo se indica si está protegido, nunca montos ni movimientos
     estado: d => ls.get('fp.pin.' + d) ? ['🔒 Protegido con PIN'] : ['Te pedirá crear un PIN'] },
+  { id:'foco', nombre:'Foco', desc:'Temporizador para concentrarte, de a poco.', href:'foco/', color:'#0C8F80',
+    icono:'<svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="20" cy="22" r="12.5"/><path d="M20 22V9.5A12.5 12.5 0 0 1 32.5 22Z" fill="#fff" stroke="none"/><path d="M16 4.5h8"/></svg>',
+    estado: d => {
+      const s = leer(d, 'foco-timer-v1'); if (!s) return [];
+      if (s.run) return [s.run.phase === 'descanso' ? '☕ En descanso' : '⏱ Enfocado ahora'];
+      const hoy = new Date().toLocaleDateString('en-CA'); const m = (s.ses || []).filter(x => x.date === hoy).reduce((a, x) => a + (Number(x.min) || 0), 0);
+      return m ? [(m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '')) + ' de foco hoy'] : [];
+    } },
 ];
+// Orden en el menú
+const ORDEN = ['english', 'ejercicio', 'lectura', 'super', 'finanzas', 'foco', 'sql'];
+MODULOS.sort((a, b) => ORDEN.indexOf(a.id) - ORDEN.indexOf(b.id));
 
 /* ---------- Almacenamiento ---------- */
 const ls = {
@@ -220,11 +255,11 @@ function validar(form){
   if (!(age >= 3 && age <= 110)) return fail('Escribe una edad válida.');
   return { name, age };
 }
-const formPerfil = (boton) => `
-  <form id="fp" novalidate>
+const formPerfil = (boton, fid = 'fp', v = {}) => `
+  <form id="${fid}" novalidate>
     <div class="two">
-      <label class="field"><span>Nombre</span><input type="text" name="name" maxlength="20" autocomplete="given-name" placeholder="Ej: Martina"></label>
-      <label class="field"><span>Edad</span><input type="number" name="age" inputmode="numeric" min="3" max="110" placeholder="00"></label>
+      <label class="field"><span>Nombre</span><input type="text" name="name" maxlength="20" autocomplete="given-name" placeholder="Ej: Martina" value="${esc(v.name || '')}"></label>
+      <label class="field"><span>Edad</span><input type="number" name="age" inputmode="numeric" min="3" max="110" placeholder="00" value="${v.age || ''}"></label>
     </div>
     <small style="color:var(--muted);font-size:13px">La edad ajusta algunos contenidos (por ejemplo, en Inglés).</small>
     <p class="err" hidden></p>
@@ -248,11 +283,11 @@ function tarjetaInstalar(){
 }
 
 /* ---------- Vistas ---------- */
-let vista = 'menu', pendiente = null, confirmar = null;
+let vista = 'menu', pendiente = null, confirmar = null, editar = null;
 
 function renderTop(){
   const p = yo();
-  $('#top').innerHTML = `<div class="brand"><img src="iconos/icon-192.png" alt="">Foco+</div>` +
+  $('#top').innerHTML = `<div class="brand"><img src="iconos/foco-luz-192.png" alt="">Foco+</div>` +
     (p && vista === 'menu' ? `<button class="who" id="cambiar" aria-label="Cambiar de perfil (ahora: ${esc(p.name)})">${avatar(p)}<span>${esc(p.name)}</span></button>` : '');
   const b = $('#cambiar'); if (b) b.onclick = () => { vista = 'quien'; render(); };
 }
@@ -268,9 +303,9 @@ function render(){
 
 function bienvenida(){
   $('#app').innerHTML = `<section class="hello">
-    <img class="hero-ic" src="iconos/icon-192.png" alt="">
+    <img class="hero-ic" src="iconos/foco-luz-192.png" alt="">
     <h1>Bienvenido a <em>Foco+</em></h1>
-    <p>Inglés, SQL, lectura, ejercicio y finanzas en un solo lugar. Cada persona tiene su propio perfil y su propio progreso.</p>
+    <p>Inglés, ejercicio, lectura, súper, finanzas, foco y SQL en un solo lugar. Cada persona tiene su propio perfil y su propio progreso.</p>
   </section>
   <div class="card" style="margin-top:12px"><h3>¿Cómo te llamas?</h3>${formPerfil('Empezar')}</div>`;
   $('#fp').onsubmit = e => { e.preventDefault(); const v = validar(e.target); if (!v) return;
@@ -288,12 +323,25 @@ function quien(){
   <div class="plist" style="margin-top:14px">${perfiles.map(p => `
     <div class="prow"><button class="pbtn${p.id === actual ? ' cur' : ''}" data-id="${p.id}">${avatar(p, true)}
       <span class="pn"><b>${esc(p.name)}</b><small>${p.age} años${p.id === actual ? ' · perfil actual' : ''}</small></span></button>
-      <button class="pdel" data-del="${p.id}" aria-label="Borrar perfil de ${esc(p.name)}">Borrar</button></div>`).join('')}
+      <span class="pacts"><button class="pedit" data-edit="${p.id}" aria-label="Editar perfil de ${esc(p.name)}">Editar</button>
+      <button class="pdel" data-del="${p.id}" aria-label="Borrar perfil de ${esc(p.name)}">Borrar</button></span></div>
+    ${editar === p.id ? `<div class="card editcard"><h3>Corregir nombre o edad</h3>${formPerfil('Guardar cambios', 'fe', p)}
+      <button class="link" id="noedit" style="display:block;margin:10px auto 0">Cancelar</button>
+      <small style="display:block;text-align:center;color:var(--muted);font-size:13px;margin-top:6px">Su progreso no cambia.</small></div>` : ''}`).join('')}
   </div>
   <div class="card" style="margin-top:16px"><h3>Agregar persona</h3>${formPerfil('Agregar')}</div>
   ${yo() ? '<button class="link" id="volver" style="display:block;margin:12px auto 0">Volver al menú</button>' : ''}`;
   document.querySelectorAll('.pbtn').forEach(b => b.onclick = () => { actual = b.dataset.id; confirmar = null; guardar(); vista = 'menu'; render(); toast('Hola, ' + yo().name); });
-  document.querySelectorAll('.pdel').forEach(b => b.onclick = () => { confirmar = b.dataset.del; render(); });
+  document.querySelectorAll('.pdel').forEach(b => b.onclick = () => { confirmar = b.dataset.del; editar = null; render(); });
+  document.querySelectorAll('.pedit').forEach(b => b.onclick = () => { editar = editar === b.dataset.edit ? null : b.dataset.edit; confirmar = null; render();
+    const i = document.querySelector('#fe [name=name]'); if (i) { i.focus(); i.select(); } });
+  const fe = $('#fe');
+  if (fe) {
+    fe.onsubmit = e => { e.preventDefault(); const v = validar(e.target); if (!v) return;
+      if (perfiles.some(p => p.id !== editar && p.name.toLowerCase() === v.name.toLowerCase())) { const er = e.target.querySelector('.err'); er.textContent = 'Ya existe otro perfil con ese nombre.'; er.hidden = false; return; }
+      const p = perfiles.find(x => x.id === editar); p.name = v.name; p.age = v.age; editar = null; guardar(); render(); toast('Listo, ahora es ' + v.name); };
+    $('#noedit').onclick = () => { editar = null; render(); };
+  }
   if (cf) {
     $('#si').onclick = () => { ls.keys().filter(k => k.startsWith(pre(cf.id))).forEach(ls.del); ls.del('fp.pin.' + cf.id);
       perfiles = perfiles.filter(p => p.id !== cf.id); if (actual === cf.id) actual = ''; confirmar = null; guardar(); vista = 'quien'; render(); toast('Perfil borrado'); };
@@ -302,7 +350,7 @@ function quien(){
   $('#fp').onsubmit = e => { e.preventDefault(); const v = validar(e.target); if (!v) return;
     if (perfiles.some(p => p.name.toLowerCase() === v.name.toLowerCase())) { const er = e.target.querySelector('.err'); er.textContent = 'Ya existe un perfil con ese nombre.'; er.hidden = false; return; }
     actual = crearPerfil(v.name, v.age).id; guardar(); vista = 'menu'; render(); toast('¡Hola, ' + v.name + '!'); };
-  const vb = $('#volver'); if (vb) vb.onclick = () => { confirmar = null; vista = 'menu'; render(); };
+  const vb = $('#volver'); if (vb) vb.onclick = () => { confirmar = null; editar = null; vista = 'menu'; render(); };
 }
 
 function menu(){
@@ -318,22 +366,83 @@ function menu(){
   ${tarjetaInstalar()}
   <section class="section"><div class="label">Respaldo</div>
     <div class="card"><p>Guarda una copia del progreso de todos los perfiles, por si cambias de teléfono o se borran los datos del navegador.</p>
-      <div class="row"><button class="btn ghost" id="bajar">${iconoDescarga} Descargar respaldo</button><button class="btn ghost" id="subir">Restaurar</button></div></div>
+      <div class="row"><button class="btn ghost" id="bajar">${iconoDescarga} Guardar copia</button><button class="btn ghost" id="subir">Restaurar</button></div>
+      <div class="bk-last">${ultimoRespaldo()}</div></div>
   </section>`;
+  if (respaldoPendiente()) {
+    const nunca = !ls.get('fp.backup.last');
+    $('.hello').insertAdjacentHTML('afterend', `<div class="aviso" role="status"><h3>💾 Guarda una copia de tu progreso</h3>
+      <p>${nunca ? 'Todavía no tienes una copia.' : 'Hace un mes que no respaldas.'} Si cambias o pierdes el teléfono, así no pierdes nada. Toma 10 segundos.</p>
+      <div class="row"><button class="btn" id="bk-si" style="white-space:nowrap;padding:0 12px">Guardar copia</button><button class="btn ghost" id="bk-no" style="white-space:nowrap;padding:0 12px">Ahora no</button></div></div>`);
+    $('#bk-si').onclick = abrirRespaldo;
+    $('#bk-no').onclick = () => { ls.set('fp.backup.snooze', String(Date.now() + 7 * DIA)); render(); toast('Te lo recuerdo en una semana'); };
+  }
   const ib = $('#instalar'); if (ib) ib.onclick = async () => { const a = aviso; aviso = null; a.prompt(); try { await a.userChoice; } catch(e) {} render(); };
-  $('#bajar').onclick = descargarRespaldo;
+  $('#bajar').onclick = abrirRespaldo;
   $('#subir').onclick = () => $('#file').click();
 }
 
-/* ---------- Respaldo (archivo .json) ---------- */
-function descargarRespaldo(){
-  const data = {}; ls.keys().filter(k => k.startsWith('fp.') || k.startsWith('p:')).forEach(k => data[k] = ls.get(k));
-  const blob = new Blob([JSON.stringify({ app:'foco-plus', v:1, fecha:new Date().toISOString(), data })], { type:'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'foco-plus-respaldo-' + new Date().toLocaleDateString('en-CA') + '.json';
-  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  toast('Respaldo descargado');
+/* ---------- Respaldo (archivo .json) ----------
+   Aviso suave cada 30 días (o a los 7 días de uso si nunca se respaldó), solo si hay progreso que perder. */
+const DIA = 86400000;
+function hayProgreso(){
+  return ls.keys().some(k => k.startsWith('p:') && !/(-view|focoEnglishProfiles)$/.test(k) && (ls.get(k) || '').length > 40);
 }
+function respaldoPendiente(){
+  const now = Date.now();
+  if (!ls.get('fp.backup.first')) ls.set('fp.backup.first', String(now));
+  if (!hayProgreso()) return false;
+  if (now < Number(ls.get('fp.backup.snooze') || 0)) return false;
+  const last = Number(ls.get('fp.backup.last') || 0), first = Number(ls.get('fp.backup.first'));
+  return last ? now - last > 30 * DIA : now - first > 7 * DIA;
+}
+function ultimoRespaldo(){
+  const last = Number(ls.get('fp.backup.last') || 0); if (!last) return 'Todavía no guardas ninguna copia.';
+  const d = Math.floor((new Date().setHours(0,0,0,0) - new Date(last).setHours(0,0,0,0)) / DIA);
+  return 'Último respaldo: <b>' + (d <= 0 ? 'hoy' : d === 1 ? 'ayer' : 'hace ' + d + ' días') + '</b>' + (d <= 30 ? ' ✓' : '');
+}
+function archivoRespaldo(){
+  const data = {}; ls.keys().filter(k => k.startsWith('fp.') || k.startsWith('p:')).forEach(k => data[k] = ls.get(k));
+  const nombre = 'foco-plus-respaldo-' + new Date().toLocaleDateString('en-CA') + '.json';
+  const txt = JSON.stringify({ app:'foco-plus', v:1, fecha:new Date().toISOString(), data });
+  return { nombre, txt };
+}
+function respaldoListo(){
+  ls.set('fp.backup.last', String(Date.now())); ls.del('fp.backup.snooze');
+  cerrarRespaldo(); render(); toast('Copia guardada. Nos vemos en un mes 👍');
+}
+function puedeCompartir(){
+  try { const f = new File(['{}'], 'x.json', { type:'application/json' }); return !!(navigator.canShare && navigator.canShare({ files:[f] })); } catch(e) { return false; }
+}
+function abrirRespaldo(){
+  const share = puedeCompartir();
+  const w = document.createElement('div'); w.id = 'bk';
+  w.innerHTML = `<div class="bk-scrim" data-bk="x"></div><div class="bk-sheet" role="dialog" aria-modal="true" aria-label="Guardar copia"><div class="in">
+    <h3>Guardar copia de tu progreso</h3>
+    <p style="color:var(--muted);font-size:15px">Incluye todos los perfiles y módulos de este teléfono.</p>
+    ${share ? '<button class="btn teal full" data-bk="share">Mandar a Drive, correo o WhatsApp</button>' : ''}
+    <button class="btn ${share ? 'ghost' : ''} full" data-bk="down">${share ? 'Solo descargar en el teléfono' : iconoDescarga + ' Descargar copia'}</button>
+    ${share ? '' : '<p style="color:var(--muted);font-size:14px">Después súbela a tu Drive o mándatela por correo: así queda fuera del teléfono.</p>'}
+    <div class="bk-lock">🔒 La copia <b>no lleva tu PIN</b>: quien la abra podría ver tus finanzas. Mejor a tu Drive o a tu correo, no a un chat con otras personas.</div>
+    <button class="link" data-bk="x" style="justify-self:center">Ahora no</button></div></div>`;
+  document.body.appendChild(w);
+  w.onclick = async e => {
+    const b = e.target.closest('[data-bk]'); if (!b) return;
+    const act = b.dataset.bk;
+    if (act === 'x') return cerrarRespaldo();
+    const { nombre, txt } = archivoRespaldo();
+    if (act === 'share') {
+      try { await navigator.share({ files:[new File([txt], nombre, { type:'application/json' })], title:'Respaldo de Foco+' }); respaldoListo(); }
+      catch(err) { if (err && err.name === 'AbortError') return; toast('No se pudo compartir. Prueba con “Solo descargar”.'); }
+    }
+    if (act === 'down') {
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type:'application/json' })); a.download = nombre;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      respaldoListo();
+    }
+  };
+}
+function cerrarRespaldo(){ const w = $('#bk'); if (w) w.remove(); }
 $('#file').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   try {
