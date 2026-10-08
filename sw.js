@@ -1,7 +1,7 @@
 /* Foco+ · modo sin internet
    Cuando subas cambios a GitHub, sube también este archivo cambiando VERSION
-   (ej. de 'foco-plus-v9' a 'foco-plus-v8'): así los teléfonos saben que hay algo nuevo. */
-const VERSION = 'foco-plus-v9';
+   (ej. de 'foco-plus-v10' a 'foco-plus-v8'): así los teléfonos saben que hay algo nuevo. */
+const VERSION = 'foco-plus-v10';
 const ARCHIVOS = [
   './', './index.html', './manifest.json', './perfil.js',
   './iconos/foco-luz-192.png', './iconos/foco-luz-512.png', './iconos/apple-touch-icon.png', './iconos/favicon.png',

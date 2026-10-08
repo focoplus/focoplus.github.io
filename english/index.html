@@ -156,6 +156,33 @@ details.why summary{cursor:pointer;font-weight:700;padding-block:12px;font-famil
 .lvup div{text-align:center;display:grid;gap:8px}
 .lvup b{font-family:var(--f-display);font-size:88px;line-height:1;color:var(--accent);animation:pop .5s}
 
+/* Foquito y camino */
+.foq{display:block;flex:none}
+.hi{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.hi b{font-family:var(--f-display);font-size:21px;display:block;line-height:1.15}
+.hi span{color:var(--muted);font-size:15px}
+.trail{display:grid;gap:6px;margin-top:6px}
+.trail .unit{background:none;border:0;padding:6px 0;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;margin-left:var(--off,0)}
+.trail .unit:not(:disabled):hover{transform:none}
+.trail .unit:not(:disabled):hover .badge{transform:translateY(-2px)}
+.trail .unit .badge{width:72px;height:66px;border-radius:50%;font-size:16px;box-shadow:0 5px 0 color-mix(in srgb,var(--ink) 22%,transparent);transition:transform .12s}
+.trail .unit.done .badge{background:var(--teal);color:#fff}
+.trail .unit.cur .badge{background:var(--accent);color:var(--accent-ink);box-shadow:0 5px 0 color-mix(in srgb,var(--accent) 55%,#000),0 0 0 6px color-mix(in srgb,var(--accent) 22%,transparent)}
+.trail .unit:disabled{opacity:.6}
+.trail .unit .badge svg{width:26px;height:26px}
+.trail .unit svg.foq{width:46px;height:58px}
+.trail .here{display:inline-block;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:2px}
+.trail .unit .mbar{max-width:150px}
+.trail .unit .go{display:flex;align-items:center}
+.fb .foq{margin:-4px 0}
+.back{display:grid;gap:14px;text-align:center;padding-top:22px}
+.back .pair{display:flex;align-items:center;justify-content:center;gap:10px}
+.back h1{font-size:32px;font-weight:800}
+.back p{margin:0;color:var(--muted)}
+.keep{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.keep div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.keep b{font-family:var(--f-display);font-size:26px;display:block}
+.keep span{font-size:13.5px;color:var(--muted)}
 /* Mundos y MCER */
 .world{margin-top:26px;display:grid;gap:10px}
 .world .path{margin-top:0}
@@ -356,7 +383,22 @@ const mainUnits=()=>WORLDS.filter(w=>!w.adult).flatMap(w=>w.units).map(id=>U[id]
 function levelInfo(xp){let l=1,need=100,r=xp;while(r>=need){r-=need;l++;need=100+40*(l-1)}return{l,r,need}}
 
 /* ---------- Iconos ---------- */
+/* ---------- Foquito: la mascota. Brilla al acertar, anima ante un error, se duerme si descansas ---------- */
+function foquito(mood,w){w=w||80;const h=Math.round(w*1.25);
+ const body=(fill)=>`<path d="M80 32 C109 32 130 53 130 82 C130 102 119 114 110 125 C104 132 102 137 102 144 L58 144 C58 137 56 132 50 125 C41 114 30 102 30 82 C30 53 51 32 80 32 Z" fill="${fill}" stroke="#16213A" stroke-width="5" stroke-linejoin="round"/><path d="M50 68 C52 55 61 46 72 43" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" opacity=".75"/>`;
+ const base=(c)=>`<rect x="56" y="146" width="48" height="11" rx="4" fill="${c}" stroke="#16213A" stroke-width="4"/><rect x="58" y="158" width="44" height="11" rx="4" fill="${c}" stroke="#16213A" stroke-width="4"/><path d="M66 172 L94 172 L88 182 Q80 187 72 182 Z" fill="#16213A"/>`;
+ const eyes=(y)=>`<ellipse cx="64" cy="${y}" rx="5.5" ry="7.5" fill="#16213A"/><ellipse cx="96" cy="${y}" rx="5.5" ry="7.5" fill="#16213A"/><circle cx="66" cy="${y-3}" r="1.8" fill="#fff"/><circle cx="98" cy="${y-3}" r="1.8" fill="#fff"/>`;
+ const cheeks=(o)=>`<circle cx="53" cy="99" r="6" fill="#F2541B" opacity="${o}"/><circle cx="107" cy="99" r="6" fill="#F2541B" opacity="${o}"/>`;
+ const happy=`<path d="M57 86 Q64 76 71 86 M89 86 Q96 76 103 86" fill="none" stroke="#16213A" stroke-width="4.5" stroke-linecap="round"/>`;
+ const M={
+  tranquilo:`<circle cx="80" cy="82" r="66" fill="#F5BF2A" opacity=".18"/>${body('#FFD65C')}${eyes(84)}${cheeks(.3)}<path d="M70 101 Q80 109 90 101" fill="none" stroke="#16213A" stroke-width="4.5" stroke-linecap="round"/>${base('#2B3A58')}`,
+  bien:`<circle cx="80" cy="82" r="72" fill="#F5BF2A" opacity=".22"/><path d="M80 24 L80 12 M109 32 L115 21 M51 32 L45 21" fill="none" stroke="#E89A00" stroke-width="5" stroke-linecap="round"/>${body('#FFDC5E')}${happy}${cheeks(.35)}<path d="M68 98 Q80 116 92 98 Z" fill="#16213A" stroke="#16213A" stroke-width="3" stroke-linejoin="round"/><path d="M74 106 Q80 111 86 106 Q80 103 74 106 Z" fill="#F2541B"/>${base('#2B3A58')}`,
+  combo:`<circle cx="80" cy="82" r="76" fill="#F5BF2A" opacity=".28"/><circle cx="80" cy="82" r="64" fill="#FFD65C" opacity=".35"/><path d="M80 24 L80 10 M109 32 L116 20 M130 53 L142 46 M138 82 L152 82 M51 32 L44 20 M30 53 L18 46 M22 82 L8 82" fill="none" stroke="#F2541B" stroke-width="6" stroke-linecap="round"/>${body('#FFE46E')}<path d="M56 84 Q64 73 72 84 M88 84 Q96 73 104 84" fill="none" stroke="#16213A" stroke-width="5" stroke-linecap="round"/>${cheeks(.4)}<path d="M63 95 Q80 122 97 95 Z" fill="#16213A" stroke="#16213A" stroke-width="3" stroke-linejoin="round"/><path d="M72 108 Q80 115 88 108 Q80 104 72 108 Z" fill="#F2541B"/><path d="M22 22 L24.5 28.5 L31 31 L24.5 33.5 L22 40 L19.5 33.5 L13 31 L19.5 28.5 Z" fill="#F5BF2A" stroke="#16213A" stroke-width="2" stroke-linejoin="round"/><path d="M140 108 L142 113 L147 115 L142 117 L140 122 L138 117 L133 115 L138 113 Z" fill="#0C8F80"/>${base('#2B3A58')}`,
+  animo:`<circle cx="80" cy="82" r="62" fill="#F5BF2A" opacity=".13"/><path d="M17 58 L24 63 L18 68 L25 73 M143 58 L136 63 L142 68 L135 73" fill="none" stroke="#E89A00" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>${body('#F7CD55')}<path d="M56 71 Q63 66 71 69 M89 69 Q97 66 104 71" fill="none" stroke="#16213A" stroke-width="4" stroke-linecap="round"/>${eyes(85)}${cheeks(.25)}<path d="M71 102 Q80 108 89 102" fill="none" stroke="#16213A" stroke-width="4.5" stroke-linecap="round"/>${base('#2B3A58')}`,
+  dormido:`${body('#DDE4EC')}<path d="M57 85 Q64 91 71 85 M89 85 Q96 91 103 85" fill="none" stroke="#16213A" stroke-width="4.5" stroke-linecap="round"/><path d="M75 103 Q80 106 85 103" fill="none" stroke="#16213A" stroke-width="4" stroke-linecap="round"/><text x="116" y="42" font-size="20" font-weight="800" fill="#566476" font-family="Bricolage Grotesque, Arial, sans-serif">z</text><text x="132" y="24" font-size="14" font-weight="800" fill="#566476" font-family="Bricolage Grotesque, Arial, sans-serif">z</text>${base('#4A566C')}`};
+ return `<svg class="foq" width="${w}" height="${h}" viewBox="0 0 160 200" aria-hidden="true">${M[mood]||M.tranquilo}</svg>`}
 const I={
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
  flame:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 2 1 3 2 3 0-3-1-6 .5-9z" fill="var(--accent)"/></svg>',
  speaker:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>',
  sound:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>',
@@ -441,12 +483,17 @@ function progressBlock(){
  const ex=s.length?pick(s):null,exT=ex?(ex.kind==='sent'?ex.en:ex.q.replace('___',ex.a)):'';
  return `<div class="known"><div class="kn"><b class="num">${w}</b><span>${w===1?'palabra que ya reconoces':'palabras que ya reconoces'}</span></div><div class="kn"><b class="num">${s.length}</b><span>${s.length===1?'frase que ya armas':'frases que ya armas'}</span></div>
  ${ex?`<p class="ex"><span class="label">Ya puedes escribir</span>«${esc(exT)}»</p>`:`<p class="ex muted">Cuando aciertes algo 2 veces, aparecerá aquí como aprendido.</p>`}</div>`}
-function home(){closeFb();renderTop();
+function daysAway(){if(!S.last)return 0;return Math.round((new Date(TODAY+'T12:00')-new Date(S.last+'T12:00'))/864e5)}
+function home(){closeFb();
+ if(daysAway()>=3&&S.welcomed!==TODAY&&S.xp>0)return welcomeBack();
+ renderTop();
  const curId=curUnit().id;
  const due=dueCards();
+ const nm=esc((me().name||'').split(' ')[0]);
+ const hiMsg=due.length?`Hoy toca repasar <b>${due.length}</b> ${due.length===1?'palabra':'palabras'}. Son 2 minutos.`:S.today>=GOAL?'Meta de hoy cumplida. Lo que sigue es bonus.':S.today?'Una ronda más y sigues sumando.':'Una ronda de 2 minutos y sigues donde ibas.';
  $('#app').innerHTML=`
  <section class="hero">
-  <h1>Inglés en rondas de <em>2 minutos</em>.</h1>
+  <div class="hi">${foquito(S.today>=GOAL?'bien':'tranquilo',62)}<div><b>¡Hola${nm?', '+nm:''}!</b><span>${hiMsg}</span></div></div>
   ${planBlock()}
   <div class="goal">${ring(S.today/GOAL)}<div><b>Meta de hoy: ${GOAL} rondas</b><p>${S.today>=GOAL?'Meta cumplida. Lo que sigue es bonus.':'Cada ronda son 10 preguntas cortas. Una a la vez.'}</p></div></div>
   ${progressBlock()}
@@ -456,12 +503,12 @@ function home(){closeFb();renderTop();
  ${WORLDS.filter(w=>!w.adult||isAdult()).map(w=>{const wi=WORLDS.indexOf(w),pw=WORLDS[wi-1];return `
  <section class="world">
   <div class="whead"><span class="cefr">${w.cefr}</span><div><h2>${esc(w.name)}</h2><small>${esc(w.sub)}</small></div></div>
-  <div class="path">${w.units.map((id,k)=>{const u=U[id],m=mastery(u),ok=unlocked(u),done=m>=.85;
+  <div class="path trail">${w.units.map((id,k)=>{const u=U[id],m=mastery(u),ok=unlocked(u),done=m>=.85,off=[0,44,80,44][k%4],firstLock=!ok&&(k===0||unlocked(U[w.units[k-1]]));
    const lockMsg=k===0&&pw&&!w.adult?`Se abre al llegar a ${UNLOCK*100}% en «${esc(U[pw.units[pw.units.length-1]].name)}»`:`Se abre al llegar a ${UNLOCK*100}% en la unidad anterior`;return `
-  <button class="unit ${id===curId?'cur':''} ${done?'done':''}" data-u="${id}" ${ok?'':'disabled'}>
-   <span class="badge">${ok?esc(u.tag):I.lock}</span>
-   <span><h3>${esc(u.name)}</h3><small>${ok?`Dominio <span class="num">${Math.round(m*100)}%</span>`:lockMsg}</small><span class="mbar"><i style="width:${m*100}%"></i></span></span>
-   <span class="go">${ok?(S.learned[u.id]?'Jugar':'Aprender'):''}</span>
+  <button class="unit ${id===curId?'cur':''} ${done?'done':''}" data-u="${id}" ${ok?'':'disabled'} style="--off:${off}px" aria-label="${esc(u.name)}${done?', dominada':id===curId?', unidad actual':ok?'':', bloqueada'}">
+   <span class="badge">${done?I.check:ok?esc(u.tag):I.lock}</span>
+   <span>${id===curId?'<span class="here">Sigue aquí</span>':''}<h3>${esc(u.name)}</h3><small>${done?'Dominada · <span class="num">'+Math.round(m*100)+'%</span>':ok?`Dominio <span class="num">${Math.round(m*100)}%</span>`:firstLock?lockMsg:'Más adelante'}</small>${ok&&!done?`<span class="mbar"><i style="width:${m*100}%"></i></span>`:''}</span>
+   <span class="go">${id===curId?foquito('bien',44):ok?(S.learned[u.id]?'Jugar':'Aprender'):''}</span>
   </button>`}).join('')}</div>
  </section>`}).join('')}
  <details class="why"><summary>Por qué está diseñado así</summary>
@@ -486,6 +533,25 @@ function home(){closeFb();renderTop();
  if($('#rev'))$('#rev').onclick=()=>{sfx.tap();startReview()};
  document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{S.plan=b.dataset.p;S.planDay=TODAY;save();sfx.ok(0);home();toast('Plan guardado')});
  if($('#planEdit'))$('#planEdit').onclick=()=>{S.planDay='';save();home()};
+}
+
+/* ---------- Volver sin culpa (3 días o más sin jugar) ---------- */
+function welcomeBack(){renderTop();
+ const nm=esc((me().name||'').split(' ')[0]);
+ const w=UNITS.flatMap(cardsOf).filter(c=>c.kind==='item'&&box(c.key)>=2).length,L=levelInfo(S.xp).l,due=dueCards().length;
+ $('#app').innerHTML=`<section class="back">
+  <span class="label">Foco English</span>
+  <div class="pair">${foquito('dormido',92)}<svg width="34" height="22" viewBox="0 0 40 24" fill="none" stroke="var(--muted)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h32M26 4l9 8-9 8"/></svg>${foquito('bien',108)}</div>
+  <h1>¡Volviste${nm?', '+nm:''}!</h1>
+  <p>Foquito se quedó dormido esperándote. Una ronda de 2 minutos y vuelve a brillar.</p>
+  <div class="keep"><div><b class="num">${w}</b><span>${w===1?'palabra sigue aquí':'palabras siguen aquí'}</span></div><div><b>Nivel ${L}</b><span>no bajaste nada</span></div></div>
+  ${due?'<div class="rule">Empezamos con un <b>repaso suave</b> de lo que ya sabías, para entrar en calor.</div>':''}
+  <button class="btn full" id="wb">Encender a Foquito</button>
+  <button class="link" id="wbno">Ahora no</button>
+ </section>`;
+ S.welcomed=TODAY;save();
+ $('#wb').onclick=()=>{sfx.tap();due?startReview():quickStart()};
+ $('#wbno').onclick=()=>home();
 }
 
 /* ---------- Aprender (vocabulario antes de evaluar) ---------- */
@@ -582,7 +648,7 @@ function resolve(ok,keys,Q,partial){
  save();
  if(ok){const msgs=R.combo>=6?['¡Imparable!','¡En llamas!','¡Modo experto!']:R.combo>=3?['¡Combo!','¡Vas volando!','¡Sigue así!']:['¡Bien!','¡Eso!','Perfecto','Correcto','¡Excelente!'];
   showFb(true,pick(msgs),R.combo===3?'Combo activado: ahora ganas el doble.':R.combo===6?'Combo x3.':`+${gained} XP`);setTimeout(()=>{if(R&&R.res[R.i]===true&&!R.adv){next()}},850)}
- else showFb(false,'Casi.',Q.type==='match'?'Los pares con error volverán a aparecer más adelante.':`La respuesta es: <b>${esc(Q.type==='order'?Q.card.en:R.ans)}</b>. Vuelve al final de la ronda para que la fijes.${R.combo>=3?' Tu combo bajó un nivel, pero sigue vivo.':''}`)
+ else showFb(false,'Casi, ¡vamos!',Q.type==='match'?'Los pares con error volverán a aparecer más adelante.':`Era <b>${esc(Q.type==='order'?Q.card.en:R.ans)}</b>. Vuelve al final de la ronda para que la fijes.${R.combo>=3?' Tu combo bajó un nivel, pero no pierdes nada de lo que ganaste.':''}`)
 }
 function next(){if(!R)return;R.adv=true;closeFb();R.i++;R.adv=false;if(R.i%3===0&&R.i<R.q.length)milestone();ask()}
 function floatXP(n){const c=document.querySelector('.card');if(!c)return;const f=document.createElement('div');f.className='float';f.textContent='+'+n;c.appendChild(f);setTimeout(()=>f.remove(),900)}
@@ -625,7 +691,8 @@ function askMatch(Q){const cs=Q.cards,L=shuffle(cs),Rr=shuffle(cs);let sel=null,
  })}
 
 /* ---------- Retroalimentación ---------- */
-function showFb(ok,title,body){const fb=$('#fb');fb.className='fb show '+(ok?'ok':'no');$('#fbmsg').innerHTML=`<strong>${title}</strong><span>${body}</span>`;const b=$('#fbbtn');b.textContent='Continuar';b.onclick=next;if(!ok)setTimeout(()=>b.focus(),50)}
+function showFb(ok,title,body){const fb=$('#fb');fb.className='fb show '+(ok?'ok':'no');const mood=!ok?'animo':(R&&R.combo>=3)?'combo':'bien';
+ $('#fbmsg').innerHTML=`<div style="display:flex;gap:10px;align-items:center">${foquito(mood,52)}<div style="min-width:0"><strong>${title}</strong><span>${body}</span></div></div>`;const b=$('#fbbtn');b.textContent='Continuar';b.onclick=next;if(!ok)setTimeout(()=>b.focus(),50)}
 function closeFb(){$('#fb').className='fb'}
 
 /* ---------- Fin de ronda ---------- */
@@ -645,6 +712,7 @@ function finish(){closeFb();stopTimer();
  const u=R.u;
  $('#app').innerHTML=`<section class="center">
   <div class="label">${esc(u.name)} · Ronda terminada</div>
+  <div style="display:flex;justify-content:center">${foquito(stars===3?'combo':stars===2?'bien':'animo',stars===3?132:112)}</div>
   <h2 style="font-size:32px">${stars===3?'¡Ronda perfecta!':stars===2?'¡Muy buena ronda!':'Ronda completa. Cada ronda suma.'}</h2>
   <div class="stars">${[0,1,2].map(k=>I.star(k<stars).replace('class="on"',`class="on" style="animation-delay:${k*.15}s"`)).join('')}</div>
   <div class="stats"><div class="stat"><b class="num">${Math.round(acc*100)}%</b><span>al primer intento</span></div><div class="stat"><b class="num" id="xpc">+0</b><span>XP ganados</span></div><div class="stat"><b class="num">${R.best}</b><span>mejor combo</span></div></div>
