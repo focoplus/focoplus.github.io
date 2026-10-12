@@ -55,6 +55,12 @@
   }
   if (document.body) barra(); else document.addEventListener('DOMContentLoaded', barra);
 
+  // iPhone/iPad: evitar que la pantalla se agrande sola al tocar un campo de texto
+  // (el zoom con dos dedos sigue funcionando; en Android no se toca nada)
+  var esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+  function sinZoom() { var m = document.querySelector('meta[name=viewport]'); if (m && m.content.indexOf('maximum-scale') < 0) m.content += ',maximum-scale=1'; }
+  if (esIOS) { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', sinZoom); else sinZoom(); }
+
   // Finanzas: protegido con un PIN personal de 4 números
   if (modulo === 'finanzas') candado(perfil, store, g, s, r, prefijo);
 })();

@@ -92,6 +92,7 @@ button { cursor: pointer; }
 .streaks { display: flex; gap: 8px; flex-wrap: wrap; }
 .chip-stat { display: inline-flex; align-items: baseline; gap: 5px; background: var(--surface-2); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--muted); }
 .chip-stat b { color: var(--ink); font-size: 15px; font-variant-numeric: tabular-nums; }
+button.chip-stat { border: 0; font-family: inherit; font-size: 13px; cursor: pointer; }
 
 /* Portadas generadas */
 .cover { position: relative; aspect-ratio: 2 / 3; border-radius: 4px 10px 10px 4px; overflow: hidden; color: #fff; background: var(--c, #2F3F86); display: grid; align-content: space-between; padding: 10% 10% 9% 16%; box-shadow: inset 6px 0 0 rgba(0,0,0,.18), inset 7px 0 0 rgba(255,255,255,.08), 0 6px 14px rgba(15,18,32,.18); max-width: 100%; }
@@ -540,8 +541,6 @@ function insightFor(byDay) {
     return ['Ayer no leíste, y no pasa nada. Saltarse <b>un día suelto</b> no afectó la formación del hábito en el estudio más citado sobre el tema. Lo que importa es retomar hoy.', 'Lally et al., 2010 · European Journal of Social Psychology'];
   if ((d.getDate() <= 3 || d.getDay() === 1) && weekN === 0)
     return [d.getDate() <= 3 ? '<b>Mes nuevo, página en blanco.</b> Los comienzos de mes o de semana son el mejor momento para retomar una meta.' : '<b>Semana nueva.</b> Los lunes y los inicios de mes funcionan como “borrón y cuenta nueva”: es más fácil retomar una meta ahí.', 'Dai, Milkman y Riis, 2014 · Management Science'];
-  if (!S.settings.plan)
-    return ['Decidir <b>cuándo y dónde</b> vas a leer tiene un efecto fuerte sobre cumplir una meta, mucho mayor que solo tener la intención.', 'Gollwitzer y Sheeran, 2006 · meta-análisis de 94 estudios'];
   if ((byDay[t] || 0) >= S.settings.goal)
     return ['<b>Meta de hoy cumplida.</b> Anotar lo que haces es parte del efecto: registrar el avance aumenta la probabilidad de lograr una meta.', 'Harkin et al., 2016 · Psychological Bulletin'];
   const tips = [
@@ -586,7 +585,7 @@ function viewHoy() {
     </div>
     <div class="weekrow">${week}</div>
     <div class="streaks">
-      <span class="chip-stat"><b>${wDone}/${wTarget}</b> días esta semana</span>
+      <button class="chip-stat" data-act="wcycle" aria-label="Cambiar meta de días por semana (ahora ${wTarget})"><b>${wDone}/${wTarget}</b> días esta semana</button>
       <span class="chip-stat"><b>${sd}</b> ${plural(sd, 'día seguido', 'días seguidos')}</span>
       <span class="chip-stat"><b>${ws}</b> ${plural(ws, 'semana cumplida', 'semanas cumplidas')}</span>
     </div>
@@ -608,15 +607,7 @@ function viewHoy() {
     <button class="add-now" data-act="new-book"><b>+</b>${books.length ? 'Otro libro' : 'Agrega el libro que estás leyendo'}</button>
   </div>
 
-  ${plan ? `<section class="card plan">
-      <p class="eyebrow">Mi plan de lectura</p>
-      <p class="big">Cuando <em>${esc(plan.cuando)}</em>, leo en <em>${esc(plan.donde)}</em>.</p>
-      <button class="link" data-act="plan">Cambiar plan</button></section>`
-    : `<section class="card plan">
-      <p class="eyebrow">Arma tu plan</p>
-      <p class="big">Cuando <em>…</em>, leo en <em>…</em>.</p>
-      <p style="opacity:.8;font-size:14px">Un plan con hora y lugar concreto convierte la intención en costumbre.</p>
-      <button class="btn" style="background:#fff;color:#2F3F86;justify-self:start;padding:11px 16px" data-act="plan">Definir mi plan</button></section>`}
+
 
   <div class="insight"><div><p>${ins}</p><cite>${cite}</cite></div></div>
 
@@ -960,13 +951,10 @@ function sheetNewBook(where) {
 function sheetPlan() {
   const p = S.settings.plan || {};
   const CUANDO = ['me acuesto', 'termine de cenar', 'tome el café de la mañana', 'llegue a la casa', 'vaya en el metro'];
-  const DONDE = ['mi rincón de lectura', 'la cama', 'el sillón', 'el metro', 'la terraza'];
   openSheet(`${head('Mi plan de lectura')}
     <p class="small muted">Un plan del tipo “cuando pase X, haré Y” ata la lectura a algo que ya haces todos los días.</p>
     <label class="f" for="p-cuando">Cuando…<input type="text" id="p-cuando" value="${esc(p.cuando || '')}" placeholder="me acueste"></label>
     <div class="chips">${CUANDO.map(t => `<button class="chip" data-act="plan-fill" data-f="p-cuando" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
-    <label class="f" for="p-donde">…leo en…<input type="text" id="p-donde" value="${esc(p.donde || '')}" placeholder="la cama"></label>
-    <div class="chips">${DONDE.map(t => `<button class="chip" data-act="plan-fill" data-f="p-donde" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
     <div class="stepper">Días de lectura por semana <button data-act="wdays" data-d="-1" aria-label="Menos días">−</button><b id="wd-n">${S.settings.weekDays || 5}</b><button data-act="wdays" data-d="1" aria-label="Más días">+</button></div>
     <button class="btn primary" data-act="plan-save">Guardar plan</button>
     ${S.settings.plan ? `<button class="x" style="justify-self:center;border:none" data-act="plan-clear">Quitar plan</button>` : ''}`, 'plan');
@@ -974,7 +962,6 @@ function sheetPlan() {
 function sheetScience() {
   const items = [
     ['Registrar funciona', 'Un meta-análisis de 138 estudios encontró que monitorear el avance aumenta la probabilidad de cumplir una meta, sobre todo cuando queda registrado.', 'Harkin et al., 2016', 'https://eprints.whiterose.ac.uk/id/eprint/87431/'],
-    ['Plan con hora y lugar', 'Las intenciones “cuando X, haré Y” tuvieron un efecto de tamaño medio-grande sobre el logro de metas (d = 0,65). Por eso existe tu plan.', 'Gollwitzer y Sheeran, 2006', 'https://www.researchgate.net/publication/37367696_Implementation_Intentions_and_Goal_Achievement_A_Meta-Analysis_of_Effects_and_Processes'],
     ['Rachas que perdonan', 'Saltarse un día suelto no frenó la formación de hábitos, que tomó en promedio 66 días. Una racha rota sí baja la motivación, así que la app también cuenta semanas cumplidas.', 'Lally et al., 2010 · Silverman y Barasch, 2023', 'https://onlinelibrary.wiley.com/doi/abs/10.1002/ejsp.674'],
     ['Empezar de nuevo', 'Los lunes y los inicios de mes aumentan la motivación para retomar metas. La app te lo recuerda en esos días.', 'Dai, Milkman y Riis, 2014', 'https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2204126'],
     ['Lo que falta motiva', 'Mientras más cerca está la meta, más se acelera el esfuerzo. Los anillos y barras muestran cuánto te queda.', 'Kivetz, Urminsky y Zheng, 2006', 'https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2733214'],
@@ -1039,12 +1026,13 @@ document.addEventListener('click', async e => {
     case 'lib': S.lib = b.dataset.k; render(); break;
     case 'science': sheetScience(); break;
     case 'plan': sheetPlan(); break;
+    case 'wcycle': { const n = (S.settings.weekDays || 5) >= 7 ? 1 : (S.settings.weekDays || 5) + 1; saveSettings({ weekDays: n }); toast('Meta: ' + n + (n === 1 ? ' día' : ' días') + ' por semana'); break; }
     case 'plan-fill': document.getElementById(b.dataset.f).value = b.dataset.t; break;
     case 'wdays': { const el = document.getElementById('wd-n'); el.textContent = Math.min(7, Math.max(1, Number(el.textContent) + Number(b.dataset.d))); break; }
     case 'plan-save': {
-      const cuando = document.getElementById('p-cuando').value.trim(), donde = document.getElementById('p-donde').value.trim(), wd = Number(document.getElementById('wd-n').textContent);
-      if (!cuando || !donde) { toast('Completa el cuándo y el dónde'); return; }
-      closeSheet(); await saveSettings({ plan: { cuando, donde }, weekDays: wd }); toast('Plan guardado'); break;
+      const cuando = document.getElementById('p-cuando').value.trim(), wd = Number(document.getElementById('wd-n').textContent);
+      if (!cuando) { toast('Elige en qué momento vas a leer'); return; }
+      closeSheet(); await saveSettings({ plan: { cuando }, weekDays: wd }); toast('Plan guardado'); break;
     }
     case 'plan-clear': closeSheet(); saveSettings({ plan: null }); break;
     case 'add': sheetAdd(todayStr()); break;

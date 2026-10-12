@@ -269,7 +269,10 @@ const formPerfil = (boton, fid = 'fp', v = {}) => `
 /* ---------- Instalación ---------- */
 let aviso = null;
 const instalada = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+if (esIOS) { const m = document.querySelector('meta[name=viewport]'); if (m && m.content.indexOf('maximum-scale') < 0) m.content += ',maximum-scale=1'; }
+// Pedir al navegador que no borre los datos de Foco+ por falta de espacio (si lo permite)
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persisted().then(p => { if (!p) navigator.storage.persist(); }); } catch(e) {}
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); aviso = e; if (vista === 'menu') render(); });
 window.addEventListener('appinstalled', () => { aviso = null; toast('¡Foco+ quedó instalada en tu teléfono!'); if (vista === 'menu') render(); });
 function tarjetaInstalar(){
@@ -277,8 +280,12 @@ function tarjetaInstalar(){
   if (aviso) return `<div class="card install"><h3>Instala Foco+ en tu teléfono</h3>
     <p>Queda con su ícono junto a tus apps y funciona sin internet.</p>
     <button class="btn full" id="instalar">${iconoDescarga} Instalar</button></div>`;
-  if (esIOS) return `<div class="card install"><h3>Instala Foco+ en tu iPhone</h3>
-    <p>En Safari toca <b>Compartir</b> (cuadrado con flecha) y luego <b>“Agregar a pantalla de inicio”</b>.</p></div>`;
+  if (esIOS) return `<div class="card install" style="margin-top:12px"><h3>Instala Foco+ en tu iPhone</h3>
+    <ol style="margin:0;padding-left:20px;display:grid;gap:4px;font-size:15px">
+      <li>Toca <b>Compartir</b> (el cuadrado con la flecha hacia arriba), abajo en Safari.</li>
+      <li>Baja y elige <b>“Agregar a pantalla de inicio”</b>.</li>
+      <li>Abre Foco+ siempre desde ese ícono.</li></ol>
+    <p style="font-size:14px"><b>Importante:</b> si la usas solo desde Safari, sin instalarla, el iPhone puede borrar tu progreso después de unas semanas sin abrirla. Instalada, queda guardado.</p></div>`;
   return '';
 }
 
@@ -363,12 +370,13 @@ function menu(){
       <span><h2>${m.nombre}</h2><p>${m.desc}</p>${st.length ? `<span class="st">${st.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</span>` : ''}</span>
       <span class="go" aria-hidden="true">${flecha}</span></a>`; }).join('')}
   </nav>
-  ${tarjetaInstalar()}
+  ${esIOS ? '' : tarjetaInstalar()}
   <section class="section"><div class="label">Respaldo</div>
     <div class="card"><p>Guarda una copia del progreso de todos los perfiles, por si cambias de teléfono o se borran los datos del navegador.</p>
       <div class="row"><button class="btn ghost" id="bajar">${iconoDescarga} Guardar copia</button><button class="btn ghost" id="subir">Restaurar</button></div>
       <div class="bk-last">${ultimoRespaldo()}</div></div>
   </section>`;
+  if (esIOS && !instalada()) $('.hello').insertAdjacentHTML('afterend', tarjetaInstalar());
   if (respaldoPendiente()) {
     const nunca = !ls.get('fp.backup.last');
     $('.hello').insertAdjacentHTML('afterend', `<div class="aviso" role="status"><h3>💾 Guarda una copia de tu progreso</h3>

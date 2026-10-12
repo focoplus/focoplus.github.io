@@ -46,6 +46,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 var(--f-ui);-w
 button{font:inherit;color:inherit;cursor:pointer}
 input{font:inherit;color:inherit}
 .wrap{width:min(560px,100%);margin:0 auto;padding:6px 16px calc(96px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.wrap.buy{gap:9px;padding-top:2px;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.buy .it{padding:7px 0}
+.buy .row2{margin-top:2px}
 .num{font-family:var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .muted{color:var(--muted)} .small{font-size:13.5px;color:var(--muted)}
 h1{margin:0;font:800 24px/1.1 var(--f-num)}
@@ -56,7 +59,7 @@ h2{margin:0;font:700 17px/1.2 var(--f-ui)}
 .link{background:none;border:0;color:var(--pr);font-weight:700;font-size:14px;padding:4px 0}
 
 /* comprar */
-.total{font:800 56px/1 var(--f-num);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.total{font:800 46px/1 var(--f-num);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .tope{display:flex;align-items:center;gap:8px;background:var(--surface);border:0;border-radius:12px;padding:8px 12px;font-size:14px;color:var(--muted);width:100%;text-align:left}
 .tope .b{flex:1;height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}.tope .b i{display:block;height:100%;background:var(--pr)}
 .tope b{color:var(--ink)}
@@ -64,7 +67,7 @@ h2{margin:0;font:700 17px/1.2 var(--f-ui)}
 .items{background:var(--surface);border-radius:16px;padding:2px 14px}
 .it{display:flex;align-items:center;gap:10px;padding:9px 0;border:0;border-bottom:1px solid var(--surface-2);background:none;width:100%;text-align:left;font-size:15px}
 .it:last-child{border-bottom:0}
-.it .q{color:var(--muted);min-width:78px;font-variant-numeric:tabular-nums;font-size:14px}
+.it .q{flex:none;white-space:nowrap;color:var(--muted);min-width:78px;font-variant-numeric:tabular-nums;font-size:14px}
 .it .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
 .it .n.none{color:var(--faint);font-weight:400}
 .it .v{font-weight:800;font-family:var(--f-num);font-variant-numeric:tabular-nums}
@@ -75,35 +78,39 @@ h2{margin:0;font:700 17px/1.2 var(--f-ui)}
 .cn.sel{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .cn.done{text-decoration:line-through;color:var(--faint);background:transparent;border-style:dashed}
 .trio{display:grid;grid-template-columns:1fr auto 1.25fr;gap:6px;align-items:stretch}
-.bx{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:8px 12px;display:flex;flex-direction:column;gap:2px;text-align:left;min-width:0}
+.bx{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:6px 10px;display:flex;flex-direction:column;gap:2px;text-align:left;min-width:0}
 .bx.f{border-color:var(--pr);box-shadow:0 0 0 3px var(--pr-soft)}
 .bx small{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.bx b{font:800 28px/1.15 var(--f-num);letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden}
+.bx b{font:800 24px/1.15 var(--f-num);letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden}
 .bx b span{font-size:15px;color:var(--muted);font-weight:700;margin-left:3px}
 .bx b.ph{color:var(--faint)}
 .cur{display:inline-block;width:2px;height:24px;background:var(--pr);vertical-align:-3px;margin-left:2px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .xx{display:grid;place-items:center;font-size:20px;color:var(--faint);font-weight:700}
-.tog{display:inline-flex;background:var(--surface-2);border-radius:99px;padding:2px;font-size:12px;font-weight:700;margin-top:4px;align-self:flex-start}
+.tog{display:inline-flex;background:var(--surface-2);border-radius:99px;padding:2px;font-size:12px;font-weight:700;margin-top:2px;align-self:flex-start}
 .tog button{border:0;background:none;padding:4px 9px;border-radius:99px;color:var(--muted)}
 .tog button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
 .totrow{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--pr-soft);border:0;border-radius:12px;padding:8px 12px;font-weight:700;color:var(--pr-ink);width:100%;text-align:left}
 .totrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .totrow .nm.none{opacity:.7;font-weight:600}
-.totrow b{font:800 22px var(--f-num);white-space:nowrap}
+.totrow b{font:800 22px var(--f-num);white-space:nowrap;flex:none}
+.totrow .two{flex:1;min-width:0;display:flex;flex-direction:column}
+.totrow .cuv{font-size:13.5px;font-weight:600;white-space:nowrap;opacity:.9}
 .hint{border-radius:12px;padding:8px 12px;font-size:14px;font-weight:600}
 .hint.w{background:var(--warn-soft);color:var(--warn-ink)}
 .hint.g{background:var(--ok-soft);color:var(--ok-ink)}
 .kp{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.k{height:52px;border-radius:14px;background:var(--surface);border:0;display:grid;place-items:center;font:700 24px var(--f-num);box-shadow:0 1px 0 var(--line)}
+.k{height:48px;border-radius:14px;background:var(--surface);border:0;display:grid;place-items:center;font:700 24px var(--f-num);box-shadow:0 1px 0 var(--line)}
 .k:active{transform:scale(.96)}
 .k.op{background:var(--pr-soft);color:var(--pr);font:700 15px var(--f-ui)}
 .k.op.big{font-size:30px}
-.k.add{grid-row:span 2;height:auto;background:var(--pr);color:var(--on-pr);font:700 18px var(--f-ui);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.k.add{grid-row:span 2;height:auto;background:var(--ink);color:var(--bg);box-shadow:0 0 0 3px var(--pr-light);font:700 18px var(--f-ui);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .k.add b{font-size:34px;line-height:1}
 .row2{display:flex;gap:8px}
-.btn{border:0;border-radius:14px;padding:14px;font-weight:700;font-size:16px;text-align:center;flex:1}
+.btn{border:0;border-radius:14px;padding:13px;font-weight:700;font-size:16px;text-align:center;flex:1}
 .btn.ghost{background:var(--surface);border:1px solid var(--line)}
+.btn.fin2{color:var(--muted);font-weight:600}
+.row2{margin-top:8px}
 .btn.dark{background:var(--ink);color:var(--bg)}
 .btn.pr{background:var(--pr);color:var(--on-pr)}
 .btn.fin{background:var(--fin);color:#fff}
@@ -285,7 +292,7 @@ function listState() {
 /* ============ vista Comprar ============ */
 function viewComprar() {
   const a = D.actual, tot = curTotal(), n = a ? a.items.length : 0;
-  let h = `<div class="hd"><h1>${a ? 'Compra de hoy' : 'Nueva compra'}</h1><span class="small">${dLong(a ? a.date : today())}</span></div>`;
+  let h = `<div class="hd"><b style="font-size:17px">${a ? 'Compra de hoy' : 'Nueva compra'}</b><span class="small">${dShort(a ? a.date : today()) === 'Hoy' ? dLong(today()) : dLong(a.date)}</span></div>`;
   // tope
   if (a && a.tope) {
     const left = a.tope - tot, over = left < 0;
@@ -312,11 +319,12 @@ function viewComprar() {
     <div class="bx ${E.focus === 'q' ? 'f' : ''}" data-act="focus" data-v="q" role="button" tabindex="0" aria-label="Cantidad"><small>Cantidad</small><b>${qShow || '<span style="color:var(--faint);margin:0">0</span>'}<span>${kg ? 'kg' : 'u'}</span>${E.focus === 'q' ? cur : ''}</b>
       <div class="tog"><button data-act="unit" data-v="u" aria-pressed="${!kg}">unid.</button><button data-act="unit" data-v="kg" aria-pressed="${kg}">kg</button></div></div>
     <div class="xx">${E.mode === 'total' ? '→' : '×'}</div>
-    <div class="bx ${E.focus === 'p' ? 'f' : ''}" data-act="focus" data-v="p" role="button" tabindex="0" aria-label="Precio"><small>${E.mode === 'total' ? 'Precio total' : kg ? 'Precio por kg' : 'Precio c/u'}</small><b class="${pShow ? '' : 'ph'}">${pShow ? '$' + pShow : '$0'}${E.focus === 'p' ? cur : ''}</b>
+    <div class="bx ${E.focus === 'p' ? 'f' : ''}" data-act="focus" data-v="p" role="button" tabindex="0" aria-label="Precio"><small>${E.mode === 'total' ? (kg ? 'Precio que pagaste' : 'Precio total') : kg ? 'Precio por kg' : 'Precio c/u'}</small><b class="${pShow ? '' : 'ph'}">${pShow ? '$' + pShow : '$0'}${E.focus === 'p' ? cur : ''}</b>
       <div class="tog"><button data-act="mode" data-v="cu" aria-pressed="${E.mode === 'cu'}">c/u</button><button data-act="mode" data-v="total" aria-pressed="${E.mode === 'total'}">total</button></div></div>
   </div>`;
   const et = entryTotal(), cu = entryCU();
-  h += `<button class="totrow" data-act="search" aria-label="Elegir qué producto es"><span class="nm ${E.n ? '' : 'none'}">${E.n ? esc(E.n) : '🔍 ¿Qué es? (opcional)'}${E.mode === 'total' && qNum() > 1 && pNum() ? ` · sale a ${$$(cu)} c/u` : ''}</span><b>= ${$$(et)}</b></button>`;
+  const showCU = E.mode === 'total' && pNum() && qNum() && qNum() !== 1;
+  h += `<button class="totrow" data-act="search" aria-label="Elegir qué producto es"><span class="two"><span class="nm ${E.n ? '' : 'none'}">${E.n ? esc(E.n) : '🔍 ¿Qué es? (opcional)'}</span>${showCU ? `<span class="cuv">sale a ${$$(cu)}${kg ? '/kg' : ' c/u'}</span>` : ''}</span><b>= ${$$(et)}</b></button>`;
   // aviso del último precio
   const lp = E.n ? lastPrice(E.n) : null;
   if (lp && pNum()) {
@@ -331,7 +339,7 @@ function viewComprar() {
     ${k('4')}${k('5')}${k('6')}${k('del', 'op big', '⌫')}
     ${k('1')}${k('2')}${k('3')}<button class="k add" data-act="add"><b>+</b>Sumar</button>
     ${k('0')}${k(',', 'op big')}${k('000')}</div>`;
-  h += `<div class="row2"><button class="btn ghost" data-act="undo" ${n ? '' : 'disabled'}>↶ Deshacer último</button><button class="btn dark" data-act="finish" ${n ? '' : 'disabled'}>Terminar compra</button></div>`;
+  h += `<div class="row2"><button class="btn ghost" data-act="undo" ${n ? '' : 'disabled'}>↶ Deshacer último</button><button class="btn ghost fin2" data-act="finish" ${n ? '' : 'disabled'}>Terminar compra</button></div>`;
   return h;
 }
 
@@ -525,7 +533,7 @@ function keyPress(v) {
   if (v === 'del') { s = s.slice(0, -1); E.fresh[f] = false; }
   else if (v === ',') { if (f !== 'q') { E.err = 'Los precios van sin decimales. La coma es para la cantidad (por ejemplo 1,2 kg).'; return; } if (!s.includes(',')) s = (s || '0') + ','; }
   else { if (f === 'q' && s.includes(',') && s.split(',')[1].length + v.length > 3) return; if ((s + v).replace(/\D/g, '').length > 9) return; s = (s === '0' ? '' : s) + v; }
-  if (f === 'q') { E.q = s; if (s.includes(',') && E.u === 'u') E.u = 'kg'; } else E.p = s;
+  if (f === 'q') { E.q = s; if (s.includes(',') && E.u === 'u') { E.u = 'kg'; E.mode = 'total'; } } else E.p = s;
 }
 function addItem() {
   const q = qNum(), p = pNum();
@@ -542,7 +550,7 @@ function addItem() {
 }
 function pickName(n) {
   n = canon(n); E.n = n; const p = products()[key(n)];
-  if (p) { E.u = p.u; }
+  if (p) { E.u = p.u; E.mode = p.u === 'kg' ? 'total' : 'cu'; }
   const l = D.lista.find(x => key(x.n) === key(n)); if (l && l.q && E.fresh.q) { E.q = String(l.q); }
   if (p && p.u === 'kg' && E.fresh.q && !(l && l.q)) { E.q = '1'; }
   E.focus = 'p';
@@ -568,6 +576,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 /* ============ render ============ */
 function render() {
   const v = S.view;
+  document.getElementById('app').className = 'wrap' + (v === 'comprar' ? ' buy' : '');
   document.getElementById('app').innerHTML = v === 'lista' ? viewLista() : v === 'hist' ? viewHist() : v === 'ana' ? viewAna() : viewComprar();
   const tab = (k, l, ic, dot) => `<button data-act="nav" data-v="${k}" ${v === k ? 'aria-current="page"' : ''}>${ic}${l}${dot ? '<span class="dot" aria-label="compra en curso"></span>' : ''}</button>`;
   document.getElementById('nav').innerHTML = tab('lista', 'Lista', IC.list) + tab('comprar', 'Comprar', IC.cart, D.actual && v !== 'comprar') + tab('hist', 'Historial', IC.hist) + tab('ana', 'Análisis', IC.ana);
@@ -601,7 +610,7 @@ document.addEventListener('click', e => {
   if (a === 'nav') setView(v);
   else if (a === 'key') { keyPress(v); render(); }
   else if (a === 'focus') { if (e.target.closest('.tog')) return; E.focus = v; E.fresh[v] = true; render(); }
-  else if (a === 'unit') { E.u = v; if (v === 'u' && E.q.includes(',')) E.q = E.q.split(',')[0] || '1'; render(); }
+  else if (a === 'unit') { E.u = v; E.mode = v === 'kg' ? 'total' : 'cu'; if (v === 'u' && E.q.includes(',')) E.q = E.q.split(',')[0] || '1'; render(); }
   else if (a === 'mode') { E.mode = v; E.focus = 'p'; render(); }
   else if (a === 'add') addItem();
   else if (a === 'undo') { if (!D.actual || !D.actual.items.length) return; const it = D.actual.items.pop(); if (!D.actual.items.length && !D.actual.tope) D.actual = null; save(); render(); toast('Quitado: ' + (it.n || 'sin nombre') + ' ' + $$(it.t)); }
