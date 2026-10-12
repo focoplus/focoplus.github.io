@@ -61,6 +61,29 @@ p{margin:0}
 
 /* Módulos */
 .mods{display:grid;gap:12px;margin-top:16px}
+/* Inicio C+: una lista elegante */
+.hi2{padding:8px 0 4px}
+.hi2 small{display:block;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.hi2 h1{margin-top:4px;font-size:clamp(26px,7vw,32px);font-weight:800;line-height:1.1;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.hi2 h1 svg{width:30px;height:30px;flex:none}
+.lst{display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:var(--surface);border:1px solid var(--line);margin-top:14px}
+.lr{display:flex;align-items:center;gap:13px;padding:11px 14px;color:inherit;text-decoration:none;position:relative;background:none;border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
+.lr+.lr{border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.lr:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.lr .ic2{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--c);box-shadow:0 0 18px color-mix(in srgb,var(--c) 30%,transparent)}
+.lr .ic2 svg{width:24px;height:24px}
+.lr .ic2.gris{background:var(--chip);box-shadow:none;font-size:20px}
+.lr .t{flex:1;min-width:0}
+.lr .t b{display:block;font-size:16.5px;font-weight:700;letter-spacing:-.01em}
+.lr .t span{display:block;font-size:13.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr .pl{flex:none;font-size:12.5px;font-weight:700;border-radius:99px;padding:4px 10px;white-space:nowrap;background:color-mix(in srgb,var(--c) 15%,transparent);color:color-mix(in srgb,var(--c) 75%,var(--ink))}
+.lr .ch{flex:none;color:var(--muted);opacity:.6;font-size:20px;line-height:1}
+.av2{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px;border:0;cursor:pointer}
+.mods-sheet .tg{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.mods-sheet .tg .t{flex:1;font-weight:700}
+.sw2{width:50px;height:30px;border-radius:99px;background:var(--line);border:0;position:relative;flex:none;cursor:pointer}
+.sw2::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s}
+.sw2[aria-checked="true"]{background:var(--teal)}.sw2[aria-checked="true"]::after{left:23px}
 .mod{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:14px;border-radius:var(--r);
   background:var(--surface);border:2px solid var(--line);border-bottom-width:5px;text-decoration:none;color:inherit;transition:transform .1s}
 .mod:active{transform:translateY(3px);border-bottom-width:2px}
@@ -201,14 +224,14 @@ const MODULOS = [
   { id:'finanzas', nombre:'Finanzas', desc:'Ordena tus ingresos, gastos y ahorros del mes.', href:'finanzas/', color:'#B7791F',
     icono:'<svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"><rect x="5" y="11" width="30" height="19" rx="3.5" fill="#fff" fill-opacity=".18"/><circle cx="20" cy="20.5" r="4.5"/><path d="M10 16v0M30 25v0" stroke-linecap="round" stroke-width="3.6"/></svg>',
     // Privado: en el menú solo se indica si está protegido, nunca montos ni movimientos
-    estado: d => ls.get('fp.pin.' + d) ? ['🔒 Protegido con PIN'] : ['Te pedirá crear un PIN'] },
+    estado: d => ls.get('fp.pin.' + d) ? ['🔒 PIN'] : ['Crear PIN'] },
   { id:'foco', nombre:'Foco', desc:'Temporizador para concentrarte, de a poco.', href:'foco/', color:'#0C8F80',
     icono:'<svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="20" cy="22" r="12.5"/><path d="M20 22V9.5A12.5 12.5 0 0 1 32.5 22Z" fill="#fff" stroke="none"/><path d="M16 4.5h8"/></svg>',
     estado: d => {
       const s = leer(d, 'foco-timer-v1'); if (!s) return [];
       if (s.run) return [s.run.phase === 'descanso' ? '☕ En descanso' : '⏱ Enfocado ahora'];
       const hoy = new Date().toLocaleDateString('en-CA'); const m = (s.ses || []).filter(x => x.date === hoy).reduce((a, x) => a + (Number(x.min) || 0), 0);
-      return m ? [(m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '')) + ' de foco hoy'] : [];
+      return m ? [(m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '')) + ' hoy'] : [];
     } },
 ];
 // Orden en el menú
@@ -295,7 +318,7 @@ let vista = 'menu', pendiente = null, confirmar = null, editar = null;
 function renderTop(){
   const p = yo();
   $('#top').innerHTML = `<div class="brand"><img src="iconos/foco-luz-192.png" alt="">Foco+</div>` +
-    (p && vista === 'menu' ? `<button class="who" id="cambiar" aria-label="Cambiar de perfil (ahora: ${esc(p.name)})">${avatar(p)}<span>${esc(p.name)}</span></button>` : '');
+    (p && vista === 'menu' ? `<button class="av2" id="cambiar" style="background:${COLORES[(p.c || 0) % COLORES.length]}" aria-label="Cambiar de perfil (ahora: ${esc(p.name)})" title="${esc(p.name)}">${esc(inicial(p.name))}</button>` : '');
   const b = $('#cambiar'); if (b) b.onclick = () => { vista = 'quien'; render(); };
 }
 
@@ -360,22 +383,28 @@ function quien(){
   const vb = $('#volver'); if (vb) vb.onclick = () => { confirmar = null; editar = null; vista = 'menu'; render(); };
 }
 
+const CORTO = { english:'Rondas de 2 min', ejercicio:'Meta semanal', lectura:'Tus libros', super:'Calculadora', finanzas:'Tu mes', foco:'Temporizador', sql:'Desde cero' };
+const DIAS_N = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'], MESES_N = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const SOL = '<svg viewBox="0 0 24 24" fill="none" stroke="#F5B529" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="#F5B529"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
+const TARDE = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M5 16a7 7 0 0 1 14 0" fill="#F28C38" stroke="#F28C38" stroke-width="2"/><path d="M12 4.5v2.2M4.6 8.6l1.6 1.4M19.4 8.6l-1.6 1.4M2.5 16h19M6 19.5h12" stroke="#F28C38" stroke-width="2"/></svg>';
+const LUNA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z" fill="#9DB4FF"/><circle cx="17.5" cy="5.5" r="1.1" fill="#9DB4FF"/><circle cx="20.5" cy="9" r=".8" fill="#9DB4FF"/></svg>';
+function saludo(){ const h = new Date().getHours(); return h >= 5 && h < 12 ? ['Buenos días', SOL] : h >= 12 && h < 20 ? ['Buenas tardes', TARDE] : ['Buenas noches', LUNA]; }
+const ocultos = id => { try { return JSON.parse(ls.get('fp.hidden.' + id) || '[]'); } catch(e) { return []; } };
 function menu(){
-  const p = yo();
-  $('#app').innerHTML = `<section class="hello"><h1>Hola, <em>${esc(p.name)}</em></h1><p>¿Qué quieres hacer hoy?</p></section>
-  <nav class="mods" aria-label="Módulos">${MODULOS.map(m => {
+  const p = yo(), d = new Date(), [sal, icono] = saludo(), hid = ocultos(p.id);
+  const fecha = DIAS_N[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES_N[d.getMonth()];
+  const vis = MODULOS.filter(m => !hid.includes(m.id));
+  $('#app').innerHTML = `<section class="hello hi2"><small>${fecha}</small><h1>${icono}<span>${sal}, ${esc(p.name.split(' ')[0])}</span></h1></section>
+  <nav class="lst" aria-label="Módulos">${vis.map(m => {
     let st = []; try { st = m.estado(p.id) || []; } catch(e) {}
-    return `<a class="mod" href="${m.href}" style="--c:${m.color}">
-      <span class="ic" aria-hidden="true">${m.icono}</span>
-      <span><h2>${m.nombre}</h2><p>${m.desc}</p>${st.length ? `<span class="st">${st.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</span>` : ''}</span>
-      <span class="go" aria-hidden="true">${flecha}</span></a>`; }).join('')}
+    return `<a class="lr" href="${m.href}" style="--c:${m.color}"><span class="ic2" aria-hidden="true">${m.icono}</span>
+      <span class="t"><b>${m.nombre}</b><span>${CORTO[m.id] || ''}</span></span>${st[0] ? `<span class="pl">${esc(st[0])}</span>` : ''}<span class="ch" aria-hidden="true">›</span></a>`; }).join('')}
   </nav>
   ${esIOS ? '' : tarjetaInstalar()}
-  <section class="section"><div class="label">Respaldo</div>
-    <div class="card"><p>Guarda una copia del progreso de todos los perfiles, por si cambias de teléfono o se borran los datos del navegador.</p>
-      <div class="row"><button class="btn ghost" id="bajar">${iconoDescarga} Guardar copia</button><button class="btn ghost" id="subir">Restaurar</button></div>
-      <div class="bk-last">${ultimoRespaldo()}</div></div>
-  </section>`;
+  <div class="lst" style="margin-top:16px">
+    <button class="lr" id="bajar"><span class="ic2 gris" aria-hidden="true">💾</span><span class="t"><b>Respaldo</b><span>${ultimoRespaldo().replace(/<[^>]+>/g, '').replace(' ✓', '')}</span></span><span class="ch" aria-hidden="true">›</span></button>
+    <button class="lr" id="elegir"><span class="ic2 gris" aria-hidden="true">⚙️</span><span class="t"><b>Elegir módulos</b><span>${hid.length ? hid.length + (hid.length === 1 ? ' oculto' : ' ocultos') : 'Oculta los que no usas'}</span></span><span class="ch" aria-hidden="true">›</span></button>
+  </div>`;
   if (esIOS && !instalada()) $('.hello').insertAdjacentHTML('afterend', tarjetaInstalar());
   if (respaldoPendiente()) {
     const nunca = !ls.get('fp.backup.last');
@@ -387,7 +416,25 @@ function menu(){
   }
   const ib = $('#instalar'); if (ib) ib.onclick = async () => { const a = aviso; aviso = null; a.prompt(); try { await a.userChoice; } catch(e) {} render(); };
   $('#bajar').onclick = abrirRespaldo;
-  $('#subir').onclick = () => $('#file').click();
+  $('#elegir').onclick = elegirModulos;
+}
+function elegirModulos(){
+  const p = yo(); let hid = ocultos(p.id);
+  const w = document.createElement('div'); w.id = 'bk';
+  const pintar = () => { w.innerHTML = `<div class="bk-scrim" data-x="1"></div><div class="bk-sheet mods-sheet" role="dialog" aria-modal="true" aria-label="Elegir módulos"><div class="in">
+    <h3>Elegir módulos</h3><p style="color:var(--muted);font-size:15px">Oculta los que no usas. Tu progreso no se borra: si lo vuelves a mostrar, sigue ahí.</p>
+    <div>${MODULOS.map(m => `<div class="tg"><span class="lr" style="--c:${m.color};padding:0;width:auto;flex:none"><span class="ic2" aria-hidden="true">${m.icono}</span></span><span class="t">${m.nombre}</span>
+      <button class="sw2" role="switch" aria-checked="${!hid.includes(m.id)}" data-m="${m.id}" aria-label="Mostrar ${m.nombre}"></button></div>`).join('')}</div>
+    <button class="btn full" data-x="1">Listo</button></div></div>`; };
+  pintar(); document.body.appendChild(w);
+  w.onclick = e => {
+    if (e.target.closest('[data-x]')) { w.remove(); render(); return; }
+    const b = e.target.closest('[data-m]'); if (!b) return;
+    const id = b.dataset.m;
+    if (hid.includes(id)) hid = hid.filter(x => x !== id);
+    else { if (MODULOS.length - hid.length <= 1) { toast('Deja al menos un módulo visible'); return; } hid = [...hid, id]; }
+    ls.set('fp.hidden.' + p.id, JSON.stringify(hid)); pintar();
+  };
 }
 
 /* ---------- Respaldo (archivo .json) ----------
@@ -432,12 +479,15 @@ function abrirRespaldo(){
     <button class="btn ${share ? 'ghost' : ''} full" data-bk="down">${share ? 'Solo descargar en el teléfono' : iconoDescarga + ' Descargar copia'}</button>
     ${share ? '' : '<p style="color:var(--muted);font-size:14px">Después súbela a tu Drive o mándatela por correo: así queda fuera del teléfono.</p>'}
     <div class="bk-lock">🔒 La copia <b>no lleva tu PIN</b>: quien la abra podría ver tus finanzas. Mejor a tu Drive o a tu correo, no a un chat con otras personas.</div>
+    <div class="bk-last">${ultimoRespaldo()}</div>
+    <button class="link" data-bk="rest" style="justify-self:center">Restaurar desde una copia</button>
     <button class="link" data-bk="x" style="justify-self:center">Ahora no</button></div></div>`;
   document.body.appendChild(w);
   w.onclick = async e => {
     const b = e.target.closest('[data-bk]'); if (!b) return;
     const act = b.dataset.bk;
     if (act === 'x') return cerrarRespaldo();
+    if (act === 'rest') { cerrarRespaldo(); $('#file').click(); return; }
     const { nombre, txt } = archivoRespaldo();
     if (act === 'share') {
       try { await navigator.share({ files:[new File([txt], nombre, { type:'application/json' })], title:'Respaldo de Foco+' }); respaldoListo(); }
