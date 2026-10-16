@@ -50,7 +50,7 @@
     var d = document.createElement('div');
     d.className = 'fp-bar';
     d.innerHTML = '<a href="../" aria-label="Volver al menú de Foco+"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Foco+</a>';
-    var n = document.createElement('span'); n.textContent = perfil.name; d.appendChild(n);
+    var n = document.createElement('span'); n.textContent = (function(x){x=String(x||'').trim();return x.charAt(0).toUpperCase()+x.slice(1)})(perfil.name); d.appendChild(n);
     document.body.insertBefore(d, document.body.firstChild);
   }
   if (document.body) barra(); else document.addEventListener('DOMContentLoaded', barra);
@@ -63,6 +63,9 @@
 
   // Finanzas: protegido con un PIN personal de 4 números
   if (modulo === 'finanzas') candado(perfil, store, g, s, r, prefijo);
+
+  // Recordatorio en el calendario: se ofrece una sola vez, al tercer día de uso del módulo
+  if (recInfo()[modulo]) recordatorio(modulo, perfil, store, g, s);
 })();
 
 /* ================= PIN de Finanzas =================
@@ -208,4 +211,117 @@ function candado(perfil, store, g, s, r, prefijo) {
     else if (oculto && Date.now() - oculto > 60000 && !root.classList.contains('fp-locked')) bloquear();
   });
   window.addEventListener('pageshow', function (e) { if (e.persisted) bloquear(); });
+}
+
+/* ================= Recordatorio en el calendario =================
+   Una PWA no puede avisar de forma confiable con la app cerrada; el calendario del teléfono sí.
+   - Se ofrece UNA vez por módulo, en una línea chica abajo, el tercer día distinto que se usa.
+   - "No, gracias" la oculta para siempre. Siempre queda un enlace discreto al final de la página.
+   - Android: abre Google Calendar con el evento listo. iPhone y otros: archivo .ics (Calendario lo abre).
+   Nada se envía a internet desde Foco+. */
+function recInfo() { return {
+  english:   { t: 'Inglés',    min: 10 },
+  lectura:   { t: 'Lectura',   min: 20 },
+  ejercicio: { t: 'Ejercicio', min: 30 },
+  foco:      { t: 'Foco',      min: 25 },
+  sql:       { t: 'SQL',       min: 10 },
+  memoria:   { t: 'Memoria',   min: 5 }
+}; }
+function recordatorio(modulo, perfil, store, g, s) {
+  var K = 'fp.cal.' + perfil.id + '.' + modulo, st = {};
+  try { st = JSON.parse(g.call(store, K) || '{}') || {}; } catch (e) {}
+  var hoy = new Date().toLocaleDateString('en-CA');
+  st.days = st.days || [];
+  if (st.days.indexOf(hoy) < 0 && st.days.length < 3) st.days.push(hoy);
+  function guardar() { try { s.call(store, K, JSON.stringify(st)); } catch (e) {} }
+  guardar();
+  var info = recInfo()[modulo];
+  var oscuro = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+  var C = oscuro ? { bg: '#1B2334', ink: '#F2F4F8', mu: '#A7B0C2', line: '#2E3A54', ac: '#4FB6DA', bgp: '#121826' }
+                 : { bg: '#FFFFFF', ink: '#14202B', mu: '#566573', line: '#D9E1E7', ac: '#0F7FA6', bgp: '#F3F6F8' };
+  var css = document.createElement('style');
+  css.textContent =
+    '.fp-cal{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9998;max-width:540px;margin:0 auto;background:' + C.bg + ';color:' + C.ink + ';border:1px solid ' + C.line + ';border-radius:16px;padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.28);font:14px/1.3 system-ui,sans-serif}' +
+    '.fp-cal span{flex:1}.fp-cal button{background:none;border:0;font:inherit;padding:8px 6px;cursor:pointer;white-space:nowrap}' +
+    '.fp-cal .si{color:' + C.ac + ';font-weight:800}.fp-cal .no{color:' + C.mu + '}' +
+    '.fp-calk{display:block;margin:28px auto 8px;background:none;border:0;color:' + C.mu + ';font:600 13px system-ui,sans-serif;text-decoration:underline;cursor:pointer}' +
+    '.fp-cs{position:fixed;inset:0;z-index:9999;background:rgba(5,10,18,.55);display:flex;align-items:flex-end;justify-content:center}' +
+    '.fp-cs .in{background:' + C.bgp + ';color:' + C.ink + ';width:min(600px,100vw);border-radius:24px 24px 0 0;padding:20px 16px calc(22px + env(safe-area-inset-bottom));display:grid;gap:12px;font:15px/1.4 system-ui,sans-serif;max-height:90vh;overflow:auto}' +
+    '.fp-cs h3{margin:0;font-size:22px}.fp-cs p{margin:0;color:' + C.mu + '}.fp-cs .lb{font:800 12px system-ui;letter-spacing:.08em;text-transform:uppercase;color:' + C.mu + '}' +
+    '.fp-cs .ds{display:flex;gap:6px}.fp-cs .ds button{flex:1;padding:11px 0;border-radius:12px;font:800 15px system-ui;border:1px solid ' + C.line + ';background:' + C.bg + ';color:' + C.mu + '}' +
+    '.fp-cs .ds button[aria-pressed=true]{background:' + C.ac + ';border-color:' + C.ac + ';color:' + (oscuro ? '#08131C' : '#fff') + '}' +
+    '.fp-cs input,.fp-cs select{font:800 20px system-ui;padding:10px;border-radius:12px;border:1px solid ' + C.line + ';background:' + C.bg + ';color:' + C.ink + ';width:100%}' +
+    '.fp-cs .r{display:flex;gap:10px}.fp-cs .r>div{flex:1;display:grid;gap:6px}' +
+    '.fp-cs .go{border:0;border-radius:16px;padding:15px;font:800 17px system-ui;background:' + C.ac + ';color:' + (oscuro ? '#08131C' : '#fff') + ';cursor:pointer}' +
+    '.fp-cs .sec{border:1px solid ' + C.line + ';background:transparent;color:' + C.ink + ';border-radius:16px;padding:13px;font:700 15px system-ui;cursor:pointer}' +
+    '.fp-cs .x{background:none;border:0;color:' + C.mu + ';font:600 14px system-ui;text-decoration:underline;cursor:pointer}';
+  function listo(fn) { if (document.body) fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  listo(function () {
+    document.head.appendChild(css);
+    // Enlace permanente y discreto al final de la página
+    var k = document.createElement('button'); k.className = 'fp-calk'; k.type = 'button';
+    k.textContent = 'Recordatorio en mi calendario'; k.onclick = hoja;
+    document.body.appendChild(k);
+    // Ofrecimiento único
+    if (st.days.length >= 3 && !st.r) setTimeout(function () {
+      var d = document.createElement('div'); d.className = 'fp-cal'; d.setAttribute('role', 'status');
+      d.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="' + C.ac + '" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>' +
+        '<span>¿Quieres que tu calendario te lo recuerde?</span><button class="si" type="button">Sí</button><button class="no" type="button">No, gracias</button>';
+      d.querySelector('.si').onclick = function () { st.r = 'si'; guardar(); d.remove(); hoja(); };
+      d.querySelector('.no').onclick = function () { st.r = 'no'; guardar(); d.remove(); };
+      document.body.appendChild(d);
+    }, 2500);
+  });
+  function hoja() {
+    var dias = [1, 2, 3, 4, 5], L = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+    var w = document.createElement('div'); w.className = 'fp-cs';
+    w.innerHTML = '<div class="in" role="dialog" aria-modal="true" aria-label="Recordatorio en el calendario">' +
+      '<h3>Recordatorio en mi calendario</h3><p>Elige un momento fijo del día. Tu calendario te avisa aunque Foco+ esté cerrado.</p>' +
+      '<div class="lb">Días</div><div class="ds">' + L.map(function (x, i) { var n = i + 1; return '<button type="button" data-d="' + n + '" aria-pressed="' + (dias.indexOf(n) >= 0) + '" aria-label="' + ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'][i] + '">' + x + '</button>'; }).join('') + '</div>' +
+      '<div class="r"><div><span class="lb">Hora</span><input type="time" id="fpc-h" value="08:30"></div>' +
+      '<div><span class="lb">Duración</span><select id="fpc-m">' + [5, 10, 15, 20, 25, 30, 45, 60].map(function (m) { return '<option value="' + m + '"' + (m === info.min ? ' selected' : '') + '>' + m + ' min</option>'; }).join('') + '</select></div></div>' +
+      '<button class="go" type="button" id="fpc-go">Agregar al calendario</button>' +
+      (esAndroid() ? '<button class="sec" type="button" id="fpc-ics">Prefiero descargar el archivo (.ics)</button>' : '') +
+      '<p style="text-align:center;font-size:13px">Se abre tu calendario con el evento listo. Foco+ no envía nada a internet.</p>' +
+      '<button class="x" type="button" id="fpc-x">Cerrar</button></div>';
+    document.body.appendChild(w);
+    w.onclick = function (e) {
+      if (e.target === w || e.target.id === 'fpc-x') return w.remove();
+      var b = e.target.closest && e.target.closest('[data-d]');
+      if (b) { var n = +b.dataset.d, i = dias.indexOf(n); if (i >= 0) { if (dias.length > 1) dias.splice(i, 1); } else dias.push(n); b.setAttribute('aria-pressed', dias.indexOf(n) >= 0); return; }
+      if (e.target.id === 'fpc-go' || e.target.id === 'fpc-ics') {
+        var h = (document.getElementById('fpc-h').value || '08:30').split(':'), m = +document.getElementById('fpc-m').value || info.min;
+        var ev = evento(info.t, dias.slice().sort(), +h[0], +h[1], m);
+        if (esAndroid() && e.target.id === 'fpc-go') window.open(ev.google, '_blank');
+        else descargarICS(ev.ics, 'foco-' + modulo + '.ics');
+        st.r = 'si'; guardar(); w.remove();
+      }
+    };
+  }
+}
+function esAndroid() { return /android/i.test(navigator.userAgent); }
+function evento(titulo, dias, hh, mm, min) {
+  var BY = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
+  var d = new Date(); d.setSeconds(0, 0); d.setHours(hh, mm);
+  // primer día elegido desde hoy (si hoy ya pasó la hora, desde mañana)
+  for (var i = 0; i < 8; i++) { var dow = ((d.getDay() + 6) % 7) + 1; if (dias.indexOf(dow) >= 0 && d > new Date()) break; d.setDate(d.getDate() + 1); d.setHours(hh, mm); }
+  var fin = new Date(d.getTime() + min * 60000);
+  var p = function (n) { return (n < 10 ? '0' : '') + n; };
+  var f = function (x) { return x.getFullYear() + p(x.getMonth() + 1) + p(x.getDate()) + 'T' + p(x.getHours()) + p(x.getMinutes()) + '00'; };
+  var rr = 'RRULE:FREQ=WEEKLY;BYDAY=' + dias.map(function (n) { return BY[n - 1]; }).join(',');
+  var txt = titulo + ' · ' + min + ' min (Foco+)', det = 'Abre Foco+ y haz ' + min + ' min de ' + titulo.toLowerCase() + '. Aunque sea un poco, cuenta.';
+  var tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  var google = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(txt) +
+    '&details=' + encodeURIComponent(det) + '&dates=' + f(d) + '/' + f(fin) + (tz ? '&ctz=' + encodeURIComponent(tz) : '') + '&recur=' + encodeURIComponent(rr);
+  var ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Foco+//ES', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+    'UID:' + Date.now() + '-' + Math.random().toString(36).slice(2) + '@focoplus', 'DTSTAMP:' + f(new Date()), 'DTSTART:' + f(d), 'DTEND:' + f(fin), rr,
+    'SUMMARY:' + txt, 'DESCRIPTION:' + det, 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + txt, 'TRIGGER:PT0M', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  return { google: google, ics: ics };
+}
+function descargarICS(txt, nombre) {
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+  if (ios) { location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(txt); return; }
+  var url = URL.createObjectURL(new Blob([txt], { type: 'text/calendar' }));
+  var a = document.createElement('a'); a.href = url; a.download = nombre; document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1500);
 }

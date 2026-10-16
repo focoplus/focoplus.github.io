@@ -81,7 +81,19 @@ button { cursor: pointer; }
 .stepper { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
 .stepper button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface-2); font-weight: 700; color: var(--ink); }
 .stepper b { color: var(--ink); font-variant-numeric: tabular-nums; }
-.weekrow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.weekrow { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 6px; }
+.dcol { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.dcol.today { color: var(--ink); }
+.dbx { width: 100%; height: 92px; border-radius: 12px; background: var(--surface-2, #F1F3F8); color: var(--faint); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 19px; line-height: 1; position: relative; overflow: hidden; font-variant-numeric: tabular-nums; }
+.dbx small { font-size: 10.5px; font-weight: 700; margin-top: 3px; }
+.dbx.met { background: var(--tinta); color: var(--surface); }
+.dbx.part { color: var(--ink); }
+.dbx.part i { position: absolute; left: 0; right: 0; bottom: 0; background: var(--tinta-soft); }
+.dbx.part span { position: relative; display: flex; flex-direction: column; align-items: center; }
+.dbx.td { outline: 2px solid var(--cinta); outline-offset: 2px; }
+.dbx.fut { background: transparent; border: 1.5px dashed var(--line); }
+.dleg { display: flex; gap: 14px; font-size: 12.5px; color: var(--muted); }
+.dleg i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
 .wd { display: grid; grid-template-rows: 34px auto; justify-items: center; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
 .wd i { width: 30px; height: 30px; border-radius: 50%; border: 2px dashed var(--line); display: grid; place-items: center; font-style: normal; }
 .wd.read i { border: none; background: var(--heat-2); }
@@ -116,13 +128,6 @@ button.chip-stat { border: 0; font-family: inherit; font-size: 13px; cursor: poi
 .add-now { flex: 0 0 auto; width: 140px; scroll-snap-align: start; border: 2px dashed var(--line); border-radius: 22px; background: none; color: var(--muted); font-weight: 600; font-size: 14px; display: grid; place-content: center; gap: 6px; text-align: center; padding: 14px; }
 .add-now b { font-size: 28px; font-weight: 400; color: var(--tinta); }
 
-.plan { background: var(--tinta); color: #fff; }
-.plan .eyebrow { color: rgba(255,255,255,.7); }
-.plan p.big { font-family: var(--f-display); font-size: 20px; line-height: 1.3; }
-.plan p.big em { font-style: italic; color: #fff; border-bottom: 1px solid rgba(255,255,255,.4); }
-.plan .link { color: #fff; opacity: .85; justify-self: start; padding: 0; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .plan { background: var(--tinta-soft); } }
-:root[data-theme="dark"] .plan { background: var(--tinta-soft); }
 
 .insight { display: grid; grid-template-columns: 4px 1fr; gap: 12px; padding: 4px 2px; }
 .insight::before { content: ""; background: var(--cinta); border-radius: 4px; }
@@ -564,11 +569,15 @@ function viewHoy() {
   const todays = S.sessions.filter(s => s.date === t);
   const books = reading();
   const [ins, cite] = insightFor(byDay);
-  const plan = S.settings.plan;
-  let week = '';
+  let week = '', wMin = 0;
+  for (let i = 0; i < 7; i++) wMin += byDay[addDays(monday, i)] || 0;
   for (let i = 0; i < 7; i++) {
     const k = addDays(monday, i), v = byDay[k] || 0;
-    week += `<div class="wd ${v >= goal ? 'met' : v ? 'read' : ''} ${k === t ? 'today' : ''} ${k > t ? 'future' : ''}" data-tip="${esc(niceDate(k) + ': ' + fmtMin(v))}"><i></i><span>${DOW[i]}</span></div>`;
+    const mm = Math.floor(v), fut = k > t, td = k === t;
+    const box = fut ? `<div class="dbx fut"></div>` : !mm ? `<div class="dbx ${td ? 'td' : ''}">${td ? '<small style="font-size:13px">hoy</small>' : '–'}</div>`
+      : v >= goal ? `<div class="dbx met ${td ? 'td' : ''}">${mm}<small>min ✓</small></div>`
+      : `<div class="dbx part ${td ? 'td' : ''}"><i style="height:${Math.round(v / goal * 100)}%"></i><span>${mm}<small>min</small></span></div>`;
+    week += `<div class="dcol ${td ? 'today' : ''}" title="${esc(niceDate(k) + ': ' + fmtMin(v))}">${DOW[i]}${box}</div>`;
   }
   return `
   <header class="hd"><div><p class="eyebrow">${esc(niceDate(t))}</p><h1>${greeting()}</h1></div>
@@ -584,10 +593,10 @@ function viewHoy() {
       </div>
     </div>
     <div class="weekrow">${week}</div>
+    <div class="dleg"><span><i style="background:var(--tinta)"></i>meta cumplida</span><span><i style="background:var(--tinta-soft)"></i>leíste algo</span></div>
     <div class="streaks">
       <button class="chip-stat" data-act="wcycle" aria-label="Cambiar meta de días por semana (ahora ${wTarget})"><b>${wDone}/${wTarget}</b> días esta semana</button>
-      <span class="chip-stat"><b>${sd}</b> ${plural(sd, 'día seguido', 'días seguidos')}</span>
-      <span class="chip-stat"><b>${ws}</b> ${plural(ws, 'semana cumplida', 'semanas cumplidas')}</span>
+      <span class="chip-stat"><b>${fmtShort(wMin)}</b> esta semana</span>
     </div>
   </section>
 
@@ -948,17 +957,6 @@ function sheetNewBook(where) {
   S.nbStatus = 'leyendo';
   setTimeout(() => document.getElementById('nb-title')?.focus(), 80);
 }
-function sheetPlan() {
-  const p = S.settings.plan || {};
-  const CUANDO = ['me acuesto', 'termine de cenar', 'tome el café de la mañana', 'llegue a la casa', 'vaya en el metro'];
-  openSheet(`${head('Mi plan de lectura')}
-    <p class="small muted">Un plan del tipo “cuando pase X, haré Y” ata la lectura a algo que ya haces todos los días.</p>
-    <label class="f" for="p-cuando">Cuando…<input type="text" id="p-cuando" value="${esc(p.cuando || '')}" placeholder="me acueste"></label>
-    <div class="chips">${CUANDO.map(t => `<button class="chip" data-act="plan-fill" data-f="p-cuando" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
-    <div class="stepper">Días de lectura por semana <button data-act="wdays" data-d="-1" aria-label="Menos días">−</button><b id="wd-n">${S.settings.weekDays || 5}</b><button data-act="wdays" data-d="1" aria-label="Más días">+</button></div>
-    <button class="btn primary" data-act="plan-save">Guardar plan</button>
-    ${S.settings.plan ? `<button class="x" style="justify-self:center;border:none" data-act="plan-clear">Quitar plan</button>` : ''}`, 'plan');
-}
 function sheetScience() {
   const items = [
     ['Registrar funciona', 'Un meta-análisis de 138 estudios encontró que monitorear el avance aumenta la probabilidad de cumplir una meta, sobre todo cuando queda registrado.', 'Harkin et al., 2016', 'https://eprints.whiterose.ac.uk/id/eprint/87431/'],
@@ -1025,16 +1023,7 @@ document.addEventListener('click', async e => {
     case 'shelf': S.shelf = b.dataset.p; render(); break;
     case 'lib': S.lib = b.dataset.k; render(); break;
     case 'science': sheetScience(); break;
-    case 'plan': sheetPlan(); break;
     case 'wcycle': { const n = (S.settings.weekDays || 5) >= 7 ? 1 : (S.settings.weekDays || 5) + 1; saveSettings({ weekDays: n }); toast('Meta: ' + n + (n === 1 ? ' día' : ' días') + ' por semana'); break; }
-    case 'plan-fill': document.getElementById(b.dataset.f).value = b.dataset.t; break;
-    case 'wdays': { const el = document.getElementById('wd-n'); el.textContent = Math.min(7, Math.max(1, Number(el.textContent) + Number(b.dataset.d))); break; }
-    case 'plan-save': {
-      const cuando = document.getElementById('p-cuando').value.trim(), wd = Number(document.getElementById('wd-n').textContent);
-      if (!cuando) { toast('Elige en qué momento vas a leer'); return; }
-      closeSheet(); await saveSettings({ plan: { cuando }, weekDays: wd }); toast('Plan guardado'); break;
-    }
-    case 'plan-clear': closeSheet(); saveSettings({ plan: null }); break;
     case 'add': sheetAdd(todayStr()); break;
     case 'add-for': sheetAdd(b.dataset.key); break;
     case 'amin': document.getElementById('a-min').value = b.dataset.v; break;

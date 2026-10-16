@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="es"><head><script src="../perfil.js" data-modulo="memoria"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0F7FA6">
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" type="image/png" href="../iconos/favicon.png">
+<link rel="apple-touch-icon" href="../iconos/apple-touch-icon.png">
+<title>Foco Memoria</title>
+<style>
+:root{--bg:#F3F6F8;--s:#FFFFFF;--s2:#E8EEF2;--line:#D9E1E7;--ink:#14202B;--mu:#566573;--fa:#8593A0;--ac:#0F7FA6;--acs:#DDF0F7;--ac-ink:#fff;--ok:#1B7F52;--oks:#DDF2E7;--bad:#B9473A;--bads:#F8E3E0;--r:18px}
+@media (prefers-color-scheme:dark){:root{--bg:#111823;--s:#1A2433;--s2:#243145;--line:#2D3B52;--ink:#F1F4F8;--mu:#A9B4C4;--fa:#728099;--ac:#4FB6DA;--acs:#163447;--ac-ink:#08131C;--ok:#45C58E;--oks:#173A2C;--bad:#F08A7C;--bads:#3A2224}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+main{width:min(560px,calc(100vw - 32px));margin:0 auto;display:grid;gap:12px;padding-top:6px}
+h1,h2,h3,p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+input,textarea{font:inherit;color:var(--ink);background:var(--s);border:1px solid var(--line);border-radius:12px;padding:12px;width:100%}
+input:focus,textarea:focus,button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
+.hd h1{font-size:28px;letter-spacing:-.02em}
+.hd h1 span{background:var(--ac);color:var(--ac-ink);border-radius:8px;padding:0 8px;margin-left:4px}
+.pill{border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-weight:700;font-size:15px;white-space:nowrap}
+.pill small{color:var(--mu);font-weight:600;font-size:13px}
+.card{background:var(--s);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card.ac{border:2px solid var(--ac)}
+.lbl{font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu)}
+.mu{color:var(--mu)}.sm{font-size:14px}.note{font-size:13px;color:var(--fa);line-height:1.45}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font-weight:800;font-size:17px;text-align:center;background:var(--ac);color:var(--ac-ink)}
+.btn.g{background:transparent;border:1px solid var(--line);color:var(--ink);font-weight:700}
+.btn:disabled{opacity:.45}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.game{display:flex;gap:12px;align-items:center;background:var(--s);border:1px solid var(--line);border-radius:var(--r);padding:14px;width:100%;text-align:left}
+.gi{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto}
+.game b{font-size:17px;display:block}.game p{color:var(--mu);font-size:14px}
+.game .pr{font-size:13px;color:var(--mu);margin-top:3px}
+.qrow{display:flex;justify-content:space-between;padding:5px 0;font-size:15px}.qrow span{color:var(--mu)}
+.step{display:flex;gap:5px}.step i{flex:1;height:5px;border-radius:9px;background:var(--s2)}.step i.on{background:var(--ac)}
+.top2{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.link{background:none;border:0;color:var(--mu);font-weight:700;padding:8px 0;text-decoration:underline}
+.big{font-weight:800;font-size:32px;line-height:1.15;letter-spacing:-.02em}
+.opt{display:block;width:100%;text-align:left;background:var(--s);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-weight:700;font-size:17px}
+.opt.ok{border-color:var(--ok);background:var(--oks)}.opt.no{border-color:var(--bad);background:var(--bads)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--s);border-radius:99px;padding:8px 13px;font-weight:700;font-size:14px}
+.chip.on{background:var(--acs);border-color:var(--ac)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp>div{border-radius:var(--r);padding:16px;text-align:center;border:1px solid var(--line);background:var(--s)}
+.cmp .v{font-weight:800;font-size:46px;line-height:1;margin:6px 0}
+.cmp .win{background:var(--oks);border-color:var(--ok);color:var(--ok)}
+.route{display:grid;gap:0}
+.stop{display:flex;align-items:center;gap:12px;padding:7px 0;font-size:15px}
+.stop .n{width:28px;height:28px;border-radius:99px;background:var(--s2);display:grid;place-items:center;font-weight:800;font-size:13px;color:var(--mu);flex:0 0 auto}
+.stop.on .n{background:var(--ac);color:var(--ac-ink)}.stop.done .n{background:var(--oks);color:var(--ok)}
+.stop small{color:var(--mu)}
+.face{display:grid;place-items:center;background:var(--s);border:1px solid var(--line);border-radius:22px;padding:14px}
+.face svg{width:160px;height:160px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.r2 button{border:0;border-radius:14px;padding:14px 6px;font-weight:800;font-size:16px}
+.yes{background:var(--oks);color:var(--ok)}.nope{background:var(--bads);color:var(--bad)}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-top:0;text-align:left}
+.item:last-child{border-bottom:0}.item small{color:var(--mu);white-space:nowrap}
+.scrim{position:fixed;inset:0;background:rgba(5,10,18,.55);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--bg);border-radius:24px 24px 0 0;padding:20px 16px calc(22px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;display:grid;gap:12px;width:min(600px,100vw);margin:0 auto}
+.sheet h2{font-size:22px}
+.sci li{margin-bottom:10px}.sci b{display:block}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body>
+<main id="app"></main>
+<div id="sheet"></div>
+<div id="toast" role="status"></div>
+<script>
+/* ================= Foco Memoria =================
+   Técnicas con evidencia para recordar cosas concretas:
+   - Mis cosas: recuperar sin mirar + repaso espaciado (1, 3, 7, 21, 60 días)
+   - Palacio: método de los lugares, con prueba "sin truco vs con palacio"
+   - Caras: nombre + gancho elegido por la persona, se repasa escribiendo
+   Todo se guarda en este teléfono, bajo el perfil de Foco+. */
+const KEY = 'foco-memoria-v1';
+const hoy = () => new Date().toLocaleDateString('en-CA');
+const addD = (ymd, n) => { const d = new Date(ymd + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toLocaleDateString('en-CA'); };
+const INT = [1, 3, 7, 21, 60];
+const ROUTE0 = ['Puerta de entrada', 'Sillón', 'Cocina', 'Refrigerador', 'Baño', 'Ducha', 'Escritorio', 'Cama', 'Clóset', 'Ventana'];
+const PALABRAS = ['pan','huevos','leche','plátano','manzana','queso','tomate','paraguas','llaves','guitarra','zapato','sombrero','pelota','reloj','libro','vela','martillo','tijeras','globo','pez','gato','perro','caballo','pato','elefante','mariposa','tortuga','avión','bicicleta','barco','tren','cohete','corona','espejo','escoba','lámpara','botella','taza','cuchara','teléfono','almohada','calcetín','bufanda','guante','mochila','maleta','cámara','piano','tambor','trompeta','helado','pizza','torta','sandía','piña','limón','zanahoria','cebolla','uvas','frutilla','chocolate','flor','árbol','cactus','luna','estrella','nube','fuego','ancla','bandera','campana','dado','diamante','imán','lápiz','tornillo','pingüino','jirafa','dinosaurio','robot'];
+const NOMBRES = { f: ['Rosario','Camila','Daniela','Javiera','Constanza','Francisca','Valentina','Catalina','Fernanda','Carolina','Paula','Andrea','Macarena','Josefa','Antonia','Isidora','Trinidad','Florencia','Bárbara','Pía','Ximena','Loreto','Marcela','Soledad'],
+                  m: ['Matías','Sebastián','Benjamín','Felipe','Tomás','Nicolás','Joaquín','Cristóbal','Diego','Ignacio','Rodrigo','Gonzalo','Vicente','Martín','Pablo','Andrés','Claudio','Mauricio','Esteban','Hernán','Patricio','Raúl','Álvaro','Leonardo'] };
+
+function fresh(){ return { daily:{}, cosas:[], pal:{ route: ROUTE0.slice(), prueba:null, record:0, n:5, last:null }, caras:{ people:[] } }; }
+let D;
+try { D = Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY) || 'null') || {}); } catch(e) { D = fresh(); }
+D.daily = D.daily || {}; D.cosas = D.cosas || [];
+D.pal = Object.assign(fresh().pal, D.pal || {}); D.caras = Object.assign(fresh().caras, D.caras || {});
+if (!Array.isArray(D.pal.route) || D.pal.route.length < 4) D.pal.route = ROUTE0.slice();
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(D)); } catch(e) {} }
+
+/* ---------- utilidades ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zñ0-9 ]/g, '').trim();
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = (arr, n, avoid = []) => shuffle(arr.filter(x => !avoid.includes(x))).slice(0, n);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const cap = s => String(s || '').charAt(0).toUpperCase() + String(s || '').slice(1);
+function toast(t){ const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 1800); }
+
+/* ---------- medidor de minutos (solo jugando; las pausas suman como máximo 1 min) ---------- */
+let V = { screen: 'home' };
+const ACT = { last: 0 };
+function actTick(){
+  const now = Date.now();
+  if (V.screen === 'home' || V.screen === 'cosas' || document.hidden) { ACT.last = 0; return; }
+  if (ACT.last) { const d = Math.min(now - ACT.last, 60000); if (d > 0) { const k = hoy(); D.daily[k] = (D.daily[k] || 0) + d / 1000; save(); } }
+  ACT.last = now;
+}
+function actStart(){ ACT.last = Date.now(); }
+function actStop(){ actTick(); ACT.last = 0; }
+['pointerdown','keydown','input'].forEach(ev => document.addEventListener(ev, actTick, true));
+document.addEventListener('visibilitychange', () => { if (document.hidden) actStop(); else if (V.screen !== 'home' && V.screen !== 'cosas') ACT.last = Date.now(); });
+const minHoy = () => Math.floor((D.daily[hoy()] || 0) / 60);
+
+/* ---------- repaso de hoy ---------- */
+function colaRepaso(){
+  const t = hoy(), q = [];
+  D.cosas.filter(c => c.due <= t).forEach(c => q.push({ t:'cosa', id:c.id }));
+  const L = D.pal.last;
+  if (L && L.date < t && !L.reviewed && L.items && L.items.length) L.items.forEach((_, k) => q.push({ t:'pal', k }));
+  D.caras.people.filter(p => p.box >= 0 && p.due <= t).forEach(p => q.push({ t:'cara', id:p.id }));
+  return q;
+}
+
+/* ================= INICIO ================= */
+const IC = {
+  cosas: '<span class="gi" style="background:#5B4BD61f"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7B6CF0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>',
+  pal: '<span class="gi" style="background:#1FA38A1f"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1FA38A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>',
+  caras: '<span class="gi" style="background:#E0A2301f"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D99520" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span>'
+};
+function home(){
+  if (V.screen !== 'home') actStop();
+  V = { screen: 'home' };
+  const q = colaRepaso(), nc = q.filter(x => x.t === 'cosa').length, np = q.filter(x => x.t === 'pal').length, nf = q.filter(x => x.t === 'cara').length;
+  const nuevo = !D.cosas.length && !D.pal.prueba && !D.caras.people.length;
+  const firmes = D.cosas.filter(c => c.box >= 3).length;
+  const aprendidos = D.caras.people.filter(p => p.box >= 2).length;
+  const L = D.pal.last;
+  const palPr = D.pal.record ? `Tu récord: ${D.pal.record} cosas sin fallar` : D.pal.prueba ? `Prueba: ${D.pal.prueba.sin} sin truco · ${D.pal.prueba.con} con palacio` : 'Empieza con una prueba de 2 minutos';
+  const pal24 = L && L.reviewed && L.score24 != null ? ` · al día siguiente: ${L.score24} de ${L.items.length}` : '';
+  $('#app').innerHTML = `
+  <div class="hd"><h1>Foco<span>Memoria</span></h1><span class="pill">${minHoy()} <small>min hoy</small></span></div>
+  ${q.length ? `<div class="card ac"><div class="lbl">Repaso de hoy · ${q.length > 12 ? '2' : '1'} min</div>
+    ${np ? `<div class="qrow">La lista de ayer en tu palacio<span>${np}</span></div>` : ''}
+    ${nc ? `<div class="qrow">Mis cosas<span>${nc}</span></div>` : ''}
+    ${nf ? `<div class="qrow">Caras<span>${nf}</span></div>` : ''}
+    <button class="btn" id="rep" style="margin-top:8px">Repasar ahora</button></div>`
+  : nuevo ? `<div class="card"><b style="font-size:17px">Técnicas para recordar cosas concretas</b><p class="mu sm" style="margin-top:4px">No entrenas "la memoria" en general: aprendes trucos que sí funcionan para listas, nombres y datos. Parte por Palacio: en 2 minutos ves con tus números si te sirve.</p></div>`
+  : `<p class="mu sm" style="text-align:center">Hoy no tienes repasos pendientes ✓</p>`}
+  <div class="lbl" style="margin-top:4px">Juegos</div>
+  <button class="game" id="g-cosas">${IC.cosas}<div><b>Mis cosas</b><p>Lo que tú quieras recordar</p><div class="pr">${D.cosas.length ? `${D.cosas.length} ${D.cosas.length === 1 ? 'guardada' : 'guardadas'} · ${firmes} ya ${firmes === 1 ? 'firme' : 'firmes'}` : 'Cumpleaños, patentes, datos del trabajo…'}</div></div></button>
+  <button class="game" id="g-pal">${IC.pal}<div><b>Palacio</b><p>Listas en orden</p><div class="pr">${palPr}${pal24}</div></div></button>
+  <button class="game" id="g-caras">${IC.caras}<div><b>Caras</b><p>Nombres de gente nueva</p><div class="pr">${D.caras.people.length ? `${aprendidos} ${aprendidos === 1 ? 'nombre aprendido' : 'nombres aprendidos'} de ${D.caras.people.length}` : 'Une cada nombre a un rasgo de la cara'}</div></div></button>
+  <div style="text-align:center;margin-top:4px"><button class="chip" id="sci" style="color:var(--mu)">¿Por qué funciona? La ciencia</button></div>`;
+  if ($('#rep')) $('#rep').onclick = () => repaso(q);
+  $('#g-cosas').onclick = cosas;
+  $('#g-pal').onclick = palacio;
+  $('#g-caras').onclick = caras;
+  $('#sci').onclick = ciencia;
+  window.scrollTo(0, 0);
+}
+
+/* ================= MIS COSAS ================= */
+function cosas(){
+  V = { screen: 'cosas' };
+  const t = hoy();
+  const lista = D.cosas.slice().sort((a, b) => a.due < b.due ? -1 : 1);
+  const cuando = c => c.due <= t ? 'hoy' : c.due === addD(t, 1) ? 'mañana' : 'en ' + Math.round((new Date(c.due + 'T12:00:00') - new Date(t + 'T12:00:00')) / 864e5) + ' días';
+  $('#app').innerHTML = `
+  <div class="top2"><button class="link" id="volver" style="text-decoration:none">‹ Memoria</button></div>
+  <h2 style="font-size:26px">Mis cosas</h2>
+  <p class="mu sm">Escribe algo que quieras recordar. La app te lo pregunta al día siguiente, a los 3 días, a la semana… justo antes de que se olvide.</p>
+  <button class="btn" id="add">+ Agregar algo que quiero recordar</button>
+  ${lista.length ? `<div class="card" style="padding:4px 16px">${lista.map(c => `<button class="item" data-id="${c.id}"><span>${esc(c.q)}</span><small>${c.box >= 3 ? '✓ firme · ' : ''}${cuando(c)}</small></button>`).join('')}</div>`
+  : `<p class="note" style="text-align:center">Todavía no guardas nada. Ideas: el cumpleaños de alguien, la patente del auto, el número de un cliente.</p>`}
+  <p class="note">Las claves del banco no se guardan aquí: el teléfono no es un lugar seguro para eso.</p>`;
+  $('#volver').onclick = home;
+  $('#add').onclick = () => hojaCosa(null);
+  document.querySelectorAll('.item').forEach(b => b.onclick = () => hojaCosa(b.dataset.id));
+  window.scrollTo(0, 0);
+}
+function hojaCosa(id){
+  const c = id ? D.cosas.find(x => x.id === id) : null;
+  const TPL = ['Cumpleaños de ', 'Patente de ', 'RUT de ', 'Clave del wifi de ', 'Nombre de ', 'Teléfono de '];
+  abrirHoja(`<h2>${c ? 'Editar' : 'Agregar'}</h2>
+    ${c ? '' : `<div class="chips">${TPL.map(x => `<button class="chip" data-t="${esc(x)}">${esc(x.trim())}…</button>`).join('')}</div>`}
+    <label class="lbl" for="hq">Pregunta</label><input id="hq" maxlength="120" placeholder="Ej: Cumpleaños de mamá" value="${esc(c ? c.q : '')}" autocomplete="off">
+    <label class="lbl" for="ha">Respuesta</label><input id="ha" maxlength="160" placeholder="Ej: 12 de marzo" value="${esc(c ? c.a : '')}" autocomplete="off">
+    <button class="btn" id="hg">Guardar</button>
+    ${c ? '<button class="btn g" id="hd" style="color:var(--bad)">Borrar</button>' : ''}
+    <button class="link" id="hx" style="justify-self:center">Cancelar</button>`);
+  document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { const i = $('#hq'); i.value = b.dataset.t; i.focus(); i.setSelectionRange(i.value.length, i.value.length); });
+  $('#hx').onclick = cerrarHoja;
+  $('#hg').onclick = () => {
+    const q = $('#hq').value.trim(), a = $('#ha').value.trim();
+    if (!q || !a) { toast('Escribe la pregunta y la respuesta'); return; }
+    if (c) { c.q = q; c.a = a; } else D.cosas.push({ id: uid(), q, a, box: 0, due: addD(hoy(), 1), created: hoy() });
+    save(); cerrarHoja(); cosas(); toast(c ? 'Guardado' : 'Guardado: te lo pregunto mañana');
+  };
+  if ($('#hd')) $('#hd').onclick = () => {
+    const b = $('#hd'); if (!b.dataset.arm) { b.dataset.arm = 1; b.textContent = 'Toca otra vez para borrar'; return; }
+    D.cosas = D.cosas.filter(x => x.id !== id); save(); cerrarHoja(); cosas();
+  };
+  if (!c) setTimeout(() => $('#hq') && $('#hq').focus(), 50);
+}
+
+/* ================= PALACIO ================= */
+function palacio(){
+  if (!D.pal.prueba) return palIntroPrueba();
+  V = { screen: 'pal-menu' }; actStart();
+  const r = D.pal.route;
+  $('#app').innerHTML = `
+  <div class="top2"><button class="link" id="volver" style="text-decoration:none">‹ Memoria</button></div>
+  <h2 style="font-size:26px">Palacio</h2>
+  <p class="mu sm">Guardas cada cosa en un lugar de un recorrido que conoces y después lo “caminas” para recordar.</p>
+  <div class="card"><div class="lbl">Tu recorrido</div><p style="margin-top:6px">${r.map(esc).join(' → ')}</p><button class="link" id="ruta">Cambiarlo por el de mi casa</button></div>
+  <button class="btn" id="prac">Practicar con ${D.pal.n} cosas</button>
+  <button class="btn g" id="propia">Guardar una lista mía (ej: el súper)</button>
+  ${D.pal.prueba ? `<p class="note" style="text-align:center">Tu primera prueba: ${D.pal.prueba.sin} sin truco · ${D.pal.prueba.con} con palacio, de 10.</p>` : ''}`;
+  $('#volver').onclick = home;
+  $('#ruta').onclick = hojaRuta;
+  $('#prac').onclick = () => palVer({ modo: 'practica', items: pick(PALABRAS, D.pal.n), loci: true });
+  $('#propia').onclick = hojaPropia;
+  window.scrollTo(0, 0);
+}
+function palIntroPrueba(){
+  V = { screen: 'pal-intro' }; actStart();
+  const a = pick(PALABRAS, 10), b = pick(PALABRAS, 10, a);
+  $('#app').innerHTML = `
+  <div class="top2"><button class="link" id="volver" style="text-decoration:none">‹ Memoria</button><span class="mu sm" style="font-weight:700">Tu primera prueba</span></div>
+  <div class="big" style="margin-top:6px">¿Te sirve la técnica? Compruébalo</div>
+  <div class="card"><b>Ronda 1 · sin truco</b><p class="mu sm" style="margin-top:2px">Verás 10 palabras, una por una. Trata de recordarlas en orden, como tú quieras.</p></div>
+  <div class="card"><b>Ronda 2 · con palacio</b><p class="mu sm" style="margin-top:2px">Otras 10 palabras. Esta vez dejas cada una en un lugar de una casa.</p></div>
+  <p class="note">Al final comparas tus dos resultados. Toma unos 3 minutos.</p>
+  <button class="btn" id="go">Empezar ronda 1</button>`;
+  $('#volver').onclick = home;
+  $('#go').onclick = () => palVer({ modo: 'prueba-sin', items: a, loci: false, siguiente: b });
+  window.scrollTo(0, 0);
+}
+function palVer(st, i = 0){
+  V = Object.assign({ screen: 'pal-ver' }, st); if (i === 0) actStart();
+  const n = st.items.length, r = D.pal.route, it = st.items[i];
+  const etiqueta = st.modo === 'prueba-sin' ? 'Ronda 1 · sin truco' : st.modo === 'prueba-con' ? 'Ronda 2 · con palacio' : st.modo === 'propia' ? 'Tu lista' : 'Práctica';
+  $('#app').innerHTML = `
+  <div class="top2"><button class="link" id="volver" style="text-decoration:none">‹ Salir</button><span class="mu sm" style="font-weight:700">${etiqueta} · ${i + 1} de ${n}</span></div>
+  <div class="step">${st.items.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div>
+  ${st.loci ? `<div class="card" style="padding:20px 18px">
+      <div class="lbl">Lugar ${i + 1} · ${esc(r[i])}</div>
+      <div class="big" style="margin-top:8px">${esc(cap(it))}</div>
+      <p class="mu" style="margin-top:10px">Imagina <b style="color:var(--ink)">${esc(it)}</b> en este lugar de forma exagerada, rara o en movimiento. Míralo en tu cabeza unos segundos.</p></div>
+    <div class="card route" style="padding:6px 16px">${st.items.map((x, k) => `<div class="stop ${k < i ? 'done' : k === i ? 'on' : ''}"><span class="n">${k < i ? '✓' : k + 1}</span><span>${esc(r[k])}${k < i ? ` <small>${esc(x)}</small>` : ''}</span></div>`).join('')}</div>`
+  : `<div class="card" style="padding:34px 18px;text-align:center"><div class="lbl">Palabra ${i + 1}</div><div class="big" style="margin-top:10px;font-size:40px">${esc(cap(it))}</div></div>
+     <p class="note" style="text-align:center">Trata de recordarlas en orden. Cuando la tengas, sigue.</p>`}
+  <button class="btn" id="nx">${i < n - 1 ? 'Listo, siguiente' : 'Listo, ahora a recordar'}</button>`;
+  $('#volver').onclick = palacio;
+  $('#nx').onclick = () => i < n - 1 ? palVer(st, i + 1) : palRecordar(st, 0, 0);
+  window.scrollTo(0, 0);
+}
+function opciones(items, k){
+  const otras = shuffle(items.filter((_, j) => j !== k)).slice(0, 3);
+  return shuffle([items[k], ...otras]);
+}
+function palRecordar(st, k, aciertos){
+  V = Object.assign({ screen: 'pal-rec' }, st);
+  const n = st.items.length, r = D.pal.route, ops = opciones(st.items, k);
+  const preg = st.loci ? `${esc(r[k])}<div class="mu" style="font-size:17px;font-weight:600;margin-top:6px">¿Qué dejaste aquí?</div>` : `¿Cuál era la palabra número ${k + 1}?`;
+  $('#app').innerHTML = `
+  <div class="top2"><button class="link" id="volver" style="text-decoration:none">‹ Salir</button><span class="mu sm" style="font-weight:700">Recordar · ${k + 1} de ${n}</span></div>
+  <div class="step">${st.items.map((_, j) => `<i class="${j <= k ? 'on' : ''}"></i>`).join('')}</div>
+  <div class="card" style="padding:22px 18px">${st.loci ? `<div class="lbl">Lugar ${k + 1}</div>` : '<div class="lbl">En orden</div>'}<div class="big" style="margin-top:8px">${preg}</div></div>
+  <div style="display:grid;gap:8px">${ops.map(o => `<button class="opt" data-o="${esc(o)}">${esc(cap(o))}</button>`).join('')}</div>`;
+  $('#volver').onclick = palacio;
+  document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const ok = b.dataset.o === st.items[k];
+    document.querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x.dataset.o === st.items[k]) x.classList.add('ok'); });
+    if (!ok) b.classList.add('no');
+    if (navigator.vibrate) try { navigator.vibrate(ok ? 15 : [30, 40, 30]); } catch(e) {}
+    setTimeout(() => k < n - 1 ? palRecordar(st, k + 1, aciertos + (ok ? 1 : 0)) : palFin(st, aciertos + (ok ? 1 : 0)), ok ? 450 : 1100);
+  });
+  window.scrollTo(0, 0);
+}
+function palFin(st, score){
+  const n = st.items.length;
+  if (st.modo === 'prueba-sin') {
+    V = { screen: 'pal-mid' };
+    $('#app').innerHTML = `
+    <div class="big" style="margin-top:10px">Ronda 1: ${score} de ${n}</div>
+    <p class="mu">Ahora la técnica. Vas a recorrer una casa típica y dejar cada palabra en un lugar:</p>
+    <div class="card"><p>${D.pal.route.slice(0, 10).map(esc).join(' → ')}</p></div>
+    <div class="card"><b>El truco</b><p class="mu sm" style="margin-top:4px">Imagina cada cosa en su lugar de forma exagerada, rara o en movimiento. Una imagen absurda se recuerda mucho mejor que una normal. Para recordar, “caminas” la casa en orden.</p></div>
+    <button class="btn" id="go">Empezar ronda 2</button>`;
+    $('#go').onclick = () => palVer({ modo: 'prueba-con', items: st.siguiente, loci: true, sin: score });
+    window.scrollTo(0, 0); return;
+  }
+  // guardar la lista para preguntarla mañana (la memoria que importa es la del día siguiente)
+  D.pal.last = { items: st.items.slice(), date: hoy(), score, reviewed: false, own: st.modo === 'propia' };
+  let extra = '';
+  if (st.modo === 'prueba-con') {
+    D.pal.prueba = { sin: st.sin, con: score, date: hoy() };
+    if (score === n) D.pal.record = Math.max(D.pal.record, n);
+    D.pal.n = Math.max(5, Math.min(D.pal.route.length, score - 1));
+  } else if (st.modo === 'practica') {
+    const antes = D.pal.n;
+    if (score === n) { D.pal.record = Math.max(D.pal.record, n); D.pal.n = Math.min(D.pal.route.length, n + 1); }
+    else if (score <= Math.floor(n / 2)) D.pal.n = Math.max(4, n - 1);
+    if (D.pal.n > antes) extra = `Próxima práctica: ${D.pal.n} cosas.`;
+    else if (D.pal.n < antes) extra = `Próxima práctica con ${D.pal.n}: mejor afirmar antes de subir.`;
+  }
+  save();
+  V = { screen: 'pal-fin' };
+  if (st.modo === 'prueba-con') {
+    const dif = score - st.sin;
+    $('#app').innerHTML = `
+    <div class="big" style="margin-top:10px">Mira la diferencia</div>
+    <p class="mu">Dos listas distintas de 10 palabras, dos formas de recordarlas.</p>
+    <div class="cmp"><div><div class="lbl">Sin truco</div><div class="v" style="color:var(--mu)">${st.sin}</div><div class="sm mu">de 10</div></div>
+      <div class="${dif > 0 ? 'win' : ''}"><div class="lbl" style="${dif > 0 ? 'color:var(--ok)' : ''}">Con palacio</div><div class="v">${score}</div><div class="sm">de 10</div></div></div>
+    <div class="card">${dif >= 3 ? `Recordaste <b>${dif} más</b> en tu primer intento con la técnica.` : dif > 0 ? `Recordaste <b>${dif} más</b> con la técnica. Con práctica la diferencia suele crecer.` : 'Esta vez no hubo diferencia. Es normal al principio: la técnica mejora con práctica, y la diferencia grande aparece al día siguiente.'}</div>
+    <p class="note">Ojo: la segunda ronda siempre sale un poco mejor solo por ser la segunda, así que este resultado es orientativo. La prueba de verdad es mañana: te preguntaremos la lista del palacio.</p>
+    <button class="btn" id="ok">Listo</button>`;
+  } else {
+    $('#app').innerHTML = `
+    <div class="big" style="margin-top:10px">${score === n ? '¡Perfecto!' : 'Ronda lista'}</div>
+    <div class="card" style="text-align:center"><div style="font-weight:800;font-size:46px">${score} <span class="mu" style="font-size:22px">de ${n}</span></div></div>
+    ${extra ? `<p class="mu" style="text-align:center">${extra}</p>` : ''}
+    <p class="note" style="text-align:center">Mañana te pregunto esta lista otra vez. Eso es lo que la fija.</p>
+    <button class="btn" id="ok">Listo</button>`;
+  }
+  $('#ok').onclick = home;
+  window.scrollTo(0, 0);
+}
+function hojaRuta(){
+  const r = D.pal.route;
+  abrirHoja(`<h2>Tu recorrido</h2>
+    <p class="mu sm">Elige lugares de tu casa en el orden en que los recorres. Que sean bien distintos entre sí.</p>
+    ${r.map((x, k) => `<input data-k="${k}" maxlength="30" value="${esc(x)}" aria-label="Lugar ${k + 1}">`).join('')}
+    <button class="btn" id="rg">Guardar recorrido</button>
+    <button class="link" id="rr" style="justify-self:center">Volver al recorrido típico</button>`);
+  $('#rg').onclick = () => {
+    const v = [...document.querySelectorAll('[data-k]')].map(i => i.value.trim()).filter(Boolean);
+    if (v.length < 4) { toast('Necesitas al menos 4 lugares'); return; }
+    D.pal.route = v; D.pal.n = Math.min(D.pal.n, v.length); save(); cerrarHoja(); palacio(); toast('Recorrido guardado');
+  };
+  $('#rr').onclick = () => { D.pal.route = ROUTE0.slice(); save(); cerrarHoja(); palacio(); };
+}
+function hojaPropia(){
+  const max = D.pal.route.length;
+  abrirHoja(`<h2>Una lista tuya</h2>
+    <p class="mu sm">Una cosa por línea, hasta ${max}. Por ejemplo, lo que tienes que comprar o los temas de una reunión.</p>
+    <textarea id="pl" rows="7" placeholder="pan\nhuevos\ndetergente"></textarea>
+    <button class="btn" id="pg">Guardar en mi palacio</button>
+    <button class="link" id="px" style="justify-self:center">Cancelar</button>`);
+  setTimeout(() => $('#pl') && $('#pl').focus(), 50);
+  $('#px').onclick = cerrarHoja;
+  $('#pg').onclick = () => {
+    const items = [...new Set($('#pl').value.split('\n').map(x => x.trim()).filter(Boolean))].slice(0, max);
+    if (items.length < 2) { toast('Escribe al menos 2 cosas'); return; }
+    cerrarHoja(); palVer({ modo: 'propia', items, loci: true });
+  };
+}
+
+/* ================= CARAS ================= */
+const PIEL = ['#F3D2B3', '#E8B894', '#C98E66', '#9C6644', '#6E4630'];
+const PELO = [['#2B2220','negro'], ['#5A3A2A','castaño'], ['#8A5A32','castaño claro'], ['#D9B25E','rubio'], ['#B5502A','colorín'], ['#B9B9B9','canoso']];
+const LENTES = [['#C9473A','rojos'], ['#2B2B2B','negros'], ['#2F6FB5','azules'], ['#C08A2B','dorados']];
+const CAMISA = ['#3C7BB8', '#2E8B6E', '#8A4FB8', '#C0563B', '#4A5568', '#C89B2E'];
+function nuevaCara(usados){
+  const g = Math.random() < .5 ? 'f' : 'm';
+  const libres = NOMBRES[g].filter(n => !usados.includes(n));
+  const name = (libres.length ? libres : NOMBRES[g])[Math.floor(Math.random() * (libres.length || NOMBRES[g].length))];
+  const r = n => Math.floor(Math.random() * n);
+  const estilos = g === 'f' ? ['largo', 'crespo', 'tomate', 'corto', 'flequillo'] : ['corto', 'crespo', 'pelado', 'flequillo', 'corto'];
+  const f = { skin: r(PIEL.length), hair: r(PELO.length), style: estilos[r(estilos.length)], glasses: Math.random() < .35 ? r(LENTES.length) : -1,
+    beard: g === 'm' && Math.random() < .4, earrings: g === 'f' && Math.random() < .45, brows: Math.random() < .3 ? 'gruesas' : 'normales',
+    smile: Math.random() < .65, shirt: r(CAMISA.length), freckles: Math.random() < .2 };
+  if (f.style === 'pelado' && f.hair === 5 && Math.random() < .5) f.hair = 1;
+  return { id: uid(), name, g, f, feat: '', hook: '', box: -1, due: '' };
+}
+function rasgos(f){
+  const t = [];
+  if (f.glasses >= 0) t.push('Lentes ' + LENTES[f.glasses][1]);
+  if (f.style === 'crespo') t.push('Pelo crespo'); else if (f.style === 'largo') t.push('Pelo largo'); else if (f.style === 'pelado') t.push('Pelado'); else if (f.style === 'tomate') t.push('Tomate en el pelo'); else if (f.style === 'flequillo') t.push('Flequillo');
+  if (f.hair === 3 && f.style !== 'pelado') t.push('Pelo rubio'); if (f.hair === 4 && f.style !== 'pelado') t.push('Colorín'); if (f.hair === 5 && f.style !== 'pelado') t.push('Canas');
+  if (f.beard) t.push('Barba'); if (f.earrings) t.push('Aros'); if (f.freckles) t.push('Pecas'); if (f.brows === 'gruesas') t.push('Cejas gruesas');
+  if (f.smile) t.push('Sonrisa');
+  return t.slice(0, 4);
+}
+function caraSVG(f){
+  const sk = PIEL[f.skin], hc = PELO[f.hair][0], sh = CAMISA[f.shirt];
+  let back = '', top = '';
+  if (f.style === 'largo') back = `<path d="M44 90c-4-40 16-62 41-62s45 22 41 62l4 52H40z" fill="${hc}"/>`;
+  if (f.style === 'tomate') top = `<circle cx="85" cy="30" r="15" fill="${hc}"/><path d="M50 82c-2-30 14-46 35-46s37 16 35 46c-6-14-18-22-35-22s-29 8-35 22z" fill="${hc}"/>`;
+  else if (f.style === 'crespo') top = [[50,64,13],[58,48,14],[72,38,14],[85,35,14],[98,38,14],[112,48,14],[120,64,13],[46,80,10],[124,80,10]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${hc}"/>`).join('');
+  else if (f.style === 'flequillo') top = `<path d="M50 84c-4-32 14-50 35-50s39 18 35 50c-4-6-8-14-10-20-10 6-40 8-58 2-1 6-1 12-2 18z" fill="${hc}"/>`;
+  else if (f.style === 'corto' || f.style === 'largo') top = `<path d="M50 80c-2-30 14-46 35-46s37 16 35 46c-4-10-10-18-18-20-12 4-28 4-38 0-8 2-12 10-14 20z" fill="${hc}"/>`;
+  else if (f.style === 'pelado') top = `<path d="M52 92c-2-8-2-16 0-20M118 92c2-8 2-16 0-20" stroke="${hc}" stroke-width="7" stroke-linecap="round" fill="none"/>`;
+  const bw = f.brows === 'gruesas' ? 5 : 2.5, bc = f.hair === 5 ? '#8A8A8A' : f.hair === 3 ? '#A8823C' : '#3A2A22';
+  const gl = f.glasses >= 0 ? `<circle cx="72" cy="92" r="11" fill="none" stroke="${LENTES[f.glasses][0]}" stroke-width="3"/><circle cx="98" cy="92" r="11" fill="none" stroke="${LENTES[f.glasses][0]}" stroke-width="3"/><path d="M83 92h4M61 90l-8-3M109 90l8-3" stroke="${LENTES[f.glasses][0]}" stroke-width="3"/>` : '';
+  const beard = f.beard ? `<path d="M52 100c2 26 16 38 33 38s31-12 33-38c-6 10-14 12-20 12-4-4-9-5-13-5s-9 1-13 5c-6 0-14-2-20-12z" fill="${hc === '#B9B9B9' ? '#9A9A9A' : hc}"/>` : '';
+  const ear = f.earrings ? `<circle cx="51" cy="108" r="4" fill="#E0B23C"/><circle cx="119" cy="108" r="4" fill="#E0B23C"/>` : '';
+  const frk = f.freckles ? [[66,104],[71,107],[76,104],[94,104],[99,107],[104,104]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#A0603E"/>`).join('') : '';
+  const mouth = f.smile ? `<path d="M73 116q12 10 24 0" fill="none" stroke="#8E4E3E" stroke-width="3" stroke-linecap="round"/>` : `<path d="M75 118h20" stroke="#8E4E3E" stroke-width="3" stroke-linecap="round"/>`;
+  return `<svg viewBox="0 0 170 170" role="img" aria-label="Cara dibujada"><circle cx="85" cy="85" r="82" fill="var(--s2)"/>${back}
+    <path d="M40 168c6-20 24-30 45-30s39 10 45 30z" fill="${sh}"/><rect x="76" y="124" width="18" height="18" fill="${sk}"/>
+    <circle cx="51" cy="96" r="7" fill="${sk}"/><circle cx="119" cy="96" r="7" fill="${sk}"/>
+    <ellipse cx="85" cy="94" rx="34" ry="40" fill="${sk}"/>${top}${frk}
+    <path d="M64 80h14M92 80h14" stroke="${bc}" stroke-width="${bw}" stroke-linecap="round"/>
+    <circle cx="72" cy="92" r="3.6" fill="#2B2B2B"/><circle cx="98" cy="92" r="3.6" fill="#2B2B2B"/>${gl}${beard}${mouth}${ear}</svg>`;
+}
+function caras(){
+  V = { screen: 'caras-menu' };
+  const ps = D.caras.people, ap = ps.filter(p => p.box >= 2).length;
+  $('#app').innerHTML = `
+  <div class="top2"><button class="link" id="volver" style="text-decoration:none">‹ Memoria</button></div>
+  <h2 style="font-size:26px">Caras</h2>
+  <p class="mu sm">Conoces 3 personas nuevas. A cada una le eliges un rasgo y lo unes con su nombre. Después la app te pregunta los nombres en los días siguientes.</p>
+  <div class="card"><b>El truco</b><p class="mu sm" style="margin-top:4px">Fíjate en algo de la cara y conéctalo con el nombre de forma visual o absurda: <b style="color:var(--ink)">lentes rojos → rosa → Rosario</b>. Un gancho que inventas tú se recuerda mejor que uno que te dan.</p></div>
+  <button class="btn" id="go">Conocer 3 personas</button>
+  ${ps.length ? `<p class="note" style="text-align:center">${ap} ${ap === 1 ? 'nombre aprendido' : 'nombres aprendidos'} de ${ps.length}. Los que fallas vuelven al día siguiente.</p>` : ''}
+  <p class="note">En la vida real: cuando conozcas a alguien, haz lo mismo y guárdalo en “Mis cosas” con “Nombre de…”.</p>`;
+  $('#volver').onclick = home;
+  $('#go').onclick = () => { const usados = D.caras.people.map(p => p.name), grupo = []; for (let i = 0; i < 3; i++) { const c = nuevaCara(usados.concat(grupo.map(x => x.name))); grupo.push(c); } caraConocer(grupo, 0); };
+  window.scrollTo(0, 0);
+}
+function caraConocer(grupo, i){
+  V = { screen: 'caras-conocer' }; if (i === 0) actStart();
+  const p = grupo[i], rs = rasgos(p.f);
+  $('#app').innerHTML = `
+  <div class="top2"><button class="link" id="volver" style="text-decoration:none">‹ Salir</button><span class="mu sm" style="font-weight:700">Conocer · ${i + 1} de ${grupo.length}</span></div>
+  <div class="step">${grupo.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div>
+  <div class="face">${caraSVG(p.f)}<div style="font-weight:800;font-size:28px;margin-top:6px">${esc(p.name)}</div></div>
+  <div class="lbl">¿Qué te llama la atención de su cara?</div>
+  <div class="chips">${rs.map(x => `<button class="chip" data-r="${esc(x)}">${esc(x)}</button>`).join('')}<button class="chip" data-r="">Otro…</button></div>
+  <div id="gw" hidden style="gap:8px">
+    <input id="ft" maxlength="40" placeholder="¿Qué rasgo?" hidden>
+    <label class="lbl" for="hk">Únelo con el nombre (opcional)</label>
+    <input id="hk" maxlength="80" placeholder="Ej: lentes rojos → rosa → Rosario" autocomplete="off">
+  </div>
+  <button class="btn" id="nx" disabled>${i < grupo.length - 1 ? 'Siguiente persona' : 'Listo, ahora a recordar'}</button>`;
+  $('#volver').onclick = caras;
+  let feat = '';
+  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+    document.querySelectorAll('[data-r]').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    feat = b.dataset.r; const gw = $('#gw'); gw.hidden = false; gw.style.display = 'grid';
+    $('#ft').hidden = !!feat; if (!feat) $('#ft').focus();
+    $('#hk').placeholder = `Ej: ${(feat || 'rasgo').toLowerCase()} → … → ${p.name}`;
+    $('#nx').disabled = false;
+  });
+  $('#nx').onclick = () => {
+    p.feat = feat || $('#ft').value.trim(); p.hook = $('#hk').value.trim();
+    i < grupo.length - 1 ? caraConocer(grupo, i + 1) : caraQuiz({ lista: shuffle(grupo), i: 0, ok: 0, nuevo: true, grupo });
+  };
+  window.scrollTo(0, 0);
+}
+function chequeaNombre(esc_, name){
+  const a = norm(esc_), b = norm(name);
+  if (!a) return null;
+  if (a.length < Math.min(3, b.length)) return 'corto';
+  return b.startsWith(a) || a === b;
+}
+function caraQuiz(st){
+  V = Object.assign({ screen: 'caras-quiz' }, st);
+  const p = st.lista[st.i];
+  $('#app').innerHTML = `
+  <div class="top2"><button class="link" id="volver" style="text-decoration:none">‹ Salir</button><span class="mu sm" style="font-weight:700">Recordar · ${st.i + 1} de ${st.lista.length}</span></div>
+  <div class="step">${st.lista.map((_, k) => `<i class="${k <= st.i ? 'on' : ''}"></i>`).join('')}</div>
+  <div class="face">${caraSVG(p.f)}</div>
+  <label class="lbl" for="nm" style="text-align:center">¿Cómo se llama? Escribe las primeras letras</label>
+  <input id="nm" autocomplete="off" autocapitalize="words" spellcheck="false" maxlength="30" style="font-size:20px;text-align:center;font-weight:700">
+  <div id="fb"></div>
+  <div class="row" id="acc"><button class="btn g" id="nose">No me acuerdo</button><button class="btn" id="ok">Comprobar</button></div>`;
+  const inp = $('#nm'); setTimeout(() => inp.focus(), 50);
+  $('#volver').onclick = () => { if (st.nuevo) guardarGrupo(st.grupo); caras(); };
+  const responder = acerto => {
+    inp.disabled = true;
+    $('#fb').innerHTML = `<div class="card" style="border-color:${acerto ? 'var(--ok)' : 'var(--line)'};background:${acerto ? 'var(--oks)' : 'var(--s)'}">
+      <b style="font-size:20px">${acerto ? '¡Sí! ' : ''}${esc(p.name)}</b>${p.hook || p.feat ? `<p class="mu sm" style="margin-top:4px">Tu gancho: <b style="color:var(--ink)">${esc(p.hook || p.feat)}</b></p>` : ''}</div>`;
+    if (navigator.vibrate) try { navigator.vibrate(acerto ? 15 : [30, 40, 30]); } catch(e) {}
+    if (!st.nuevo) {
+      const real = D.caras.people.find(x => x.id === p.id);
+      if (real) { if (acerto) { real.box = Math.min(real.box + 1, INT.length - 1); real.due = addD(hoy(), INT[real.box]); } else { real.box = 0; real.due = addD(hoy(), 1); } save(); }
+    }
+    $('#acc').innerHTML = `<button class="btn" id="sig">${st.i < st.lista.length - 1 ? 'Siguiente' : 'Terminar'}</button>`;
+    $('#sig').onclick = () => {
+      const ok = st.ok + (acerto ? 1 : 0);
+      if (st.i < st.lista.length - 1) return caraQuiz(Object.assign({}, st, { i: st.i + 1, ok }));
+      if (st.nuevo) guardarGrupo(st.grupo);
+      if (st.alTerminar) return st.alTerminar(ok);
+      caraFin(ok, st.lista.length);
+    };
+    setTimeout(() => $('#sig') && $('#sig').focus(), 30);
+  };
+  $('#ok').onclick = () => { const r = chequeaNombre(inp.value, p.name); if (r === null) { toast('Escribe algunas letras o toca “No me acuerdo”'); return; } if (r === 'corto') { toast('Escribe al menos 3 letras'); return; } responder(r); };
+  inp.onkeydown = e => { if (e.key === 'Enter') $('#ok') && $('#ok').click(); };
+  $('#nose').onclick = () => responder(false);
+  window.scrollTo(0, 0);
+}
+function guardarGrupo(grupo){
+  grupo.forEach(p => { if (!D.caras.people.some(x => x.id === p.id)) { p.box = 0; p.due = addD(hoy(), 1); D.caras.people.push(p); } });
+  if (D.caras.people.length > 120) D.caras.people = D.caras.people.slice(-120);
+  save();
+}
+function caraFin(ok, n){
+  V = { screen: 'caras-fin' };
+  $('#app').innerHTML = `
+  <div class="big" style="margin-top:10px">${ok === n ? '¡Todos!' : 'Listo'}</div>
+  <div class="card" style="text-align:center"><div style="font-weight:800;font-size:46px">${ok} <span class="mu" style="font-size:22px">de ${n}</span></div></div>
+  <p class="note" style="text-align:center">Mañana te pregunto estos nombres otra vez. Los que recuerdes vuelven cada vez más espaciados.</p>
+  <button class="btn" id="ok">Listo</button>`;
+  $('#ok').onclick = home;
+  window.scrollTo(0, 0);
+}
+
+/* ================= REPASO DE HOY ================= */
+function repaso(q){
+  const st = { q, i: 0, ok: 0 };
+  actStart(); repasoPaso(st);
+}
+function repasoPaso(st){
+  if (st.i >= st.q.length) return repasoFin(st);
+  const x = st.q[st.i];
+  const sigue = acerto => { st.ok += acerto ? 1 : 0; st.i++; repasoPaso(st); };
+  if (x.t === 'cosa') return repasoCosa(st, x, sigue);
+  if (x.t === 'pal') return repasoPal(st, x, sigue);
+  if (x.t === 'cara') {
+    const p = D.caras.people.find(y => y.id === x.id); if (!p) { st.i++; return repasoPaso(st); }
+    // agrupa las caras seguidas del repaso en un solo quiz
+    const ids = []; let j = st.i; while (j < st.q.length && st.q[j].t === 'cara') { ids.push(st.q[j].id); j++; }
+    const lista = ids.map(id => D.caras.people.find(y => y.id === id)).filter(Boolean);
+    return caraQuiz({ lista, i: 0, ok: 0, nuevo: false, alTerminar: ok => { st.ok += ok; st.i = j; repasoPaso(st); } });
+  }
+}
+function cabRepaso(st){
+  return `<div class="top2"><button class="link" id="volver" style="text-decoration:none">‹ Salir</button><span class="mu sm" style="font-weight:700">Repaso · ${st.i + 1} de ${st.q.length}</span></div>
+  <div class="step">${st.q.length <= 24 ? st.q.map((_, k) => `<i class="${k <= st.i ? 'on' : ''}"></i>`).join('') : `<i class="on" style="flex:${st.i + 1}"></i><i style="flex:${st.q.length - st.i - 1}"></i>`}</div>`;
+}
+function repasoCosa(st, x, sigue){
+  V = { screen: 'rep' };
+  const c = D.cosas.find(y => y.id === x.id); if (!c) return sigue(false);
+  $('#app').innerHTML = cabRepaso(st) + `
+  <div class="card" style="padding:22px 18px;margin-top:4px"><div class="lbl">Dilo en tu cabeza primero</div><div class="big" style="margin-top:10px">${esc(c.q)}</div></div>
+  <button class="card" id="ver" style="padding:26px 18px;border-style:dashed;text-align:center;color:var(--mu);font-weight:700;width:100%">Toca para ver la respuesta</button>
+  <div id="acc"></div>`;
+  $('#volver').onclick = home;
+  $('#ver').onclick = () => {
+    $('#ver').outerHTML = `<div class="card ac" style="padding:18px"><div class="lbl">Respuesta</div><div style="font-weight:800;font-size:26px;margin-top:6px">${esc(c.a)}</div></div>`;
+    $('#acc').innerHTML = `<p class="mu sm" style="text-align:center;margin-bottom:8px">¿Te acordaste?</p><div class="r2"><button class="nope" id="no">No me acordé</button><button class="yes" id="si">Me acordé</button></div>`;
+    $('#si').onclick = () => { c.box = Math.min(c.box + 1, INT.length - 1); c.due = addD(hoy(), INT[c.box]); save(); sigue(true); };
+    $('#no').onclick = () => { c.box = 0; c.due = addD(hoy(), 1); save(); sigue(false); };
+  };
+  window.scrollTo(0, 0);
+}
+function repasoPal(st, x, sigue){
+  V = { screen: 'rep' };
+  const L = D.pal.last, r = D.pal.route, k = x.k, ops = opciones(L.items, k);
+  $('#app').innerHTML = cabRepaso(st) + `
+  <div class="card" style="padding:22px 18px;margin-top:4px"><div class="lbl">${L.own ? 'Tu lista' : 'La lista'} de ayer · lugar ${k + 1}</div><div class="big" style="margin-top:8px">${esc(r[k])}<div class="mu" style="font-size:17px;font-weight:600;margin-top:6px">¿Qué dejaste aquí?</div></div></div>
+  <div style="display:grid;gap:8px">${ops.map(o => `<button class="opt" data-o="${esc(o)}">${esc(cap(o))}</button>`).join('')}</div>`;
+  $('#volver').onclick = home;
+  document.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const ok = b.dataset.o === L.items[k];
+    document.querySelectorAll('.opt').forEach(y => { y.disabled = true; if (y.dataset.o === L.items[k]) y.classList.add('ok'); });
+    if (!ok) b.classList.add('no');
+    if (k === 0) L.hits = 0;
+    L.hits = (L.hits || 0) + (ok ? 1 : 0);
+    if (k === L.items.length - 1) { L.reviewed = true; L.score24 = L.hits; delete L.hits; }
+    save();
+    setTimeout(() => sigue(ok), ok ? 450 : 1100);
+  });
+  window.scrollTo(0, 0);
+}
+function repasoFin(st){
+  V = { screen: 'rep-fin' };
+  const L = D.pal.last;
+  $('#app').innerHTML = `
+  <div class="big" style="margin-top:10px">Repaso listo</div>
+  <div class="card" style="text-align:center"><div style="font-weight:800;font-size:46px">${st.ok} <span class="mu" style="font-size:22px">de ${st.q.length}</span></div></div>
+  ${L && L.reviewed && L.score24 != null && L.date === addD(hoy(), -1) ? `<div class="card sm">Tu palacio de ayer: <b>${L.score} de ${L.items.length}</b> recién vista, <b>${L.score24} de ${L.items.length}</b> hoy. Eso es memoria de verdad.</div>` : ''}
+  <p class="note" style="text-align:center">Lo que recordaste vuelve más espaciado. Lo que no, vuelve mañana.</p>
+  <button class="btn" id="ok">Listo</button>`;
+  $('#ok').onclick = home;
+  window.scrollTo(0, 0);
+}
+
+/* ================= CIENCIA ================= */
+function ciencia(){
+  abrirHoja(`<h2>Por qué funciona</h2>
+  <ol class="sci" style="padding-left:20px;margin:0">
+    <li><b>Recordar sin mirar.</b><span class="mu sm">Intentar recordar algo lo fija mucho mejor que releerlo (Roediger y Karpicke, 2006). En la revisión de Dunlosky y colegas (2013) es una de las dos técnicas con utilidad “alta”, y también funcionó en universitarios con TDAH (Knouse y colegas, 2016). Por eso la respuesta queda oculta hasta que lo intentas.</span></li>
+    <li><b>Repaso espaciado.</b><span class="mu sm">Repasar con intervalos cada vez más largos rinde más que repasar todo junto (Cepeda y colegas, 2006). Por eso Mis cosas vuelve al día siguiente, a los 3, 7, 21 y 60 días.</span></li>
+    <li><b>Palacio de la memoria.</b><span class="mu sm">Ubicar cada cosa en un lugar de un recorrido conocido mejora mucho el recuerdo de listas en orden (meta-análisis de Twomey y Kroneisen, 2021). En el estudio de Dresler y colegas (2017), personas sin experiencia que practicaron 6 semanas más que duplicaron las palabras que recordaban.</span></li>
+    <li><b>Nombres con un gancho propio.</b><span class="mu sm">Lo que generas tú se recuerda mejor que lo que lees (efecto de generación), y escribir un nombre cuesta más que reconocerlo, por eso se fija más. La evidencia de esta técnica es moderada y casi toda de laboratorio.</span></li>
+  </ol>
+  <div class="card sm"><b>Lo que no hace</b><p class="mu" style="margin-top:4px">No mejora “la memoria” en general: los juegos de entrenamiento cerebral mejoran en esos juegos, pero casi no se traspasa a la vida diaria (Simons y colegas, 2016). Por eso aquí aprendes técnicas para recordar cosas concretas. La mayoría de estos estudios son en adultos sin TDAH.</p></div>
+  <button class="btn" id="cx">Entendido</button>`);
+  $('#cx').onclick = cerrarHoja;
+}
+
+/* ---------- hojas ---------- */
+function abrirHoja(html){
+  $('#sheet').innerHTML = `<div class="scrim" id="scrim"></div><div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
+  $('#scrim').onclick = cerrarHoja;
+}
+function cerrarHoja(){ $('#sheet').innerHTML = ''; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#sheet').innerHTML) cerrarHoja(); });
+
+home();
+</script>
+</body></html>

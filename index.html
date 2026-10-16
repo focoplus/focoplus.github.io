@@ -62,7 +62,9 @@ p{margin:0}
 /* Módulos */
 .mods{display:grid;gap:12px;margin-top:16px}
 /* Inicio C+: una lista elegante */
-.hi2{padding:8px 0 4px}
+.hi2{padding:18px 0 4px}
+.hi2-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hi2-top .av2{width:34px;height:34px;font-size:14px}
 .hi2 small{display:block;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--muted)}
 .hi2 h1{margin-top:4px;font-size:clamp(26px,7vw,32px);font-weight:800;line-height:1.1;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
 .hi2 h1 svg{width:30px;height:30px;flex:none}
@@ -70,15 +72,42 @@ p{margin:0}
 .lr{display:flex;align-items:center;gap:13px;padding:11px 14px;color:inherit;text-decoration:none;position:relative;background:none;border:0;width:100%;text-align:left;font:inherit;cursor:pointer}
 .lr+.lr{border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
 .lr:active{background:color-mix(in srgb,var(--ink) 5%,transparent)}
-.lr .ic2{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--c);box-shadow:0 0 18px color-mix(in srgb,var(--c) 30%,transparent)}
+.lr .ic2{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--c)}
 .lr .ic2 svg{width:24px;height:24px}
 .lr .ic2.gris{background:var(--chip);box-shadow:none;font-size:20px}
 .lr .t{flex:1;min-width:0}
 .lr .t b{display:block;font-size:16.5px;font-weight:700;letter-spacing:-.01em}
 .lr .t span{display:block;font-size:13.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lr .pl{flex:none;font-size:12.5px;font-weight:700;border-radius:99px;padding:4px 10px;white-space:nowrap;background:color-mix(in srgb,var(--c) 15%,transparent);color:color-mix(in srgb,var(--c) 75%,var(--ink))}
+.lr .t span.ok{color:var(--good,#1B7F52)}
+.lr .pl{flex:none;font-size:13.5px;font-weight:600;white-space:nowrap;color:var(--muted)}
 .lr .ch{flex:none;color:var(--muted);opacity:.6;font-size:20px;line-height:1}
 .av2{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px;border:0;cursor:pointer}
+.semlink{margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:color-mix(in srgb,var(--teal) 14%,transparent);color:var(--teal);border:0;border-radius:99px;padding:8px 14px;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer}
+.semlink span{transition:transform .15s}.semlink:active span{transform:translateX(3px)}
+.sem-hd{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.sem-nav{display:flex;align-items:center;justify-content:space-between;margin:12px 0 8px}
+.sem-nav button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:18px;cursor:pointer}
+.sem-nav button:disabled{opacity:.3;cursor:default}
+.sem-dl{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;font-size:11.5px;font-weight:700;color:var(--muted);text-align:center;margin:4px 0 6px}
+.sem-m{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:9px;margin-bottom:10px}
+.sem-mh{display:flex;align-items:center;gap:10px}
+.sem-mh .ic3{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--c)}
+.sem-mh .ic3 svg{width:19px;height:19px}
+.sem-mh b{flex:1;font-size:15.5px}
+.sem-mh .tot{font-weight:800;font-size:14px}.sem-mh .tot small{color:var(--muted);font-weight:600;font-size:12px}
+.sem-c{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.sem-b{height:46px;border-radius:9px;background:var(--chip);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--muted);line-height:1.05}
+.sem-b small{font-size:9.5px;font-weight:700;opacity:.9}
+.sem-b.on{background:var(--c);color:#fff}
+.sem-b.td{outline:2px solid var(--ink);outline-offset:1px}
+.sem-tot{border:2px solid var(--ink)}.sem-tot .sem-b.on{color:var(--bg)}.sem-tot .sem-mh{align-items:flex-end}
+.sem-tl{font:800 11.5px system-ui;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.sem-tv{font-weight:800;font-size:30px;letter-spacing:-.02em;line-height:1.1;margin-top:2px}.sem-tv span{font-size:18px}
+.sem-tn{font-size:13px;color:var(--muted);padding-bottom:4px}
+.sem-m:not(.sem-tot) .sem-b:not(.on):not(.fu){background:transparent;border:1.5px solid var(--line);color:var(--muted)}
+.sem-m:not(.sem-tot) .sem-b.on{background:color-mix(in srgb,var(--c) 15%,var(--surface));color:color-mix(in srgb,var(--c) 85%,#000)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sem-m:not(.sem-tot) .sem-b.on{background:color-mix(in srgb,var(--c) 26%,var(--surface));color:color-mix(in srgb,var(--c) 45%,#fff)}}
+.sem-b.fu{background:transparent;border:1.5px dashed var(--line)}
 .mods-sheet .tg{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .mods-sheet .tg .t{flex:1;font-weight:700}
 .sw2{width:50px;height:30px;border-radius:99px;background:var(--line);border:0;position:relative;flex:none;cursor:pointer}
@@ -233,9 +262,16 @@ const MODULOS = [
       const hoy = new Date().toLocaleDateString('en-CA'); const m = (s.ses || []).filter(x => x.date === hoy).reduce((a, x) => a + (Number(x.min) || 0), 0);
       return m ? [(m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '')) + ' hoy'] : [];
     } },
+  { id:'memoria', nombre:'Memoria', desc:'Técnicas con evidencia para recordar cosas concretas.', href:'memoria/', color:'#0F7FA6',
+    icono:'<svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 8c-6.5 0-11 4.3-11 10 0 3.2 1.3 5.6 3.5 7v5h15v-5c2.2-1.4 3.5-3.8 3.5-7 0-5.7-4.5-10-11-10z" fill="#fff" fill-opacity=".18"/><path d="M15.5 34h9"/></svg>',
+    estado: d => {
+      const s = leer(d, 'foco-memoria-v1'); if (!s) return [];
+      const n = (s.cosas || []).length + ((s.caras && s.caras.people) || []).length; const r = s.pal && s.pal.record;
+      return [n ? n + ' cosas y nombres' : '', r ? 'Récord palacio: ' + r : ''].filter(Boolean);
+    } },
 ];
 // Orden en el menú
-const ORDEN = ['english', 'ejercicio', 'lectura', 'super', 'finanzas', 'foco', 'sql'];
+const ORDEN = ['english', 'ejercicio', 'lectura', 'super', 'finanzas', 'memoria', 'foco', 'sql'];
 MODULOS.sort((a, b) => ORDEN.indexOf(a.id) - ORDEN.indexOf(b.id));
 
 /* ---------- Almacenamiento ---------- */
@@ -317,9 +353,8 @@ let vista = 'menu', pendiente = null, confirmar = null, editar = null;
 
 function renderTop(){
   const p = yo();
-  $('#top').innerHTML = `<div class="brand"><img src="iconos/foco-luz-192.png" alt="">Foco+</div>` +
-    (p && vista === 'menu' ? `<button class="av2" id="cambiar" style="background:${COLORES[(p.c || 0) % COLORES.length]}" aria-label="Cambiar de perfil (ahora: ${esc(p.name)})" title="${esc(p.name)}">${esc(inicial(p.name))}</button>` : '');
-  const b = $('#cambiar'); if (b) b.onclick = () => { vista = 'quien'; render(); };
+  $('#top').innerHTML = p && vista === 'menu' ? '' : `<div class="brand"><img src="iconos/foco-luz-192.png" alt="">Foco+</div>`;
+  $('#top').style.display = p && vista === 'menu' ? 'none' : '';
 }
 
 function render(){
@@ -327,7 +362,7 @@ function render(){
   else if (!perfiles.length) vista = 'bienvenida';
   else if (!yo() && vista === 'menu') vista = 'quien';
   renderTop();
-  ({ bienvenida, quien, menu, importar })[vista]();
+  ({ bienvenida, quien, menu, importar, semana, empezar })[vista]();
   window.scrollTo(0, 0);
 }
 
@@ -335,11 +370,11 @@ function bienvenida(){
   $('#app').innerHTML = `<section class="hello">
     <img class="hero-ic" src="iconos/foco-luz-192.png" alt="">
     <h1>Bienvenido a <em>Foco+</em></h1>
-    <p>Inglés, ejercicio, lectura, súper, finanzas, foco y SQL en un solo lugar. Cada persona tiene su propio perfil y su propio progreso.</p>
+    <p>Inglés, ejercicio, lectura, súper, finanzas, memoria, foco y SQL en un solo lugar. Cada persona tiene su propio perfil y su propio progreso.</p>
   </section>
   <div class="card" style="margin-top:12px"><h3>¿Cómo te llamas?</h3>${formPerfil('Empezar')}</div>`;
   $('#fp').onsubmit = e => { e.preventDefault(); const v = validar(e.target); if (!v) return;
-    actual = crearPerfil(v.name, v.age).id; guardar(); vista = 'menu'; render(); toast('¡Hola, ' + v.name + '!'); };
+    actual = crearPerfil(v.name, v.age).id; guardar(); vista = 'empezar'; render(); };
 }
 
 function quien(){
@@ -361,7 +396,7 @@ function quien(){
   </div>
   <div class="card" style="margin-top:16px"><h3>Agregar persona</h3>${formPerfil('Agregar')}</div>
   ${yo() ? '<button class="link" id="volver" style="display:block;margin:12px auto 0">Volver al menú</button>' : ''}`;
-  document.querySelectorAll('.pbtn').forEach(b => b.onclick = () => { actual = b.dataset.id; confirmar = null; guardar(); vista = 'menu'; render(); toast('Hola, ' + yo().name); });
+  document.querySelectorAll('.pbtn').forEach(b => b.onclick = () => { actual = b.dataset.id; confirmar = null; guardar(); vista = 'menu'; render(); toast('Hola, ' + nombreBonito(yo().name)); });
   document.querySelectorAll('.pdel').forEach(b => b.onclick = () => { confirmar = b.dataset.del; editar = null; render(); });
   document.querySelectorAll('.pedit').forEach(b => b.onclick = () => { editar = editar === b.dataset.edit ? null : b.dataset.edit; confirmar = null; render();
     const i = document.querySelector('#fe [name=name]'); if (i) { i.focus(); i.select(); } });
@@ -379,26 +414,54 @@ function quien(){
   }
   $('#fp').onsubmit = e => { e.preventDefault(); const v = validar(e.target); if (!v) return;
     if (perfiles.some(p => p.name.toLowerCase() === v.name.toLowerCase())) { const er = e.target.querySelector('.err'); er.textContent = 'Ya existe un perfil con ese nombre.'; er.hidden = false; return; }
-    actual = crearPerfil(v.name, v.age).id; guardar(); vista = 'menu'; render(); toast('¡Hola, ' + v.name + '!'); };
+    actual = crearPerfil(v.name, v.age).id; guardar(); vista = 'empezar'; render(); };
   const vb = $('#volver'); if (vb) vb.onclick = () => { confirmar = null; editar = null; vista = 'menu'; render(); };
 }
 
-const CORTO = { english:'Rondas de 2 min', ejercicio:'Meta semanal', lectura:'Tus libros', super:'Calculadora', finanzas:'Tu mes', foco:'Temporizador', sql:'Desde cero' };
+const CORTO = { english:'Rondas de 2 min', ejercicio:'Meta semanal', lectura:'Tus libros', super:'Calculadora', finanzas:'Tu mes', foco:'Temporizador', sql:'Desde cero', memoria:'Técnicas para recordar' };
 const DIAS_N = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'], MESES_N = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const SOL = '<svg viewBox="0 0 24 24" fill="none" stroke="#F5B529" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="#F5B529"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>';
 const TARDE = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M5 16a7 7 0 0 1 14 0" fill="#F28C38" stroke="#F28C38" stroke-width="2"/><path d="M12 4.5v2.2M4.6 8.6l1.6 1.4M19.4 8.6l-1.6 1.4M2.5 16h19M6 19.5h12" stroke="#F28C38" stroke-width="2"/></svg>';
 const LUNA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z" fill="#9DB4FF"/><circle cx="17.5" cy="5.5" r="1.1" fill="#9DB4FF"/><circle cx="20.5" cy="9" r=".8" fill="#9DB4FF"/></svg>';
+// Debajo del nombre de cada módulo: el avance de hoy, en gris (recordatorio, no protagonista).
+// Devuelve [texto, cumplido]. Sin avance: la meta en neutro o el texto corto de siempre.
+const fmtMin = v => v < 60 ? v + ' min' : Math.floor(v / 60) + ' h' + (v % 60 ? ' ' + (v % 60) + ' min' : '');
+function docSettings(pid, key){ const a = leer(pid, key) || {}; return a.settings || {}; }
+function estadoHoy(m, pid){
+  const hoyK = ymdL(new Date());
+  const minHoy = id => Math.floor(minutosPorDia(id, pid)[hoyK] || 0);
+  if (m.id === 'finanzas') return [ls.get('fp.pin.' + pid) ? 'Protegido con PIN' : CORTO.finanzas, false];
+  if (m.id === 'super') { const s = leer(pid, 'foco-super-v1'); if (s && s.actual && s.actual.items && s.actual.items.length) { const t = s.actual.items.reduce((a, x) => a + (Number(x.t) || 0), 0); return ['Compra en curso' + (t > 0 ? ' · $' + Math.round(t).toLocaleString('es-CL') : ''), false]; } return [CORTO.super, false]; }
+  if (m.id === 'foco') { const s = leer(pid, 'foco-timer-v1'); if (s && s.run) return [s.run.phase === 'descanso' ? 'En descanso' : 'Enfocado ahora', false]; }
+  if (m.id === 'english') { const v = minHoy('english'); return v ? [v >= 10 ? fmtMin(v) + ' hoy ✓' : v + ' de 10 min hoy', v >= 10] : ['Meta: 10 min al día', false]; }
+  if (m.id === 'lectura') { const g = Number(docSettings(pid, 'foco-lectura-v1').goal) || 20, v = minHoy('lectura'); return v ? [v >= g ? fmtMin(v) + ' hoy ✓' : v + ' de ' + g + ' min hoy', v >= g] : ['Meta: ' + g + ' min al día', false]; }
+  if (m.id === 'ejercicio') {
+    const g = Number(docSettings(pid, 'foco-ejercicio-v1').goalMin) || 200, pd = minutosPorDia('ejercicio', pid), lun = lunesDe(new Date());
+    let v = 0; for (let i = 0; i < 7; i++) v += pd[sumaDias(lun, i)] || 0; v = Math.floor(v);
+    return v ? [v >= g ? fmtMin(v) + ' esta semana ✓' : v + ' de ' + g + ' min esta semana', v >= g] : ['Meta: ' + g + ' min a la semana', false];
+  }
+  if (m.id === 'memoria') {
+    const s = leer(pid, 'foco-memoria-v1'), v = minHoy('memoria');
+    if (s) { const t = hoyK; let n = (s.cosas || []).filter(c => c.due <= t).length + ((s.caras && s.caras.people) || []).filter(p => p.box >= 0 && p.due <= t).length;
+      const L = s.pal && s.pal.last; if (L && L.date < t && !L.reviewed && L.items) n += L.items.length;
+      if (n) return [n + ' por repasar hoy', false]; }
+    return v ? [fmtMin(v) + ' hoy', false] : [CORTO.memoria, false];
+  }
+  if (m.id === 'foco' || m.id === 'sql') { const v = minHoy(m.id); return v ? [fmtMin(v) + ' hoy', false] : [CORTO[m.id], false]; }
+  return [CORTO[m.id] || '', false];
+}
+const nombreBonito = n => { n = String(n || '').trim().split(' ')[0]; return n.charAt(0).toUpperCase() + n.slice(1); };
 function saludo(){ const h = new Date().getHours(); return h >= 5 && h < 12 ? ['Buenos días', SOL] : h >= 12 && h < 20 ? ['Buenas tardes', TARDE] : ['Buenas noches', LUNA]; }
 const ocultos = id => { try { return JSON.parse(ls.get('fp.hidden.' + id) || '[]'); } catch(e) { return []; } };
 function menu(){
   const p = yo(), d = new Date(), [sal, icono] = saludo(), hid = ocultos(p.id);
   const fecha = DIAS_N[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES_N[d.getMonth()];
   const vis = MODULOS.filter(m => !hid.includes(m.id));
-  $('#app').innerHTML = `<section class="hello hi2"><small>${fecha}</small><h1>${icono}<span>${sal}, ${esc(p.name.split(' ')[0])}</span></h1></section>
+  $('#app').innerHTML = `<section class="hello hi2"><div class="hi2-top"><small>${fecha}</small><button class="av2" id="cambiar" style="background:${COLORES[(p.c || 0) % COLORES.length]}" aria-label="Cambiar de perfil (ahora: ${esc(p.name)})" title="${esc(p.name)}">${esc(inicial(p.name))}</button></div><h1>${icono}<span>${sal}, ${esc(nombreBonito(p.name))}</span></h1><button class="semlink" id="misemana">Ver mi resumen semanal <span aria-hidden="true">→</span></button></section>
   <nav class="lst" aria-label="Módulos">${vis.map(m => {
-    let st = []; try { st = m.estado(p.id) || []; } catch(e) {}
+    let st = [CORTO[m.id] || '', false]; try { st = estadoHoy(m, p.id); } catch(e) {}
     return `<a class="lr" href="${m.href}" style="--c:${m.color}"><span class="ic2" aria-hidden="true">${m.icono}</span>
-      <span class="t"><b>${m.nombre}</b><span>${CORTO[m.id] || ''}</span></span>${st[0] ? `<span class="pl">${esc(st[0])}</span>` : ''}<span class="ch" aria-hidden="true">›</span></a>`; }).join('')}
+      <span class="t"><b>${m.nombre}</b><span${st[1] ? ' class="ok"' : ''}>${esc(st[0])}</span></span><span class="ch" aria-hidden="true">›</span></a>`; }).join('')}
   </nav>
   ${esIOS ? '' : tarjetaInstalar()}
   <div class="lst" style="margin-top:16px">
@@ -417,6 +480,76 @@ function menu(){
   const ib = $('#instalar'); if (ib) ib.onclick = async () => { const a = aviso; aviso = null; a.prompt(); try { await a.userChoice; } catch(e) {} render(); };
   $('#bajar').onclick = abrirRespaldo;
   $('#elegir').onclick = elegirModulos;
+  $('#cambiar').onclick = () => { vista = 'quien'; render(); };
+  $('#misemana').onclick = () => { semanaIni = lunesDe(new Date()); vista = 'semana'; render(); };
+}
+/* ---------- Mi semana: los mismos 7 días en todos los módulos que registran tiempo ---------- */
+let semanaIni = null;
+const ymdL = d => d.toLocaleDateString('en-CA');
+function lunesDe(d){ const x = new Date(d); x.setHours(12,0,0,0); x.setDate(x.getDate() - (x.getDay() + 6) % 7); return ymdL(x); }
+const sumaDias = (k, n) => { const d = new Date(k + 'T12:00:00'); d.setDate(d.getDate() + n); return ymdL(d); };
+function minutosPorDia(id, pid){
+  const m = {}, add = (k, v) => { if (k && v > 0) m[k] = (m[k] || 0) + v; };
+  if (id === 'english') { const s = leer(pid, 'focoEnglish:main'); for (const k in (s && s.daily) || {}) add(k, s.daily[k] / 60); }
+  if (id === 'ejercicio') { const a = leer(pid, 'foco-ejercicio-v1') || {}; for (const k in a) { const x = a[k]; if (x && x.kind === 'ses') add(x.date, Number(x.min) || 0); } }
+  if (id === 'lectura') { const a = leer(pid, 'foco-lectura-v1') || {}; for (const k in a) { const x = a[k]; if (x && x.kind === 'session') add(String(x.date || ''), Number(x.seconds ?? (Number(x.minutes) || 0) * 60) / 60); } }
+  if (id === 'foco') { const s = leer(pid, 'foco-timer-v1'); for (const x of (s && s.ses) || []) add(x.date, Number(x.min) || 0); }
+  if (id === 'sql') { const s = leer(pid, 'foco-sql'); for (const k in (s && s.daily) || {}) add(k, s.daily[k] / 60); }
+  if (id === 'memoria') { const s = leer(pid, 'foco-memoria-v1'); for (const k in (s && s.daily) || {}) add(k, s.daily[k] / 60); }
+  return m;
+}
+function semana(){
+  const p = yo(), hid = ocultos(p.id), hoy = ymdL(new Date()), lunesHoy = lunesDe(new Date());
+  if (!semanaIni) semanaIni = lunesHoy;
+  const dias = [0,1,2,3,4,5,6].map(i => sumaDias(semanaIni, i));
+  const a = new Date(dias[0] + 'T12:00:00'), b = new Date(dias[6] + 'T12:00:00');
+  const rango = a.getMonth() === b.getMonth() ? `${a.getDate()} al ${b.getDate()} de ${MESES_N[b.getMonth()]}` : `${a.getDate()} de ${MESES_N[a.getMonth()].slice(0,3)} al ${b.getDate()} de ${MESES_N[b.getMonth()].slice(0,3)}`;
+  const visibles = ['english','ejercicio','lectura','memoria','foco','sql'].map(id => MODULOS.find(m => m.id === id)).filter(m => m && !hid.includes(m.id));
+  // Total de la semana (lunes a domingo), sumando solo los módulos que miden tiempo y están visibles
+  const totDia = {}; let totSem = 0;
+  visibles.forEach(m => { const pd = minutosPorDia(m.id, p.id); dias.forEach(k => { const v = Math.floor(pd[k] || 0); totDia[k] = (totDia[k] || 0) + v; totSem += v; }); });
+  const fDia = v => v >= 60 ? Math.floor(v / 60) + ':' + String(v % 60).padStart(2, '0') + '<small>h</small>' : v + '<small>min</small>';
+  const total = visibles.length ? `<div class="sem-m sem-tot" style="--c:var(--ink)"><div class="sem-mh"><div style="flex:1"><div class="sem-tl">Total de la semana</div><div class="sem-tv">${totSem >= 60 ? Math.floor(totSem / 60) + ' h ' : ''}${totSem % 60} <span>min</span></div></div><span class="sem-tn">en ${visibles.length} ${visibles.length === 1 ? 'módulo' : 'módulos'}</span></div>
+    <div class="sem-c">${dias.map(k => { const v = totDia[k] || 0; if (k > hoy) return '<div class="sem-b fu"></div>'; return v ? `<div class="sem-b on ${k === hoy ? 'td' : ''}">${fDia(v)}</div>` : `<div class="sem-b ${k === hoy ? 'td' : ''}">–</div>`; }).join('')}</div></div>` : '';
+  const filas = visibles.map(m => {
+    const pd = minutosPorDia(m.id, p.id);
+    let tot = 0;
+    const cel = dias.map(k => { const v = Math.floor(pd[k] || 0); tot += v; if (k > hoy) return '<div class="sem-b fu"></div>';
+      return v ? `<div class="sem-b on ${k === hoy ? 'td' : ''}">${v}<small>min</small></div>` : `<div class="sem-b ${k === hoy ? 'td' : ''}">–</div>`; }).join('');
+    return `<a class="sem-m" href="${m.href}" style="--c:${m.color};color:inherit;text-decoration:none"><div class="sem-mh"><span class="ic3" aria-hidden="true">${m.icono}</span><b>${m.nombre}</b><span class="tot">${tot >= 60 ? Math.floor(tot / 60) + ' h ' + (tot % 60) : tot} <small>min</small></span></div><div class="sem-c">${cel}</div></a>`;
+  }).join('');
+  $('#app').innerHTML = `<div class="sem-hd"><button class="link" id="volverS" style="margin:0;padding:6px 0;text-decoration:none">‹ Inicio</button><b style="font-size:17px">Mi semana</b><span style="width:60px"></span></div>
+    <div class="sem-nav"><button id="semAnt" aria-label="Semana anterior">‹</button><div style="text-align:center"><b>${semanaIni === lunesHoy ? 'Esta semana' : semanaIni === sumaDias(lunesHoy, -7) ? 'Semana pasada' : 'Semana'}</b><div style="font-size:13px;color:var(--muted)">${rango}</div></div><button id="semSig" aria-label="Semana siguiente" ${semanaIni >= lunesHoy ? 'disabled' : ''}>›</button></div>
+    <div class="sem-dl">${['L','M','M','J','V','S','D'].map(x => `<span>${x}</span>`).join('')}</div>
+    ${total}${filas || '<p style="text-align:center;color:var(--muted);padding:20px 0">Cuando registres tiempo en Inglés, Ejercicio, Lectura o Foco, aquí verás tu semana.</p>'}
+    <p style="text-align:center;color:var(--muted);font-size:13px">Toca un módulo para abrirlo.</p>`;
+  $('#volverS').onclick = () => { vista = 'menu'; render(); };
+  $('#semAnt').onclick = () => { semanaIni = sumaDias(semanaIni, -7); render(); };
+  $('#semSig').onclick = () => { if (semanaIni < lunesHoy) { semanaIni = sumaDias(semanaIni, 7); render(); } };
+}
+
+/* Primera vez de un perfil: elegir hasta 3 módulos para no abrumar. El resto queda en "Elegir módulos". */
+function empezar(){
+  const p = yo(); if (!p) { vista = 'menu'; return render(); }
+  let sel = [];
+  const pintar = () => {
+    $('#app').innerHTML = `<section class="hello" style="padding-bottom:4px"><small style="font:800 12px/1 system-ui;letter-spacing:.08em;color:var(--muted)">PRIMERA VEZ</small>
+      <h1 style="margin-top:8px">¿Con qué quieres empezar?</h1><p>Elige hasta 3. Los demás quedan guardados en “Elegir módulos” para cuando quieras.</p></section>
+    <nav class="lst" aria-label="Elige hasta 3 módulos">${MODULOS.map(m => { const on = sel.includes(m.id); return `<button class="lr" data-m="${m.id}" role="checkbox" aria-checked="${on}" style="--c:${m.color};${!on && sel.length >= 3 ? 'opacity:.5' : ''}">
+      <span class="ic2" aria-hidden="true">${m.icono}</span><span class="t"><b>${m.nombre}</b><span>${esc(m.desc)}</span></span>
+      <span aria-hidden="true" style="flex:none;width:28px;height:28px;border-radius:99px;display:grid;place-items:center;font-weight:800;${on ? 'background:var(--teal,#0E8A7E);color:#fff' : 'border:2px solid var(--line)'}">${on ? '✓' : ''}</span></button>`; }).join('')}</nav>
+    <div style="position:sticky;bottom:0;padding:14px 0 18px;background:linear-gradient(transparent,var(--bg) 35%)">
+      <button class="btn full" id="emp-ok" ${sel.length ? '' : 'disabled style="opacity:1;background:var(--line);color:var(--muted);box-shadow:none"'}>${sel.length ? 'Empezar con ' + sel.length + (sel.length === 1 ? ' módulo' : ' módulos') : 'Elige al menos 1'}</button>
+      <button class="link" id="emp-todos" style="display:block;margin:10px auto 0">Prefiero ver todos</button></div>`;
+    document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => {
+      const id = b.dataset.m;
+      if (sel.includes(id)) sel = sel.filter(x => x !== id); else if (sel.length < 3) sel.push(id); else { toast('Máximo 3 para empezar'); return; }
+      pintar();
+    });
+    $('#emp-ok').onclick = () => { ls.set('fp.hidden.' + p.id, JSON.stringify(MODULOS.map(m => m.id).filter(id => !sel.includes(id)))); vista = 'menu'; render(); toast('¡Hola, ' + nombreBonito(p.name) + '!'); };
+    $('#emp-todos').onclick = () => { vista = 'menu'; render(); toast('¡Hola, ' + nombreBonito(p.name) + '!'); };
+  };
+  pintar();
 }
 function elegirModulos(){
   const p = yo(); let hid = ocultos(p.id);

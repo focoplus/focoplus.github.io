@@ -493,8 +493,21 @@ const store = {
 const today = () => new Date().toISOString().slice(0,10);
 const fresh = () => ({done:{}, stats:{}, runs:{}, inprog:{}, xp:0, streak:0, lastDay:null});
 let P = Object.assign(fresh(), store.get() || {});
-P.stats = P.stats || {}; P.runs = P.runs || {}; P.inprog = P.inprog || {};
+P.stats = P.stats || {}; P.runs = P.runs || {}; P.inprog = P.inprog || {}; P.daily = P.daily || {};
 function save(){ store.set(P); }
+/* Medidor de minutos: cuenta solo dentro de una lección; las pausas suman como máximo 1 minuto */
+const ACT = {last:0};
+const dayKey = () => new Date().toLocaleDateString('en-CA');
+function actTick(){
+  const now = Date.now();
+  if (S.screen !== 'lesson' || document.hidden){ ACT.last = 0; return; }
+  if (ACT.last){ const d = Math.min(now - ACT.last, 60000); if (d > 0){ const k = dayKey(); P.daily = P.daily || {}; P.daily[k] = (P.daily[k] || 0) + d/1000; save(); } }
+  ACT.last = now;
+}
+function actStop(){ actTick(); ACT.last = 0; }
+const todayMin = () => Math.floor(((P.daily || {})[dayKey()] || 0) / 60);
+['pointerdown','keydown','input'].forEach(ev => document.addEventListener(ev, actTick, true));
+document.addEventListener('visibilitychange', () => { if (document.hidden) actStop(); else if (S.screen === 'lesson') ACT.last = Date.now(); });
 function bumpStreak(){
   const t = today();
   if (P.lastDay === t) return;
@@ -540,7 +553,7 @@ function nextIndex(){ const i = LESSONS.findIndex(l => !P.done[l.id]); return i 
 function statusOf(l){ return !P.done[l.id] ? '' : (P.stats[l.id] && P.stats[l.id].weak ? 'weak' : 'done'); }
 function topbar(){
   return `<div class="top"><div class="brand"><h1>Foco <span>SQL</span></h1></div>
-  <div class="stats"><span class="pill" title="Puntos">${P.xp} <small>XP</small></span><span class="pill" title="Días seguidos">${P.streak||0} <small>${P.streak===1?'día':'días'}</small></span></div></div>`;
+  <div class="stats"><span class="pill" title="Puntos">${P.xp} <small>XP</small></span><span class="pill" title="Minutos de SQL hoy">${todayMin()} <small>min hoy</small></span></div></div>`;
 }
 function setActions(html){
   const bar = $('#actionbar');
@@ -549,6 +562,7 @@ function setActions(html){
 }
 
 function renderMap(){
+  if (S.screen === 'lesson') actStop();
   S.screen = 'map';
   const ni = nextIndex();
   const total = LESSONS.length, doneN = LESSONS.filter(l=>P.done[l.id]).length;
@@ -594,9 +608,11 @@ function openLesson(i, restart){
   const saved = !restart && P.inprog[id];
   if (saved){
     S = Object.assign({tries:0, solved:false, draft:'', order:null, sawSol:false, finished:false}, saved, {screen:'lesson', li:i});
+    ACT.last = Date.now();
   } else {
     const run = P.runs[id] || 0;
     P.runs[id] = run + 1;
+    ACT.last = Date.now();
     S = {screen:'lesson', li:i, run, step:0, maxStep:0, solvedSteps:[], tries:0, solved:false, draft:'', lessonXp:0, errors:0, missed:[], order:null, sawSol:false, finished:false};
     persist();
   }
@@ -769,6 +785,7 @@ function renderWrite(l, ch){
 }
 const WEAK_AT = 2; // con 2 o más errores la lección queda "por reforzar"
 function renderDone(l){
+  actTick();
   if (!S.finished){
     S.finished = true;
     const weak = S.errors >= WEAK_AT;

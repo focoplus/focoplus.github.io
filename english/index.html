@@ -223,11 +223,6 @@ details.why summary{cursor:pointer;font-weight:700;padding-block:12px;font-famil
 .err{color:var(--bad);margin:0;font-weight:700;font-size:15px}
 .prof .link{justify-self:center}
 /* Plan si-entonces, progreso real, mini-hitos */
-.plan{background:var(--surface);border:2px dashed var(--teal);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px}
-.plan p{margin:0}
-.plan.set{border-style:solid;grid-template-columns:1fr auto;align-items:center}
-.plan .chips{justify-content:flex-start;margin:0}
-.plan .chip{font-size:15px;padding:8px 12px}
 .link{color:var(--teal);font-weight:700;text-decoration:underline;padding:6px}
 .known{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .kn{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;min-width:0}
@@ -350,7 +345,10 @@ let S=fresh();
 function peek(id){try{return JSON.parse(ls.get('focoEnglish:'+id))||{}}catch(e){return{}}}
 function loadProfile(id){P.cur=id;saveP();const s=Object.assign(fresh(),peek(id));
  if(s.day!==TODAY){s.day=TODAY;s.today=0}
- if(s.last&&s.last!==TODAY&&s.last!==YEST)s.streak=0;
+ if(s.last&&s.last!==TODAY&&s.last!==YEST){
+  // Racha que perdona: 1 día libre por semana (Lally y colegas: saltarse un día suelto no frena el hábito)
+  const d2=new Date(Date.now()-2*864e5).toLocaleDateString('en-CA'),y=new Date(YEST+'T12:00:00');y.setDate(y.getDate()-((y.getDay()+6)%7));const wk=y.toLocaleDateString('en-CA');
+  if(s.last===d2&&s.streak>0&&s.freeWk!==wk){s.freeWk=wk;s.freeDay=YEST;s.last=YEST}else s.streak=0}
  s.due=s.due||{};Object.keys(s.boxes).forEach(k=>{if(!s.due[k])s.due[k]=TODAY});
  S=s;sessionRounds=0}
 const me=()=>P.list.find(p=>p.id===P.cur)||{name:'',c:0};
@@ -360,9 +358,17 @@ const initial=n=>(n.trim()[0]||'?').toUpperCase();
 const addDays=n=>new Date(Date.now()+n*864e5).toLocaleDateString('en-CA');
 const GAPS=[0,1,2,4,7,14];
 function setBox(k,ok){const b=Math.max(0,Math.min(5,(S.boxes[k]||0)+(ok?1:-1)));S.boxes[k]=b;S.due[k]=ok?addDays(GAPS[b]):TODAY}
-const PLANS=['tomo mi café','termino de almorzar','voy en el transporte','llego a casa','termino mi jornada'];
 function save(){if(P.cur)ls.set('focoEnglish:'+P.cur,JSON.stringify(S))}
-const GOAL=3;
+/* Minutos de práctica por día: se cuenta solo mientras juegas; una pausa larga suma como máximo 1 minuto */
+const ACT={on:false,last:0};
+function actTick(){if(!ACT.on)return;const now=Date.now(),d=Math.min(now-ACT.last,60000);ACT.last=now;if(d<=0)return;const k=new Date().toLocaleDateString('en-CA');S.daily=S.daily||{};S.daily[k]=(S.daily[k]||0)+d/1000}
+function actStart(){if(!ACT.on){ACT.on=true;ACT.last=Date.now()}}
+function actStop(){if(ACT.on){actTick();ACT.on=false;save()}}
+document.addEventListener('pointerdown',actTick,true);document.addEventListener('keydown',actTick,true);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&ACT.on){actTick();save()}});
+const todayMin=()=>Math.floor(((S.daily||{})[new Date().toLocaleDateString('en-CA')]||0)/60);
+const GOAL=10; // minutos al día
+const cap=n=>{n=String(n||'').trim();return n.charAt(0).toUpperCase()+n.slice(1)};
 
 /* ---------- Utilidades ---------- */
 const $=s=>document.querySelector(s);
@@ -424,7 +430,7 @@ function speak(t){if(!canSpeak)return;try{speechSynthesis.cancel();const u=new S
 /* ---------- Barra superior ---------- */
 function renderTop(){const L=levelInfo(S.xp),m=me();$('#top').innerHTML=`
  <button class="av" id="who" style="background:${AVC[m.c%AVC.length]}" aria-label="Cambiar jugador (ahora juega ${esc(m.name)})" title="Cambiar jugador">${esc(initial(m.name))}</button>
- <div class="xpwrap"><div class="label"><span class="tn">${esc(m.name)}</span> · Nivel ${L.l} · <span class="num">${L.r}/${L.need}</span> XP</div><div class="xpbar"><i style="width:${L.r/L.need*100}%"></i></div></div>
+ <div class="xpwrap"><div class="label"><span class="tn">${esc(cap(m.name))}</span> · Nivel ${L.l} · <span class="num">${L.r}/${L.need}</span> XP</div><div class="xpbar"><i style="width:${L.r/L.need*100}%"></i></div></div>
  <span class="pill" title="Días seguidos">${I.flame}<span class="num">${S.streak}</span></span>
  <button class="iconbtn" id="snd" aria-pressed="${S.sound}" aria-label="Sonido">${I.sound}</button>`;
  $('#snd').onclick=()=>{S.sound=!S.sound;save();renderTop()};
@@ -474,30 +480,29 @@ function cefrLadder(){return `<div class="mcer"><span class="label">Niveles del 
  <p>Todo el contenido está ordenado según esta escala internacional, que va de <b>A1</b> (principiante) a <b>C2</b> (dominio). Hoy el juego cubre el nivel <b>A1</b>, y el camino de trabajo llega a <b>A2</b>. Los niveles siguientes se irán agregando.</p></div>`}
 
 /* ---------- Inicio ---------- */
-function ring(p){const r=24,c=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 58 58"><circle cx="29" cy="29" r="${r}" fill="none" stroke="var(--chip)" stroke-width="7"/><circle cx="29" cy="29" r="${r}" fill="none" stroke="var(--teal)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.min(p,1))}" transform="rotate(-90 29 29)"/><text x="29" y="34" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="15" fill="var(--ink)">${Math.min(S.today,GOAL)}/${GOAL}</text></svg>`}
-function planBlock(){
- if(S.planDay===TODAY&&S.plan)return `<div class="plan set"><div><span class="label">Tu plan de hoy</span><p><b>Si</b> ${esc(S.plan)}, <b>entonces</b> juego 1 ronda.</p></div><button class="link" id="planEdit">Cambiar</button></div>`;
- return `<div class="plan"><span class="label">Antes de jugar · 5 segundos</span><p>¿En qué momento vas a jugar hoy? Elige uno concreto.</p><div class="chips">${PLANS.map(p=>`<button class="chip" data-p="${esc(p)}">Si ${esc(p)}…</button>`).join('')}</div></div>`}
+function ring(p){const r=24,c=2*Math.PI*r;return `<svg class="ring" viewBox="0 0 58 58"><circle cx="29" cy="29" r="${r}" fill="none" stroke="var(--chip)" stroke-width="7"/><circle cx="29" cy="29" r="${r}" fill="none" stroke="var(--teal)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.min(p,1))}" transform="rotate(-90 29 29)"/><text x="29" y="34" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="14" fill="var(--ink)">${Math.min(todayMin(),GOAL)}/${GOAL}</text></svg>`}
 function progressBlock(){
  const all=UNITS.flatMap(cardsOf).filter(c=>box(c.key)>=2),w=all.filter(c=>c.kind==='item').length,s=all.filter(c=>c.kind!=='item');
  const ex=s.length?pick(s):null,exT=ex?(ex.kind==='sent'?ex.en:ex.q.replace('___',ex.a)):'';
  return `<div class="known"><div class="kn"><b class="num">${w}</b><span>${w===1?'palabra que ya reconoces':'palabras que ya reconoces'}</span></div><div class="kn"><b class="num">${s.length}</b><span>${s.length===1?'frase que ya armas':'frases que ya armas'}</span></div>
  ${ex?`<p class="ex"><span class="label">Ya puedes escribir</span>«${esc(exT)}»</p>`:`<p class="ex muted">Cuando aciertes algo 2 veces, aparecerá aquí como aprendido.</p>`}</div>`}
 function daysAway(){if(!S.last)return 0;return Math.round((new Date(TODAY+'T12:00')-new Date(S.last+'T12:00'))/864e5)}
-function home(){closeFb();
+function home(){closeFb();actStop();
  if(daysAway()>=3&&S.welcomed!==TODAY&&S.xp>0)return welcomeBack();
  renderTop();
  const curId=curUnit().id;
  const due=dueCards();
- const nm=esc((me().name||'').split(' ')[0]);
- const hiMsg=due.length?`Hoy toca repasar <b>${due.length}</b> ${due.length===1?'palabra':'palabras'}. Son 2 minutos.`:S.today>=GOAL?'Meta de hoy cumplida. Lo que sigue es bonus.':S.today?'Una ronda más y sigues sumando.':'Una ronda de 2 minutos y sigues donde ibas.';
+ const nm=esc(cap((me().name||'').split(' ')[0]));
+ const tm=todayMin(),met=tm>=GOAL,falta=GOAL-tm;
+ const hiMsg=due.length?`${tm?`Hoy llevas <strong style="color:var(--ink);font-weight:700">${tm} min</strong> de inglés. `:''}Hoy toca repasar <b>${due.length}</b> ${due.length===1?'palabra':'palabras'}. Son 2 minutos.`:tm?`Hoy llevas <strong style="color:var(--ink);font-weight:700">${tm} min</strong> de inglés.`:'Una ronda de 2 minutos y sigues donde ibas.';
+ const goalMsg=met?'Meta cumplida. Lo que sigue es bonus.':tm?(falta<=2?`Llevas ${tm} min. Una ronda más (~2 min) y la cumples.`:`Llevas ${tm} min. Te faltan ${falta}.`):'Cada ronda dura unos 2 minutos. Una a la vez.';
  $('#app').innerHTML=`
  <section class="hero">
-  <div class="hi">${foquito(S.today>=GOAL?'bien':'tranquilo',62)}<div><b>¡Hola${nm?', '+nm:''}!</b><span>${hiMsg}</span></div></div>
-  ${planBlock()}
-  <div class="goal">${ring(S.today/GOAL)}<div><b>Meta de hoy: ${GOAL} rondas</b><p>${S.today>=GOAL?'Meta cumplida. Lo que sigue es bonus.':'Cada ronda son 10 preguntas cortas. Una a la vez.'}</p></div></div>
+  <div class="hi">${foquito(met?'bien':'tranquilo',62)}<div><b>¡Hola${nm?', '+nm:''}!</b><span>${hiMsg}</span></div></div>
+  ${S.freeDay===YEST&&S.streak>0?`<div class="goal"><span style="font-size:30px;line-height:1" aria-hidden="true">🔥</span><div><b>Tu racha de ${S.streak} ${S.streak===1?'día':'días'} sigue</b><p>Ayer descansaste y no pasa nada: tienes 1 día libre por semana para descansar sin perder la racha.</p></div></div>`:''}
+  <div class="goal">${ring(tm/GOAL)}<div><b>Meta de hoy: ${GOAL} min</b><p>${goalMsg}</p></div></div>
   ${progressBlock()}
-  <div class="row">${due.length?`<button class="btn" id="rev">${I.bolt}<span>Repaso de hoy (${due.length})</span></button><button class="btn ghost" id="quick">Aprender más</button>`:`<button class="btn full" id="quick">${I.bolt} Jugar ahora</button>`}</div>
+  <div class="row">${due.length?`<button class="btn" id="rev">${I.bolt}<span>Repaso de hoy (${due.length})</span></button><button class="btn ghost" id="quick">Aprender más</button>`:`<button class="btn full" id="quick">${I.bolt} Jugar 1 ronda (~2 min)</button>`}</div>
   <label class="pill" style="justify-self:start;cursor:pointer"><input type="checkbox" id="turbo" ${S.turbo?'checked':''}> Modo turbo: bonus por responder en menos de 5 s</label>
  </section>
  ${WORLDS.filter(w=>!w.adult||isAdult()).map(w=>{const wi=WORLDS.indexOf(w),pw=WORLDS[wi-1];return `
@@ -523,7 +528,6 @@ function home(){closeFb();
    <li><b>Variedad constante.</b><p>Cada ronda mezcla 6 formatos (traducir, escuchar, completar, ordenar, emparejar) para que el cerebro no se habitúe. Cada 3 rondas aparece una pausa activa de 20 segundos.</p></li>
    <li><b>Repaso espaciado entre días.</b><p>Intentar recordar rinde más que releer, y los estudios con universitarios con TDAH muestran que también les funciona (Knouse y colegas; Stern y Halamish, 2023). Cada acierto aleja el próximo repaso (1, 2, 4, 7 y 14 días) y cada error lo trae de vuelta a hoy. <a href="https://www.researchgate.net/publication/276830824_Does_Testing_Improve_Learning_for_College_Students_With_Attention-DeficitHyperactivity_Disorder" target="_blank" rel="noopener">Ver estudio</a></p></li>
    <li><b>Premios frecuentes, castigos suaves.</b><p>El grupo de Luman y Oosterlaan (VU Ámsterdam, 2008) encontró que en TDAH pesa más la frecuencia de premios y castigos que su tamaño. Por eso hay un mini-premio cada 3 preguntas, cofres más seguidos y más chicos, y un error solo baja el combo un nivel. <a href="https://acamh.onlinelibrary.wiley.com/doi/10.1111/j.1469-7610.2008.01910.x" target="_blank" rel="noopener">Ver estudio</a></p></li>
-   <li><b>Plan "si… entonces".</b><p>Gawrilow y Gollwitzer mostraron que formular un plan concreto ("si pasa X, entonces hago Y") mejora el autocontrol en TDAH, y que el efecto se suma al de la medicación. Por eso el juego te pide elegir tu momento del día. <a href="https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2015.00395/full" target="_blank" rel="noopener">Ver revisión</a></p></li>
    <li><b>Progreso real, no solo puntos.</b><p>Hanus y Fox (2015) vieron que en un curso con insignias y rankings la motivación cayó a mitad de semestre. Por eso el inicio muestra cuántas palabras y frases ya dominas y un ejemplo de lo que ya puedes escribir, y no hay ranking entre jugadores. <a href="https://www.academia.edu/12454798/Assessing_the_Effects_of_Gamification_in_the_Classroom_A_Longitudinal_Study_on_Intrinsic_Motivation_Social_Comparison_Satisfaction_Effort_and_Academic_Performance" target="_blank" rel="noopener">Ver estudio</a></p></li>
   </ol>
  </details>`;
@@ -531,13 +535,11 @@ function home(){closeFb();
  document.querySelectorAll('.unit').forEach(b=>b.onclick=()=>{sfx.tap();const u=U[b.dataset.u];S.learned[u.id]?startRound(u):learn(u)});
  $('#quick').onclick=()=>{sfx.tap();quickStart()};
  if($('#rev'))$('#rev').onclick=()=>{sfx.tap();startReview()};
- document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{S.plan=b.dataset.p;S.planDay=TODAY;save();sfx.ok(0);home();toast('Plan guardado')});
- if($('#planEdit'))$('#planEdit').onclick=()=>{S.planDay='';save();home()};
 }
 
 /* ---------- Volver sin culpa (3 días o más sin jugar) ---------- */
 function welcomeBack(){renderTop();
- const nm=esc((me().name||'').split(' ')[0]);
+ const nm=esc(cap((me().name||'').split(' ')[0]));
  const w=UNITS.flatMap(cardsOf).filter(c=>c.kind==='item'&&box(c.key)>=2).length,L=levelInfo(S.xp).l,due=dueCards().length;
  $('#app').innerHTML=`<section class="back">
   <span class="label">Foco English</span>
@@ -555,7 +557,7 @@ function welcomeBack(){renderTop();
 }
 
 /* ---------- Aprender (vocabulario antes de evaluar) ---------- */
-function learn(u){closeFb();let i=u.rule?-1:0;const items=u.items;
+function learn(u){closeFb();actStart();let i=u.rule?-1:0;const items=u.items;
  function draw(){
   if(i===-1){$('#app').innerHTML=`<section class="center"><div class="label">${esc(u.name)} · La regla</div><div class="rule">${u.rule}</div><button class="btn full" id="nx">Ver palabras</button><button class="btn ghost full" id="bk">Volver</button></section>`;
    $('#nx').onclick=()=>{i=0;draw()};$('#bk').onclick=home;return}
@@ -584,7 +586,7 @@ function buildQueue(pool,N=10){const items=pool.filter(c=>c.kind==='item'),q=[];
   const c=weightedCard(pool,lastKey);let ts=typesFor(c).filter(t=>t!==lastType);if(!ts.length)ts=typesFor(c);
   const t=pick(ts);q.push({type:t,card:c});lastType=t;lastKey=c.key}
  return q}
-function startRound(u){closeFb();R={u,q:u.review?buildQueue(u.pool,Math.min(10,Math.max(5,u.pool.length))):buildQueue(cardsOf(u)),i:0,res:[],xp:0,combo:0,best:0,retries:0};renderTop();ask()}
+function startRound(u){closeFb();actStart();R={u,q:u.review?buildQueue(u.pool,Math.min(10,Math.max(5,u.pool.length))):buildQueue(cardsOf(u)),i:0,res:[],xp:0,combo:0,best:0,retries:0};renderTop();ask()}
 function dueCards(){return UNITS.filter(u=>unlocked(u)&&S.learned[u.id]).flatMap(cardsOf).filter(c=>S.due[c.key]&&S.due[c.key]<=TODAY)}
 function startReview(){const pool=dueCards();if(!pool.length)return quickStart();startRound({id:'review',name:'Repaso del día',review:true,pool,items:[]})}
 function curUnit(){const m=mainUnits();return m.find(u=>unlocked(u)&&mastery(u)<UNLOCK)||m.filter(unlocked).pop()||m[0]}
@@ -696,7 +698,7 @@ function showFb(ok,title,body){const fb=$('#fb');fb.className='fb show '+(ok?'ok
 function closeFb(){$('#fb').className='fb'}
 
 /* ---------- Fin de ronda ---------- */
-function finish(){closeFb();stopTimer();
+function finish(){closeFb();stopTimer();actTick();
  const firstTry=R.q.map((q,k)=>({q,r:R.res[k]})).filter(x=>!x.q.retry);
  const acc=firstTry.filter(x=>x.r).length/firstTry.length;
  const stars=acc>=.9?3:acc>=.7?2:1;
